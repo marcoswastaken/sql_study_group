@@ -1,0 +1,456 @@
+{
+  "metadata": {
+    "database_name": "data_jobs.db",
+    "description": "Normalized schema for real-world data analytics job postings dataset",
+    "total_tables": 6,
+    "total_records": 987313,
+    "source": "Luke Barousse Data Jobs Dataset from HuggingFace",
+    "original_dataset_size": 785741,
+    "normalization_approach": "Dimensional modeling with fact table (jobs) and dimension tables (companies, locations, platforms, skills)",
+    "year": "2023",
+    "creation_date": "2024",
+    "use_cases": [
+      "SQL practice exercises",
+      "JOIN operations training",
+      "Database normalization examples",
+      "Real-world data analysis",
+      "Business intelligence tutorials"
+    ]
+  },
+  "tables": [
+    {
+      "id": 1,
+      "name": "companies",
+      "description": "Contains information about companies that post job listings",
+      "creation_query": "CREATE TABLE companies AS\nSELECT DISTINCT \n    ROW_NUMBER() OVER (ORDER BY company_name) as company_id,\n    company_name\nFROM raw_jobs_data \nWHERE company_name IS NOT NULL\nORDER BY company_name;",
+      "row_count": 139983,
+      "columns": [
+        {
+          "name": "company_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": true,
+          "description": "Unique identifier for each company",
+          "foreign_key": ""
+        },
+        {
+          "name": "company_name",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "description": "Name of the company posting the job",
+          "foreign_key": ""
+        }
+      ],
+      "sample_data": [
+        {
+          "company_id": "1",
+          "company_name": "Boehringer Ingelheim"
+        },
+        {
+          "company_id": "2",
+          "company_name": "Hewlett Packard Enterprise"
+        },
+        {
+          "company_id": "3",
+          "company_name": "ALPHA Augmented Services"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "job_skills",
+      "description": "Junction table linking jobs to their required skills (many-to-many relationship)",
+      "creation_query": "CREATE TABLE job_skills AS\nSELECT DISTINCT\n    j.job_id,\n    s.skill_id\nFROM jobs j\nCROSS JOIN skills s\nWHERE \n    -- Pattern matching job descriptions/titles for skill requirements\n    LOWER(j.job_title) LIKE '%' || LOWER(s.skill_name) || '%'\n    OR LOWER(j.job_title_short) LIKE '%' || LOWER(s.skill_name) || '%'\n    -- Additional skill detection logic would be applied here\nORDER BY j.job_id, s.skill_id;",
+      "row_count": 35125,
+      "columns": [
+        {
+          "name": "job_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": true,
+          "description": "Unique identifier for each job posting",
+          "foreign_key": ""
+        },
+        {
+          "name": "skill_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": true,
+          "description": "Unique identifier for each skill",
+          "foreign_key": ""
+        }
+      ],
+      "sample_data": [
+        {
+          "job_id": "1",
+          "skill_id": "1"
+        },
+        {
+          "job_id": "1",
+          "skill_id": "12"
+        },
+        {
+          "job_id": "2",
+          "skill_id": "4"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "jobs",
+      "description": "Main table containing all job postings with details like title, salary, and requirements",
+      "creation_query": "CREATE TABLE jobs AS\nSELECT \n    j.job_id,\n    c.company_id,\n    l.location_id, \n    p.platform_id,\n    j.job_title_short,\n    j.job_title,\n    j.job_schedule_type,\n    j.job_work_from_home,\n    j.job_posted_date,\n    j.job_no_degree_mention,\n    j.job_health_insurance,\n    j.salary_rate,\n    j.salary_year_avg,\n    j.salary_hour_avg\nFROM raw_jobs_data j\nLEFT JOIN companies c ON j.company_name = c.company_name\nLEFT JOIN locations l ON j.job_location = l.job_location AND j.job_country = l.job_country  \nLEFT JOIN platforms p ON j.job_via = p.platform_name;",
+      "row_count": 785741,
+      "columns": [
+        {
+          "name": "job_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": true,
+          "description": "Unique identifier for each job posting",
+          "foreign_key": ""
+        },
+        {
+          "name": "company_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "description": "Unique identifier for each company",
+          "foreign_key": "References companies.company_id"
+        },
+        {
+          "name": "location_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "description": "Unique identifier for each location",
+          "foreign_key": "References locations.location_id"
+        },
+        {
+          "name": "platform_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "description": "Unique identifier for each job posting platform",
+          "foreign_key": "References platforms.platform_id"
+        },
+        {
+          "name": "job_title_short",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "description": "Standardized job title category (e.g., \"Data Scientist\", \"Data Engineer\")",
+          "foreign_key": ""
+        },
+        {
+          "name": "job_title",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "description": "Full job title as posted by the company",
+          "foreign_key": ""
+        },
+        {
+          "name": "job_schedule_type",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "description": "Employment type (full-time, part-time, contract, etc.)",
+          "foreign_key": ""
+        },
+        {
+          "name": "job_work_from_home",
+          "type": "BOOLEAN",
+          "nullable": true,
+          "primary_key": false,
+          "description": "Boolean indicating if remote work is available",
+          "foreign_key": ""
+        },
+        {
+          "name": "job_posted_date",
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "primary_key": false,
+          "description": "Date and time when the job was posted",
+          "foreign_key": ""
+        },
+        {
+          "name": "job_no_degree_mention",
+          "type": "BOOLEAN",
+          "nullable": true,
+          "primary_key": false,
+          "description": "Boolean indicating if the job posting mentions no degree requirement",
+          "foreign_key": ""
+        },
+        {
+          "name": "job_health_insurance",
+          "type": "BOOLEAN",
+          "nullable": true,
+          "primary_key": false,
+          "description": "Boolean indicating if health insurance is mentioned as a benefit",
+          "foreign_key": ""
+        },
+        {
+          "name": "salary_rate",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "description": "Rate type for salary (yearly, hourly, etc.)",
+          "foreign_key": ""
+        },
+        {
+          "name": "salary_year_avg",
+          "type": "DECIMAL(10,2)",
+          "nullable": true,
+          "primary_key": false,
+          "description": "Average yearly salary in USD",
+          "foreign_key": ""
+        },
+        {
+          "name": "salary_hour_avg",
+          "type": "DECIMAL(8,2)",
+          "nullable": true,
+          "primary_key": false,
+          "description": "Average hourly salary in USD",
+          "foreign_key": ""
+        }
+      ],
+      "sample_data": [
+        {
+          "job_id": "1",
+          "company_id": "1",
+          "location_id": "1",
+          "platform_id": "1",
+          "job_title_short": "Senior Data Engineer",
+          "job_title": "Senior Clinical Data Engineer / Principal Clinical Data Engineer ...",
+          "job_schedule_type": "Full-time",
+          "job_work_from_home": "False",
+          "job_posted_date": "2023-06-16 13:44:15",
+          "job_no_degree_mention": "False",
+          "job_health_insurance": "False",
+          "salary_rate": "None",
+          "salary_year_avg": "None",
+          "salary_hour_avg": "None"
+        },
+        {
+          "job_id": "2",
+          "company_id": "2",
+          "location_id": "2",
+          "platform_id": "2",
+          "job_title_short": "Data Analyst",
+          "job_title": "Data Analyst",
+          "job_schedule_type": "Full-time",
+          "job_work_from_home": "False",
+          "job_posted_date": "2023-01-14 13:18:07",
+          "job_no_degree_mention": "False",
+          "job_health_insurance": "False",
+          "salary_rate": "None",
+          "salary_year_avg": "None",
+          "salary_hour_avg": "None"
+        },
+        {
+          "job_id": "3",
+          "company_id": "3",
+          "location_id": "3",
+          "platform_id": "3",
+          "job_title_short": "Data Engineer",
+          "job_title": "Data Engineer/Scientist/Analyst, Mid or Senior (m/f/x)",
+          "job_schedule_type": "Full-time",
+          "job_work_from_home": "False",
+          "job_posted_date": "2023-10-10 13:14:55",
+          "job_no_degree_mention": "False",
+          "job_health_insurance": "False",
+          "salary_rate": "None",
+          "salary_year_avg": "None",
+          "salary_hour_avg": "None"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "locations",
+      "description": "Geographic information for job locations including city and country",
+      "creation_query": "CREATE TABLE locations AS\nSELECT DISTINCT\n    ROW_NUMBER() OVER (ORDER BY job_location, job_country) as location_id,\n    job_location,\n    job_country\nFROM raw_jobs_data\nWHERE job_location IS NOT NULL\nORDER BY job_country, job_location;",
+      "row_count": 18545,
+      "columns": [
+        {
+          "name": "location_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": true,
+          "description": "Unique identifier for each location",
+          "foreign_key": ""
+        },
+        {
+          "name": "job_location",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "description": "City or geographic area where the job is located",
+          "foreign_key": ""
+        },
+        {
+          "name": "job_country",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "description": "Country where the job is located",
+          "foreign_key": ""
+        }
+      ],
+      "sample_data": [
+        {
+          "location_id": "1",
+          "job_location": "Watertown, CT",
+          "job_country": "United States"
+        },
+        {
+          "location_id": "2",
+          "job_location": "Guadalajara, Jalisco, Mexico",
+          "job_country": "Mexico"
+        },
+        {
+          "location_id": "3",
+          "job_location": "Berlin, Germany",
+          "job_country": "Germany"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "platforms",
+      "description": "Job posting platforms (LinkedIn, Indeed, etc.) where jobs are advertised",
+      "creation_query": "CREATE TABLE platforms AS\nSELECT DISTINCT\n    ROW_NUMBER() OVER (ORDER BY job_via) as platform_id,\n    job_via as platform_name\nFROM raw_jobs_data\nWHERE job_via IS NOT NULL\nORDER BY job_via;",
+      "row_count": 7904,
+      "columns": [
+        {
+          "name": "platform_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": true,
+          "description": "Unique identifier for each job posting platform",
+          "foreign_key": ""
+        },
+        {
+          "name": "platform_name",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "description": "Name of the platform (e.g., \"via LinkedIn\", \"via Indeed\")",
+          "foreign_key": ""
+        }
+      ],
+      "sample_data": [
+        {
+          "platform_id": "1",
+          "platform_name": "via Work Nearby"
+        },
+        {
+          "platform_id": "2",
+          "platform_name": "via BeBee México"
+        },
+        {
+          "platform_id": "3",
+          "platform_name": "via LinkedIn"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "skills",
+      "description": "Available skills that can be required for jobs, categorized by type",
+      "creation_query": "CREATE TABLE skills AS\nSELECT skill_id, skill_name, skill_category\nFROM (VALUES \n    (1, 'Python', 'programming'),\n    (2, 'SQL', 'programming'), \n    (3, 'R', 'programming'),\n    (4, 'Excel', 'analyst_tools'),\n    (5, 'Tableau', 'analyst_tools'),\n    (6, 'Power BI', 'analyst_tools'),\n    (7, 'AWS', 'cloud'),\n    (8, 'Azure', 'cloud'),\n    (9, 'GCP', 'cloud'),\n    (10, 'Spark', 'big_data'),\n    (11, 'Hadoop', 'big_data'),\n    (12, 'Docker', 'devops'),\n    (13, 'Kubernetes', 'devops'),\n    (14, 'Git', 'devops'),\n    (15, 'Machine Learning', 'analytics')\n) AS t(skill_id, skill_name, skill_category);",
+      "row_count": 15,
+      "columns": [
+        {
+          "name": "skill_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": true,
+          "description": "Unique identifier for each skill",
+          "foreign_key": ""
+        },
+        {
+          "name": "skill_name",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "description": "Name of the skill (e.g., \"Python\", \"SQL\", \"Excel\")",
+          "foreign_key": ""
+        },
+        {
+          "name": "skill_category",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "description": "Category of the skill (programming, analyst_tools, cloud, etc.)",
+          "foreign_key": ""
+        }
+      ],
+      "sample_data": [
+        {
+          "skill_id": "1",
+          "skill_name": "Python",
+          "skill_category": "programming"
+        },
+        {
+          "skill_id": "2",
+          "skill_name": "SQL",
+          "skill_category": "programming"
+        },
+        {
+          "skill_id": "3",
+          "skill_name": "R",
+          "skill_category": "programming"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "type": "one-to-many",
+      "from_table": "companies",
+      "from_column": "company_id",
+      "to_table": "jobs",
+      "to_column": "company_id",
+      "description": "One company can have many job postings"
+    },
+    {
+      "type": "one-to-many",
+      "from_table": "locations",
+      "from_column": "location_id",
+      "to_table": "jobs",
+      "to_column": "location_id",
+      "description": "One location can have many job postings"
+    },
+    {
+      "type": "one-to-many",
+      "from_table": "platforms",
+      "from_column": "platform_id",
+      "to_table": "jobs",
+      "to_column": "platform_id",
+      "description": "One platform can have many job postings"
+    },
+    {
+      "type": "many-to-many",
+      "from_table": "jobs",
+      "from_column": "job_id",
+      "to_table": "skills",
+      "to_column": "skill_id",
+      "junction_table": "job_skills",
+      "description": "Jobs can require multiple skills, and skills can be required by multiple jobs"
+    }
+  ],
+  "schema_notes": [
+    "Database follows normalized design principles with dimensional modeling approach",
+    "All dimension tables (companies, locations, platforms, skills) were extracted from the original dataset",
+    "The jobs table serves as the central fact table with foreign key references",
+    "Foreign key relationships ensure data integrity and enable efficient JOINs",
+    "Junction table (job_skills) implements many-to-many relationship between jobs and skills",
+    "Creation queries show the normalization process from raw data to structured schema",
+    "Salary information is in USD where available",
+    "Date format follows ISO 8601 standard (YYYY-MM-DD HH:MM:SS)",
+    "Schema is optimized for educational SQL exercises and real-world analysis"
+  ]
+}

@@ -1,0 +1,524 @@
+{
+  "metadata": {
+    "title": "Week 4 Practice - Data Jobs Dataset",
+    "description": "JOIN operations on real-world data analytics job postings",
+    "total_exercises": 15,
+    "database": "data_jobs.db",
+    "total_records": 785741
+  },
+  "exercises": [
+    {
+      "id": 1,
+      "title": "Company Job Listings",
+      "statement": "Find all job titles and company names for Data Scientist positions. Show only companies that currently have job postings.",
+      "solution": "SELECT c.company_name, j.job_title, j.job_posted_date\nFROM companies AS c\nINNER JOIN jobs AS j ON c.company_id = j.company_id\nWHERE j.job_title_short = 'Data Scientist'\nORDER BY j.job_posted_date DESC;",
+      "result": {
+        "working": true,
+        "execution_time": 0.277,
+        "row_count": 172286,
+        "columns": [
+          "company_name",
+          "job_title",
+          "job_posted_date"
+        ],
+        "sample_results": [
+          {
+            "company_name": "Cognizant Technology Solutions",
+            "job_title": "Data scientist",
+            "job_posted_date": "2023-12-31 23:40:22"
+          },
+          {
+            "company_name": "ManTech International",
+            "job_title": "Data Scientist II with Security Clearance",
+            "job_posted_date": "2023-12-31 23:40:03"
+          },
+          {
+            "company_name": "ManTech International",
+            "job_title": "Data Scientist III with Security Clearance",
+            "job_posted_date": "2023-12-31 23:40:03"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 2,
+      "title": "Jobs by Location",
+      "statement": "List all job titles with their corresponding countries and cities. Only include jobs that have location information.",
+      "solution": "SELECT j.job_title_short, l.job_location, l.job_country\nFROM jobs AS j\nINNER JOIN locations AS l ON j.location_id = l.location_id\nORDER BY l.job_country, l.job_location;",
+      "result": {
+        "working": true,
+        "execution_time": 0.51,
+        "row_count": 785741,
+        "columns": [
+          "job_title_short",
+          "job_location",
+          "job_country"
+        ],
+        "sample_results": [
+          {
+            "job_title_short": "Data Analyst",
+            "job_location": "Afghanistan",
+            "job_country": "Afghanistan"
+          },
+          {
+            "job_title_short": "Senior Data Analyst",
+            "job_location": "Afghanistan",
+            "job_country": "Afghanistan"
+          },
+          {
+            "job_title_short": "Data Analyst",
+            "job_location": "Afghanistan",
+            "job_country": "Afghanistan"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 3,
+      "title": "Platform Analytics",
+      "statement": "Show which platforms (job_via) are posting the most Data Engineer jobs. Include platform name and job count.",
+      "solution": "SELECT p.platform_name, COUNT(j.job_id) AS job_count\nFROM platforms AS p\nINNER JOIN jobs AS j ON p.platform_id = j.platform_id\nWHERE j.job_title_short = 'Data Engineer'\nGROUP BY p.platform_name\nORDER BY job_count DESC;",
+      "result": {
+        "working": true,
+        "execution_time": 0.01,
+        "row_count": 3416,
+        "columns": [
+          "platform_name",
+          "job_count"
+        ],
+        "sample_results": [
+          {
+            "platform_name": "via LinkedIn",
+            "job_count": "58830"
+          },
+          {
+            "platform_name": "via BeBee",
+            "job_count": "18034"
+          },
+          {
+            "platform_name": "via Indeed",
+            "job_count": "11279"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 4,
+      "title": "All Companies with Job Counts",
+      "statement": "List all companies and count how many current job postings they have. Include companies that might not have any current postings (show 0 for them).",
+      "solution": "SELECT c.company_name, COUNT(j.job_id) AS job_count\nFROM companies AS c\nLEFT JOIN jobs AS j ON c.company_id = j.company_id\nGROUP BY c.company_name\nORDER BY job_count DESC;",
+      "result": {
+        "working": true,
+        "execution_time": 0.084,
+        "row_count": 139983,
+        "columns": [
+          "company_name",
+          "job_count"
+        ],
+        "sample_results": [
+          {
+            "company_name": "Emprego",
+            "job_count": "6664"
+          },
+          {
+            "company_name": "Booz Allen Hamilton",
+            "job_count": "2879"
+          },
+          {
+            "company_name": "Dice",
+            "job_count": "2827"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 5,
+      "title": "Remote Work Analysis",
+      "statement": "Show all job titles and whether they offer remote work options. Include all jobs, even those where remote work information is not specified.",
+      "solution": "SELECT j.job_title_short, \n       j.job_work_from_home,\n       COUNT(*) AS total_jobs\nFROM jobs AS j\nGROUP BY j.job_title_short, j.job_work_from_home\nORDER BY j.job_title_short, j.job_work_from_home;",
+      "result": {
+        "working": true,
+        "execution_time": 0.006,
+        "row_count": 20,
+        "columns": [
+          "job_title_short",
+          "job_work_from_home",
+          "total_jobs"
+        ],
+        "sample_results": [
+          {
+            "job_title_short": "Business Analyst",
+            "job_work_from_home": "False",
+            "total_jobs": "46274"
+          },
+          {
+            "job_title_short": "Business Analyst",
+            "job_work_from_home": "True",
+            "total_jobs": "2789"
+          },
+          {
+            "job_title_short": "Cloud Engineer",
+            "job_work_from_home": "False",
+            "total_jobs": "11760"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 6,
+      "title": "Skills in Demand",
+      "statement": "Find the top 10 most requested skills across all Data Analyst positions. Join jobs, companies, and skills tables.",
+      "solution": "SELECT s.skill_name, s.skill_category, COUNT(js.job_id) AS demand_count\nFROM skills AS s\nINNER JOIN job_skills AS js ON s.skill_id = js.skill_id\nINNER JOIN jobs AS j ON js.job_id = j.job_id\nWHERE j.job_title_short = 'Data Analyst'\nGROUP BY s.skill_name, s.skill_category\nORDER BY demand_count DESC\nLIMIT 10;",
+      "result": {
+        "working": true,
+        "execution_time": 0.005,
+        "row_count": 10,
+        "columns": [
+          "skill_name",
+          "skill_category",
+          "demand_count"
+        ],
+        "sample_results": [
+          {
+            "skill_name": "R",
+            "skill_category": "programming",
+            "demand_count": "567"
+          },
+          {
+            "skill_name": "Power BI",
+            "skill_category": "analyst_tools",
+            "demand_count": "566"
+          },
+          {
+            "skill_name": "GCP",
+            "skill_category": "cloud",
+            "demand_count": "563"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 7,
+      "title": "High-Paying Companies",
+      "statement": "List companies offering Data Engineer positions with above-average salaries (>$100,000). Include company name, average salary, and job count.",
+      "solution": "SELECT c.company_name, \n       AVG(j.salary_year_avg) AS avg_salary,\n       COUNT(j.job_id) AS job_count\nFROM companies AS c\nINNER JOIN jobs AS j ON c.company_id = j.company_id\nWHERE j.job_title_short = 'Data Engineer' \n  AND j.salary_year_avg > 100000\nGROUP BY c.company_name\nORDER BY avg_salary DESC;",
+      "result": {
+        "working": true,
+        "execution_time": 0.01,
+        "row_count": 1565,
+        "columns": [
+          "company_name",
+          "avg_salary",
+          "job_count"
+        ],
+        "sample_results": [
+          {
+            "company_name": "Netflix",
+            "avg_salary": "450000.0",
+            "job_count": "1"
+          },
+          {
+            "company_name": "Greenfield Source",
+            "avg_salary": "390000.0",
+            "job_count": "1"
+          },
+          {
+            "company_name": "Chenega Corporation",
+            "avg_salary": "375000.0",
+            "job_count": "1"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 8,
+      "title": "Geographic Salary Analysis",
+      "statement": "Find the average salary for Data Scientist roles by country. Only include countries with at least 5 job postings.",
+      "solution": "SELECT l.job_country, \n       AVG(j.salary_year_avg) AS avg_salary,\n       COUNT(j.job_id) AS job_count\nFROM locations AS l\nINNER JOIN jobs AS j ON l.location_id = j.location_id\nWHERE j.job_title_short = 'Data Scientist'\n  AND j.salary_year_avg IS NOT NULL\nGROUP BY l.job_country\nHAVING COUNT(j.job_id) >= 5\nORDER BY avg_salary DESC;",
+      "result": {
+        "working": true,
+        "execution_time": 0.004,
+        "row_count": 42,
+        "columns": [
+          "job_country",
+          "avg_salary",
+          "job_count"
+        ],
+        "sample_results": [
+          {
+            "job_country": "None",
+            "avg_salary": "159517.1590909091",
+            "job_count": "66"
+          },
+          {
+            "job_country": "Somalia",
+            "avg_salary": "144283.63218124342",
+            "job_count": "949"
+          },
+          {
+            "job_country": "Japan",
+            "avg_salary": "140522.6",
+            "job_count": "5"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 9,
+      "title": "Tech Stack Analysis",
+      "statement": "For each company hiring Data Engineers, show the most common skill category they require (programming, cloud, analyst_tools, etc.).",
+      "solution": "WITH skill_counts AS (\n    SELECT c.company_name, \n           s.skill_category,\n           COUNT(s.skill_id) AS category_count,\n           ROW_NUMBER() OVER (PARTITION BY c.company_name ORDER BY COUNT(s.skill_id) DESC) AS rn\n    FROM companies AS c\n    INNER JOIN jobs AS j ON c.company_id = j.company_id\n    INNER JOIN job_skills AS js ON j.job_id = js.job_id\n    INNER JOIN skills AS s ON js.skill_id = s.skill_id\n    WHERE j.job_title_short = 'Data Engineer'\n    GROUP BY c.company_name, s.skill_category\n)\nSELECT company_name, skill_category AS most_common_skill_category, category_count AS skill_count\nFROM skill_counts\nWHERE rn = 1\nORDER BY skill_count DESC;",
+      "result": {
+        "working": true,
+        "execution_time": 0.016,
+        "row_count": 2254,
+        "columns": [
+          "company_name",
+          "most_common_skill_category",
+          "skill_count"
+        ],
+        "sample_results": [
+          {
+            "company_name": "Tata Consultancy Services",
+            "most_common_skill_category": "programming",
+            "skill_count": "26"
+          },
+          {
+            "company_name": "Insight Global",
+            "most_common_skill_category": "programming",
+            "skill_count": "23"
+          },
+          {
+            "company_name": "Listopro",
+            "most_common_skill_category": "programming",
+            "skill_count": "18"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 10,
+      "title": "Platform Performance",
+      "statement": "Find platforms that post jobs from companies offering above-average salaries ($90,000+). Include platform name, number of high-paying companies, and average salary of jobs posted.",
+      "solution": "SELECT p.platform_name,\n       COUNT(DISTINCT c.company_id) AS high_paying_companies,\n       AVG(j.salary_year_avg) AS avg_salary\nFROM platforms AS p\nINNER JOIN jobs AS j ON p.platform_id = j.platform_id\nINNER JOIN companies AS c ON j.company_id = c.company_id\nWHERE j.salary_year_avg >= 90000\nGROUP BY p.platform_name\nORDER BY avg_salary DESC;",
+      "result": {
+        "working": true,
+        "execution_time": 0.009,
+        "row_count": 245,
+        "columns": [
+          "platform_name",
+          "high_paying_companies",
+          "avg_salary"
+        ],
+        "sample_results": [
+          {
+            "platform_name": "via Cooperative Career Center",
+            "high_paying_companies": "2",
+            "avg_salary": "550500.0"
+          },
+          {
+            "platform_name": "via GeekLink",
+            "high_paying_companies": "4",
+            "avg_salary": "330000.0"
+          },
+          {
+            "platform_name": "via Wall Street Careers",
+            "high_paying_companies": "1",
+            "avg_salary": "287500.0"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 11,
+      "title": "Multi-Skill Requirements",
+      "statement": "Find Data Scientist jobs that require both Python and SQL skills. Show company name, job title, and salary.",
+      "solution": "SELECT c.company_name, j.job_title, j.salary_year_avg\nFROM companies AS c\nINNER JOIN jobs AS j ON c.company_id = j.company_id\nINNER JOIN job_skills AS js1 ON j.job_id = js1.job_id\nINNER JOIN skills AS s1 ON js1.skill_id = s1.skill_id\nINNER JOIN job_skills AS js2 ON j.job_id = js2.job_id\nINNER JOIN skills AS s2 ON js2.skill_id = s2.skill_id\nWHERE j.job_title_short = 'Data Scientist'\n  AND s1.skill_name = 'Python'\n  AND s2.skill_name = 'SQL'\n  AND j.salary_year_avg IS NOT NULL\nORDER BY j.salary_year_avg DESC;",
+      "result": {
+        "working": true,
+        "execution_time": 0.01,
+        "row_count": 2,
+        "columns": [
+          "company_name",
+          "job_title",
+          "salary_year_avg"
+        ],
+        "sample_results": [
+          {
+            "company_name": "Robinhood",
+            "job_title": "People Analyst",
+            "salary_year_avg": "111000.0"
+          },
+          {
+            "company_name": "Patterned Learning AI",
+            "job_title": "Entry-Level Data Scientist Engineer - US/Canada",
+            "salary_year_avg": "65000.0"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 12,
+      "title": "Remote vs On-site Salary Gap",
+      "statement": "Compare average salaries for remote vs on-site Data Engineer positions by company. Only include companies with both types of positions.",
+      "solution": "WITH salary_comparison AS (\n    SELECT c.company_name,\n           AVG(CASE WHEN j.job_work_from_home = TRUE THEN j.salary_year_avg END) AS remote_avg_salary,\n           AVG(CASE WHEN j.job_work_from_home = FALSE THEN j.salary_year_avg END) AS onsite_avg_salary\n    FROM companies AS c\n    INNER JOIN jobs AS j ON c.company_id = j.company_id\n    WHERE j.job_title_short = 'Data Engineer'\n      AND j.salary_year_avg IS NOT NULL\n    GROUP BY c.company_name\n    HAVING COUNT(CASE WHEN j.job_work_from_home = TRUE THEN 1 END) > 0\n       AND COUNT(CASE WHEN j.job_work_from_home = FALSE THEN 1 END) > 0\n)\nSELECT company_name,\n       remote_avg_salary,\n       onsite_avg_salary,\n       (remote_avg_salary - onsite_avg_salary) AS salary_difference\nFROM salary_comparison\nWHERE remote_avg_salary IS NOT NULL AND onsite_avg_salary IS NOT NULL\nORDER BY salary_difference DESC;",
+      "result": {
+        "working": true,
+        "execution_time": 0.011,
+        "row_count": 114,
+        "columns": [
+          "company_name",
+          "remote_avg_salary",
+          "onsite_avg_salary",
+          "salary_difference"
+        ],
+        "sample_results": [
+          {
+            "company_name": "Twitch",
+            "remote_avg_salary": "251000.0",
+            "onsite_avg_salary": "157000.0",
+            "salary_difference": "94000.0"
+          },
+          {
+            "company_name": "Stryker",
+            "remote_avg_salary": "179500.0",
+            "onsite_avg_salary": "100740.0",
+            "salary_difference": "78760.0"
+          },
+          {
+            "company_name": "Rackspace",
+            "remote_avg_salary": "114500.0",
+            "onsite_avg_salary": "45000.0",
+            "salary_difference": "69500.0"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 13,
+      "title": "Skill Correlation Analysis",
+      "statement": "Find pairs of skills that frequently appear together in Data Analyst job postings. Show skill combinations that appear in at least 10 jobs together.",
+      "solution": "SELECT s1.skill_name AS skill1_name,\n       s2.skill_name AS skill2_name,\n       COUNT(DISTINCT js1.job_id) AS co_occurrence_count\nFROM job_skills AS js1\nINNER JOIN job_skills AS js2 ON js1.job_id = js2.job_id AND js1.skill_id < js2.skill_id\nINNER JOIN skills AS s1 ON js1.skill_id = s1.skill_id\nINNER JOIN skills AS s2 ON js2.skill_id = s2.skill_id\nINNER JOIN jobs AS j ON js1.job_id = j.job_id\nWHERE j.job_title_short = 'Data Analyst'\nGROUP BY s1.skill_name, s2.skill_name\nHAVING COUNT(DISTINCT js1.job_id) >= 10\nORDER BY co_occurrence_count DESC;",
+      "result": {
+        "working": true,
+        "execution_time": 0.009,
+        "row_count": 105,
+        "columns": [
+          "skill1_name",
+          "skill2_name",
+          "co_occurrence_count"
+        ],
+        "sample_results": [
+          {
+            "skill1_name": "R",
+            "skill2_name": "GCP",
+            "co_occurrence_count": "134"
+          },
+          {
+            "skill1_name": "GCP",
+            "skill2_name": "Power BI",
+            "co_occurrence_count": "133"
+          },
+          {
+            "skill1_name": "R",
+            "skill2_name": "Docker",
+            "co_occurrence_count": "128"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 14,
+      "title": "Seasonal Hiring Patterns",
+      "statement": "Analyze hiring patterns by showing the number of Data Engineer jobs posted by each platform per month in 2023.",
+      "solution": "SELECT p.platform_name,\n       EXTRACT(MONTH FROM j.job_posted_date) AS month,\n       COUNT(j.job_id) AS job_count\nFROM platforms AS p\nINNER JOIN jobs AS j ON p.platform_id = j.platform_id\nWHERE j.job_title_short = 'Data Engineer'\n  AND EXTRACT(YEAR FROM j.job_posted_date) = 2023\nGROUP BY p.platform_name, EXTRACT(MONTH FROM j.job_posted_date)\nORDER BY p.platform_name, month;",
+      "result": {
+        "working": true,
+        "execution_time": 0.012,
+        "row_count": 8702,
+        "columns": [
+          "platform_name",
+          "month",
+          "job_count"
+        ],
+        "sample_results": [
+          {
+            "platform_name": "melalui BeBee Deutschland",
+            "month": "3",
+            "job_count": "4"
+          },
+          {
+            "platform_name": "melalui BeBee India",
+            "month": "3",
+            "job_count": "2"
+          },
+          {
+            "platform_name": "melalui BeBee Schweiz",
+            "month": "3",
+            "job_count": "5"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 15,
+      "title": "Complete Market Analysis",
+      "statement": "Create a comprehensive report showing: company name, location, total jobs posted, average salary, most required skill, and primary posting platform. Only include companies with 5+ job postings.",
+      "solution": "WITH company_stats AS (\n    SELECT c.company_name,\n           l.job_location,\n           COUNT(j.job_id) AS total_jobs,\n           AVG(j.salary_year_avg) AS avg_salary\n    FROM companies AS c\n    INNER JOIN jobs AS j ON c.company_id = j.company_id\n    INNER JOIN locations AS l ON j.location_id = l.location_id\n    WHERE j.salary_year_avg IS NOT NULL\n    GROUP BY c.company_name, l.job_location\n    HAVING COUNT(j.job_id) >= 5\n),\ntop_skills AS (\n    SELECT c.company_name,\n           s.skill_name,\n           ROW_NUMBER() OVER (PARTITION BY c.company_name ORDER BY COUNT(s.skill_id) DESC) AS skill_rank\n    FROM companies AS c\n    INNER JOIN jobs AS j ON c.company_id = j.company_id\n    INNER JOIN job_skills AS js ON j.job_id = js.job_id\n    INNER JOIN skills AS s ON js.skill_id = s.skill_id\n    GROUP BY c.company_name, s.skill_name\n),\nmain_platforms AS (\n    SELECT c.company_name,\n           p.platform_name,\n           ROW_NUMBER() OVER (PARTITION BY c.company_name ORDER BY COUNT(j.job_id) DESC) AS platform_rank\n    FROM companies AS c\n    INNER JOIN jobs AS j ON c.company_id = j.company_id\n    INNER JOIN platforms AS p ON j.platform_id = p.platform_id\n    GROUP BY c.company_name, p.platform_name\n)\nSELECT cs.company_name,\n       cs.job_location,\n       cs.total_jobs,\n       ROUND(cs.avg_salary, 2) AS avg_salary,\n       ts.skill_name AS top_skill,\n       mp.platform_name AS main_platform\nFROM company_stats AS cs\nLEFT JOIN top_skills AS ts ON cs.company_name = ts.company_name AND ts.skill_rank = 1\nLEFT JOIN main_platforms AS mp ON cs.company_name = mp.company_name AND mp.platform_rank = 1\nORDER BY cs.total_jobs DESC;",
+      "result": {
+        "working": true,
+        "execution_time": 0.059,
+        "row_count": 557,
+        "columns": [
+          "company_name",
+          "job_location",
+          "total_jobs",
+          "avg_salary",
+          "top_skill",
+          "main_platform"
+        ],
+        "sample_results": [
+          {
+            "company_name": "Get It Recruit - Information Technology",
+            "job_location": "Anywhere",
+            "total_jobs": "234",
+            "avg_salary": "100890.6",
+            "top_skill": "Power BI",
+            "main_platform": "via LinkedIn"
+          },
+          {
+            "company_name": "Harnham",
+            "job_location": "Anywhere",
+            "total_jobs": "83",
+            "avg_salary": "167740.96",
+            "top_skill": "Java",
+            "main_platform": "via LinkedIn"
+          },
+          {
+            "company_name": "TikTok",
+            "job_location": "Mountain View, CA",
+            "total_jobs": "78",
+            "avg_salary": "195535.57",
+            "top_skill": "Excel",
+            "main_platform": "via LinkedIn"
+          }
+        ],
+        "error": null
+      }
+    }
+  ]
+}

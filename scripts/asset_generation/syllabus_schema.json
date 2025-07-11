@@ -1,0 +1,445 @@
+{
+  "metadata": {
+    "title": "8-Week SQL Study Group Syllabus",
+    "description": "Comprehensive week-by-week breakdown with specific LeetCode problems and learning objectives",
+    "duration_weeks": 8,
+    "target_audience": "SQL learners progressing from basic to intermediate level",
+    "created": "2024",
+    "last_updated": "2024-12-19"
+  },
+  "weeks": [
+    {
+      "number": 1,
+      "title": "Introduction to Databases & Basic SELECT Queries",
+      "intro": "This week will cover the basics of databases and SQL. We will start with the basics of databases and SQL, and then move on to more advanced topics.",
+      "core_concepts": [
+        "What is a database?",
+        "Relational Database (RDBMS)?",
+        "Basic SQL Syntax",
+        "SELECT, FROM, WHERE (basic operators: =, >, <, >=, <=, !=/<>)",
+        "ORDER BY",
+        "LIMIT/TOP"
+      ],
+      "learning_objectives": [
+        "Understand basic database structure",
+        "Write simple queries to retrieve and filter specific columns",
+        "Sort results",
+        "Limit output"
+      ],
+      "sqlzoo": [
+        {
+          "title": "0. SELECT basics",
+          "url": "https://sqlzoo.net/wiki/SELECT_basics"
+        },
+        {
+          "title": "1. SELECT names", 
+          "url": "https://sqlzoo.net/wiki/SELECT_names"
+        },
+        {
+          "title": "2. SELECT from WORLD Tutorial",
+          "url": "https://sqlzoo.net/wiki/SELECT_from_WORLD_Tutorial"
+        }
+      ],
+      "leetcode": [
+        {
+          "title": "1757. Recyclable and Low Fat Products",
+          "url": null,
+          "description": "Basic SELECT and WHERE with AND"
+        },
+        {
+          "title": "595. Big Countries",
+          "url": null,
+          "description": "Basic SELECT and WHERE with OR"
+        },
+        {
+          "title": "584. Find Customer Referee",
+          "url": null,
+          "description": "Basic SELECT and WHERE with IS NULL or !="
+        }
+      ],
+      "additional_resources": [
+        {
+          "title": "Mode Analytics SQL Tutorial: Basic SQL",
+          "url": "https://mode.com/sql-tutorial/sql-basics/"
+        }
+      ],
+      "note": "Make sure you are checking for updates on Slack for important announcements."
+    },
+    {
+      "number": 2,
+      "title": "Advanced Filtering, Aliases, & Introduction to Aggregate Functions",
+      "intro": null,
+      "core_concepts": [
+        "Advanced WHERE operators (AND, OR, NOT, IN, BETWEEN, LIKE)",
+        "Handling NULL values (IS NULL, IS NOT NULL)",
+        "Column Aliases (AS)",
+        "Introduction to Aggregate Functions (COUNT(), SUM(), AVG(), MIN(), MAX()) without GROUP BY"
+      ],
+      "learning_objectives": [
+        "Construct complex filtering conditions",
+        "Filter on ranges/lists/patterns",
+        "Handle NULLs",
+        "Rename columns",
+        "Use basic aggregates on entire tables"
+      ],
+      "sqlzoo": [
+        {
+          "title": "3. SELECT from Nobel Tutorial",
+          "url": "https://sqlzoo.net/wiki/SELECT_from_Nobel_Tutorial"
+        },
+        {
+          "title": "6. SUM and COUNT",
+          "url": "https://sqlzoo.net/wiki/SUM_and_COUNT",
+          "description": "Focus on aggregates without GROUP BY"
+        }
+      ],
+      "leetcode": [
+        {
+          "title": "183. Customers Who Never Order",
+          "url": null,
+          "description": "Uses NOT IN or LEFT JOIN... IS NULL, good for NULL understanding early on, though JOIN is formally later"
+        },
+        {
+          "title": "1683. Invalid Tweets",
+          "url": null,
+          "description": "Uses LENGTH function, CHAR_LENGTH in MySQL, introduces a simple function with WHERE"
+        },
+        {
+          "title": "1148. Article Views I",
+          "url": null,
+          "description": "Simple SELECT DISTINCT, WHERE, ORDER BY - distinct is also a good concept here"
+        }
+      ],
+      "additional_resources": [
+        {
+          "title": "W3Schools SQL Tutorial",
+          "url": "https://www.w3schools.com/sql/"
+        }
+      ],
+      "note": null
+    },
+    {
+      "number": 3,
+      "title": "Grouping Data with GROUP BY & HAVING",
+      "intro": null,
+      "core_concepts": [
+        "GROUP BY clause",
+        "Using aggregate functions with GROUP BY",
+        "HAVING clause",
+        "Difference between WHERE and HAVING"
+      ],
+      "learning_objectives": [
+        "Group data",
+        "Calculate aggregates for groups",
+        "Filter groups",
+        "Understand logical order of operations"
+      ],
+      "sqlzoo": [
+        {
+          "title": "6. SUM and COUNT",
+          "url": "https://sqlzoo.net/wiki/SUM_and_COUNT",
+          "description": "Focus on GROUP BY examples"
+        }
+      ],
+      "leetcode": [
+        {
+          "title": "596. Classes More Than 5 Students",
+          "url": null,
+          "description": "Classic GROUP BY and HAVING"
+        },
+        {
+          "title": "1729. Find Followers Count",
+          "url": null,
+          "description": "GROUP BY, COUNT, ORDER BY"
+        },
+        {
+          "title": "1050. Actors and Directors Who Cooperated At Least Three Times",
+          "url": null,
+          "description": "GROUP BY multiple columns, COUNT, HAVING"
+        }
+      ],
+      "additional_resources": [
+        {
+          "title": "Mode Analytics SQL Tutorial: Aggregations",
+          "url": "https://mode.com/sql-tutorial/sql-aggregations/"
+        }
+      ],
+      "note": null
+    },
+    {
+      "number": 4,
+      "title": "Joining Tables – INNER & LEFT JOINs",
+      "intro": null,
+      "core_concepts": [
+        "Primary/foreign keys",
+        "INNER JOIN",
+        "LEFT JOIN (or LEFT OUTER JOIN)",
+        "ON clause",
+        "Table aliases in joins"
+      ],
+      "learning_objectives": [
+        "Identify when JOIN is needed",
+        "Write INNER JOIN and LEFT JOIN queries",
+        "Understand how NULLs are handled in LEFT JOINs"
+      ],
+      "sqlzoo": [
+        {
+          "title": "7. The JOIN operation",
+          "url": "https://sqlzoo.net/wiki/The_JOIN_operation"
+        },
+        {
+          "title": "8. More JOIN operations",
+          "url": "https://sqlzoo.net/wiki/More_JOIN_operations",
+          "description": "Start this section"
+        }
+      ],
+      "leetcode": [
+        {
+          "title": "175. Combine Two Tables",
+          "url": null,
+          "description": "Basic LEFT JOIN"
+        },
+        {
+          "title": "586. Customer Placing the Largest Number of Orders",
+          "url": null,
+          "description": "Can be solved with JOIN, GROUP BY, ORDER BY, LIMIT. Subquery or CTE is also an option learned later"
+        },
+        {
+          "title": "197. Rising Temperature",
+          "url": null,
+          "description": "Requires a JOIN (often self-join conceptually or using date functions) and comparing values from different rows/dates. Note: Could also use LAG() which is a window function, but good to try with JOINs first"
+        }
+      ],
+      "additional_resources": [
+        {
+          "title": "Mode Analytics SQL Tutorial: Joins",
+          "url": "https://mode.com/sql-tutorial/sql-joins/"
+        }
+      ],
+      "note": null
+    },
+    {
+      "number": 5,
+      "title": "More JOINs, Subqueries & Common Table Expressions (CTEs)",
+      "intro": null,
+      "core_concepts": [
+        "RIGHT JOIN",
+        "FULL OUTER JOIN",
+        "SELF JOIN",
+        "Subqueries (scalar, in WHERE, SELECT, FROM)",
+        "Introduction to CTEs (WITH clause)"
+      ],
+      "learning_objectives": [
+        "Utilize different JOIN types",
+        "Implement SELF JOINs",
+        "Write subqueries",
+        "Start using CTEs for readability"
+      ],
+      "sqlzoo": [
+        {
+          "title": "8. More JOIN operations",
+          "url": "https://sqlzoo.net/wiki/More_JOIN_operations",
+          "description": "Complete this section"
+        },
+        {
+          "title": "4. SELECT within SELECT Tutorial",
+          "url": "https://sqlzoo.net/wiki/SELECT_within_SELECT_Tutorial"
+        },
+        {
+          "title": "9. Using Null",
+          "url": "https://sqlzoo.net/wiki/Using_Null"
+        }
+      ],
+      "leetcode": [
+        {
+          "title": "181. Employees Earning More Than Their Managers",
+          "url": null,
+          "description": "Classic SELF JOIN or subquery"
+        },
+        {
+          "title": "182. Duplicate Emails",
+          "url": null,
+          "description": "Can use GROUP BY and HAVING, or a subquery with IN"
+        },
+        {
+          "title": "627. Swap Salary",
+          "url": null,
+          "description": "This is an UPDATE statement, good for a brief look at DML, but primarily for CASE statement logic. If focusing purely on SELECT practice for this week, maybe 176. Second Highest Salary which uses subqueries/CTEs/offset"
+        },
+        {
+          "title": "176. Second Highest Salary",
+          "url": null,
+          "description": "Good for subqueries, OFFSET, or even window functions later"
+        }
+      ],
+      "additional_resources": [
+        {
+          "title": "Mode Analytics SQL Tutorial: Subqueries & CTEs",
+          "url": "https://mode.com/sql-tutorial/sql-subqueries-common-table-expressions/"
+        }
+      ],
+      "note": null
+    },
+    {
+      "number": 6,
+      "title": "String Functions, Date/Time Functions & Data Types",
+      "intro": null,
+      "core_concepts": [
+        "Common SQL Data Types",
+        "String manipulation (CONCAT, SUBSTRING, LENGTH, UPPER, LOWER, REPLACE, TRIM)",
+        "Date/time functions (NOW(), CURRENT_DATE, EXTRACT(), DATE_ADD(), DATE_FORMAT())",
+        "Syntax varies by SQL dialect"
+      ],
+      "learning_objectives": [
+        "Understand common data types",
+        "Manipulate strings",
+        "Extract date components",
+        "Perform basic date calculations/formatting"
+      ],
+      "sqlzoo": [
+        {
+          "title": "Apply functions within problems from previous sections",
+          "url": null,
+          "description": "Look for function examples in Numeric Examples section"
+        }
+      ],
+      "leetcode": [
+        {
+          "title": "1484. Group Sold Products By The Date",
+          "url": null,
+          "description": "Uses GROUP_CONCAT (MySQL specific, but concept of string aggregation), COUNT DISTINCT, GROUP BY date"
+        },
+        {
+          "title": "1527. Patients With a Condition",
+          "url": null,
+          "description": "Uses LIKE for pattern matching, good string practice"
+        },
+        {
+          "title": "196. Delete Duplicate Emails",
+          "url": null,
+          "description": "This is a DELETE problem, but often involves subqueries to identify duplicates first. Good conceptual DML practice. Alternatively, 1667. Fix Names in a Table for string functions like UPPER, LOWER, CONCAT, SUBSTRING"
+        },
+        {
+          "title": "1667. Fix Names in a Table",
+          "url": null,
+          "description": "Excellent for UPPER, LOWER, SUBSTRING, CONCAT"
+        }
+      ],
+      "additional_resources": [
+        {
+          "title": "SQL dialect documentation",
+          "url": null,
+          "description": "Refer to documentation for your specific SQL dialect (e.g., PostgreSQL, MySQL) for string and date/time functions. W3Schools is a good quick reference."
+        }
+      ],
+      "note": "This week relies more on other resources for function-specific practice."
+    },
+    {
+      "number": 7,
+      "title": "Data Definition Language (DDL) & Data Manipulation Language (DML)",
+      "intro": null,
+      "core_concepts": [
+        "DDL (CREATE TABLE, ALTER TABLE, DROP TABLE, basic constraints)",
+        "DML (INSERT INTO, UPDATE, DELETE)"
+      ],
+      "learning_objectives": [
+        "Understand DDL/DML",
+        "Write basic CREATE TABLE",
+        "Perform INSERT, UPDATE, DELETE",
+        "Understand WHERE clause importance in DML"
+      ],
+      "sqlzoo": [
+        {
+          "title": "SQLZoo is query-focused",
+          "url": null,
+          "description": "Practice DDL/DML in a local database"
+        }
+      ],
+      "leetcode": [
+        {
+          "title": "627. Swap Salary",
+          "url": null,
+          "description": "Actually an UPDATE problem. Good for DML practice."
+        },
+        {
+          "title": "196. Delete Duplicate Emails",
+          "url": null,
+          "description": "A DELETE problem. Requires identifying rows to delete, often with a subquery."
+        }
+      ],
+      "additional_resources": [
+        {
+          "title": "Local database setup",
+          "url": null,
+          "description": "SQLite via DB Browser for SQLite, PostgreSQL, MySQL"
+        },
+        {
+          "title": "Mode Analytics SQL Tutorial: DDL and DML",
+          "url": "https://mode.com/sql-tutorial/sql-ddl-dml/"
+        }
+      ],
+      "note": "Focus for this week: Set up a local database (e.g., SQLite). Try to CREATE the tables from LeetCode problems. INSERT some sample data. UPDATE it. DELETE it. This hands-on practice is crucial for DDL/DML."
+    },
+    {
+      "number": 8,
+      "title": "Introduction to Window Functions & Comprehensive Review",
+      "intro": null,
+      "core_concepts": [
+        "Window Functions (ROW_NUMBER(), RANK(), DENSE_RANK())",
+        "OVER() clause (PARTITION BY, ORDER BY)"
+      ],
+      "learning_objectives": [
+        "Understand window functions",
+        "Use ROW_NUMBER(), RANK(), DENSE_RANK()",
+        "Apply basic PARTITION BY and ORDER BY"
+      ],
+      "sqlzoo": [
+        {
+          "title": "11. Window functions",
+          "url": "https://sqlzoo.net/wiki/Window_functions"
+        },
+        {
+          "title": "10. Self join",
+          "url": "https://sqlzoo.net/wiki/Self_join",
+          "description": "Review, or see if window functions offer alternative solutions"
+        }
+      ],
+      "leetcode": [
+        {
+          "title": "177. Nth Highest Salary",
+          "url": null,
+          "description": "Can be solved with window functions, subqueries, or LIMIT/OFFSET"
+        },
+        {
+          "title": "184. Department Highest Salary",
+          "url": null,
+          "description": "Find employees who have the highest salary in each department. Uses JOIN and can be elegantly solved with window functions or subqueries"
+        },
+        {
+          "title": "626. Exchange Seats",
+          "url": null,
+          "description": "Uses CASE statements and window functions like LEAD, LAG, or ROW_NUMBER can simplify logic"
+        },
+        {
+          "title": "185. Department Top Three Salaries",
+          "url": null,
+          "description": "Classic window function problem with DENSE_RANK or RANK"
+        }
+      ],
+      "additional_resources": [
+        {
+          "title": "Mode Analytics SQL Tutorial: Window Functions",
+          "url": "https://mode.com/sql-tutorial/sql-window-functions/"
+        }
+      ],
+      "note": "Comprehensive Review: Revisit challenging problems, mixed problem sets, Q&A."
+    }
+  ],
+  "study_tips": [
+    "Practice Regularly: Dedicate at least 2-3 hours per week to hands-on practice",
+    "Join Online Communities: Participate in SQL forums and Discord communities",
+    "Build Projects: Apply learned concepts to real-world scenarios",
+    "Document Progress: Keep notes on challenging concepts and solutions",
+    "Review Regularly: Revisit previous weeks' material to reinforce learning"
+  ]
+} 
