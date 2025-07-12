@@ -45,7 +45,19 @@ def execute_table_creation(dataset_name, verbose=True):
         return False
     
     # Connect to database
-    db_path = f'../../datasets/data_{dataset_name}.db'
+    # Handle dataset naming: if dataset_name contains '/', extract just the name part
+    # If it doesn't start with 'data_', prefix it
+    if '/' in dataset_name:
+        # Extract name from HuggingFace format (e.g., "lukebarousse/data_jobs" -> "data_jobs")
+        db_name = dataset_name.split('/')[-1]
+    else:
+        db_name = dataset_name
+    
+    # Ensure db_name starts with 'data_' if it doesn't already
+    if not db_name.startswith('data_'):
+        db_name = f'data_{db_name}'
+    
+    db_path = f'../../datasets/{db_name}.db'
     if not os.path.exists(db_path):
         print(f"❌ Database not found: {db_path}")
         return False

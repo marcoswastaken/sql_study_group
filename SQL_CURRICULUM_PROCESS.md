@@ -109,14 +109,14 @@ Instructor specifies:
 - Week number (e.g., 4)
 - Dataset source (HuggingFace link, local file, or existing dataset)
 
-### Step 4: Dataset Exploration
+### Step 4: Dataset Exploration + Database Creation
 
 **Script:** `scripts/core/explore_dataset.py`
 
 **Command:**
 
 ```bash
-python scripts/core/explore_dataset.py --dataset lukebarousse/data_jobs --output initial_exploration_jobs.json
+python scripts/core/explore_dataset.py --dataset lukebarousse/data_jobs --create-database
 ```
 
 **Process:**
@@ -125,6 +125,9 @@ python scripts/core/explore_dataset.py --dataset lukebarousse/data_jobs --output
 2. Generate comprehensive analysis (metadata, column types, data quality)
 3. Identify potential relationships and normalization opportunities
 4. Output detailed dataset summary to `/scripts/data_schema_generation/` directory
+5. Create normalized database as `datasets/data_jobs.db` (using `--create-database` flag)
+   - Single download for both analysis and database creation
+   - Required for Step 6 validation and Step 7 table creation
 
 **Dataset Summary Format:**
 
@@ -187,7 +190,9 @@ Agent create a new script to generate child tables if needed, `generate_child_ta
 1. Run Phase 1 to create tables from JSON queries
 2. Run Phase 2 to generate schema template with enhancement prompt
 3. Agent enhances semantic fields (descriptions, educational context, relationships)
-4. Results in complete `data_schema_[dataset].json` ready for curriculum use
+4. Run `validate_data_schema.py --dataset [dataset]` to verify completion
+5. Fix any empty fields or validation issues identified
+6. Results in complete `data_schema_[dataset].json` ready for curriculum use
 
 **Key Benefits:**
 - Fully generic - works with any dataset following naming conventions

@@ -6,7 +6,7 @@
     "total_records": 785741,
     "total_columns": 17,
     "memory_usage_mb": 625.81,
-    "analysis_date": "2025-07-11T21:03:08.267719",
+    "analysis_date": "2025-07-11T21:26:12.679462",
     "column_names": [
       "job_title_short",
       "job_title",
@@ -71,11 +71,11 @@
       "unique_count": 234673,
       "unique_percentage": 29.87,
       "sample_values": [
-        "BI Engineer / Data Engineer (w/m/d)",
-        "Data Analyst (m/w/d) Für Die Abteilung Data-analyt...",
-        "Data Scientist w/ Secret Clearance",
-        "Financial Analyst - FDI",
-        "Senior Applied Scientist, EU ATS Science and Tech ..."
+        "Staff Data Scientist (m/f/d) Autonomous, Data Anal...",
+        "Data Engeneer",
+        "Data Engineer - DBA",
+        "Junior Business Analyst",
+        "Department Data Analyst Jobs in Dallas, TX"
       ],
       "statistics": {
         "count": 785740,
@@ -249,11 +249,11 @@
       "unique_count": 607192,
       "unique_percentage": 77.28,
       "sample_values": [
-        "2023-07-07 08:26:58",
-        "2023-05-13 23:22:43",
-        "2023-03-28 11:09:12",
-        "2023-02-23 21:04:22",
-        "2023-02-23 23:47:46"
+        "2023-01-31 14:11:42",
+        "2023-01-06 12:27:57",
+        "2023-01-25 21:50:06",
+        "2023-01-16 14:06:25",
+        "2023-12-06 07:16:41"
       ],
       "statistics": {
         "count": 785741,
@@ -376,11 +376,11 @@
       "unique_count": 2702,
       "unique_percentage": 0.34,
       "sample_values": [
-        "116700.0",
-        "225000.0",
-        "158697.0",
-        "109430.0",
-        "89100.0"
+        "107330.0",
+        "308000.0",
+        "115656.0",
+        "70700.0",
+        "124900.0"
       ],
       "statistics": {
         "count": 22003,
@@ -405,11 +405,11 @@
       "unique_count": 1184,
       "unique_percentage": 0.15,
       "sample_values": [
-        "39.99500274658203",
-        "25.649999618530273",
-        "23.279998779296875",
-        "61.0",
-        "46.0"
+        "60.69499969482422",
+        "45.68499755859375",
+        "55.62999725341797",
+        "117.5",
+        "35.709999084472656"
       ],
       "statistics": {
         "count": 10662,
@@ -434,11 +434,11 @@
       "unique_count": 139982,
       "unique_percentage": 17.82,
       "sample_values": [
-        "Asito",
-        "Digital Reef/Column6",
-        "PRODUCT FIRM , BASED ON USA (BFSI DOMAIN)",
-        "Vereinigte Hagelversicherung VVaG",
-        "Charterhouse Pte. Ltd."
+        "Group Nine LLC",
+        "TAMAMOTO",
+        "CAISSE FEDERALE DE CREDIT MUTUEL",
+        "PIGIER CREATION STRASBOURG",
+        "Cognizant Japan K.K, Cognizant Technology Solution..."
       ],
       "statistics": {
         "count": 785723,
@@ -454,11 +454,11 @@
       "unique_count": 177562,
       "unique_percentage": 22.6,
       "sample_values": [
-        "['python', 'shell', 'sql', 'oracle', 'windows', 'l...",
-        "['sql', 'excel', 'tableau', 'alteryx', 'outlook', ...",
-        "['ruby', 'ruby', 'python', 'scala', 'java', 'mysql...",
-        "['java', 'sql', 'sap', 'flow']",
-        "['mongodb', 'mongodb', 'sql', 'nltk', 'spark']"
+        "['sql', 'node.js']",
+        "['python', 'java', 'sql', 'microstrategy', 'power ...",
+        "['sql', 'vba', 'express', 'cognos', 'excel', 'powe...",
+        "['python', 'java', 'c#', 'nosql', 'aws', 'gcp', 'a...",
+        "['python', 'sql', 'vba', 'spss', 'excel', 'power b..."
       ],
       "statistics": {
         "count": 668704,
@@ -474,11 +474,11 @@
       "unique_count": 177562,
       "unique_percentage": 22.6,
       "sample_values": [
-        "{'analyst_tools': ['ssrs', 'ssis', 'sharepoint', '...",
-        "{'cloud': ['snowflake', 'aws', 'gcp'], 'programmin...",
-        "{'libraries': ['numpy', 'pandas', 'tensorflow', 's...",
-        "{'analyst_tools': ['excel', 'tableau'], 'libraries...",
-        "{'analyst_tools': ['excel', 'power bi'], 'programm..."
+        "{'analyst_tools': ['power bi', 'tableau'], 'cloud'...",
+        "{'analyst_tools': ['excel', 'word', 'powerpoint'],...",
+        "{'cloud': ['aws', 'azure', 'gcp'], 'libraries': ['...",
+        "{'cloud': ['aws'], 'libraries': ['react'], 'other'...",
+        "{'analyst_tools': ['sap'], 'databases': ['postgres..."
       ],
       "statistics": {
         "count": 668704,
