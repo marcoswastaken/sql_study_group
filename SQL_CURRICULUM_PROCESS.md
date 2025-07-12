@@ -101,13 +101,18 @@ Instructor specifies:
 - Dataset source (HuggingFace link, local file, or existing dataset)
 
 ### Step 4: Dataset Exploration
-**Script:** `explore_dataset.py`
+**Script:** `scripts/core/explore_dataset.py`
+
+**Command:**
+```bash
+python scripts/core/explore_dataset.py --dataset lukebarousse/data_jobs --output initial_exploration_jobs.json
+```
 
 **Process:**
-1. Load dataset into DuckDB
-2. Generate basic stats (table count, row count, column types)
-3. Identify potential relationships
-4. Output dataset summary
+1. Load dataset from HuggingFace 
+2. Generate comprehensive analysis (metadata, column types, data quality)
+3. Identify potential relationships and normalization opportunities
+4. Output detailed dataset summary to `/scripts/data_schema_generation/` directory
 
 **Dataset Summary Format:**
 ```json
@@ -281,15 +286,17 @@ sql_study_group/
     │   └── generate_week_4_key.py       # Exercise extraction (adapt for Step 8)
     ├── data_schema_generation/
     │   ├── generate_data_schema_jobs.py # Step 7 (already built)
+    │   ├── initial_exploration_data_jobs.json # Dataset exploration output
     │   └── table_creation_queries_jobs.json # SQL creation queries
     ├── core/
-    │   └── sql_helper.py                # SQL execution framework
+    │   ├── sql_helper.py                # SQL execution framework
+    │   └── explore_dataset.py           # Step 4 (built)
     ├── tests/
-    │   └── test_sql_helper_comprehensive.py # Comprehensive testing
+    │   ├── test_core_sql_helper.py      # SQL helper tests
+    │   └── test_core_explore_dataset.py # Dataset exploration tests
     ├── utilities/
     │   ├── setup_sql_environment.py     # Database setup
     │   └── verify_environment.py        # Environment verification
-    ├── explore_dataset.py               # Step 4 (to be built)
     ├── generate_child_tables.py         # Step 6 (to be built)
     ├── generate_exercises.py            # Step 8 (to be built)
     ├── test_solutions.py                # Step 9 (to be built)
@@ -298,6 +305,7 @@ sql_study_group/
 
 ## Scripts We Already Have
 - `scripts/core/sql_helper.py` - SQL execution framework
+- `scripts/core/explore_dataset.py` - Dataset exploration and assessment (Step 4)
 - `scripts/asset_generation/generate_syllabus.py` - Converts structured JSON schema to formatted markdown (Step 2)
   - Handles URLs for SQLZoo, LeetCode, and additional resources
   - Supports intro and note fields for each week
@@ -312,7 +320,6 @@ sql_study_group/
 - `scripts/utilities/verify_environment.py` - Environment verification and testing
 
 ## Scripts We Need to Build
-- `scripts/explore_dataset.py` - Dataset exploration and assessment
 - `scripts/generate_child_tables.py` - Child table generation
 - `scripts/generate_exercises.py` - Exercise generation
 - `scripts/test_solutions.py` - Solution testing
@@ -321,7 +328,7 @@ sql_study_group/
 ## Next Steps
 1. ✅ Created structured syllabus schema with URL support and intro/note fields
 2. ✅ Built syllabus generation script that converts schema to markdown
-3. Build `explore_dataset.py` for dataset assessment
+3. ✅ Built `explore_dataset.py` for dataset assessment
 4. Test MVP process with Week 4 data_jobs dataset
 5. Refine scripts based on results
 6. Apply to additional weeks

@@ -55,7 +55,7 @@ def main():
     
     # Initialize helper
     try:
-        helper = SQLHelper('../../datasets/data_jobs.db')
+        helper = SQLHelper('datasets/data_jobs.db')
         print("✅ SQL Helper initialized successfully")
     except Exception as e:
         print(f"❌ Failed to initialize SQL Helper: {e}")
