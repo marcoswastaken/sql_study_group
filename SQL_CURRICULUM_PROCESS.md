@@ -1,14 +1,17 @@
 # SQL Curriculum MVP Process
 
 ## Overview
+
 Simple, repeatable process for generating SQL practice materials from syllabus + dataset + week number.
 
 ## MVP Steps
 
 ### Step 1: Instructor Provides Syllabus Schema
+
 Instructor creates syllabus content in structured JSON format and saves as `syllabus_schema.json`.
 
 **Required Schema Format:**
+
 ```json
 {
   "metadata": {
@@ -76,45 +79,55 @@ Instructor creates syllabus content in structured JSON format and saves as `syll
 ```
 
 **Field Definitions:**
+
 - `intro`: Optional introductory text for the week (use `null` if none)
 - `note`: Optional note at end of week (use `null` if none)  
 - `url`: Optional URL for resources (use `null` if none)
 - `description`: Optional description for SQLZoo/LeetCode items
 
 ### Step 2: Generate Syllabus Markdown
+
 **Script:** `generate_syllabus.py`
 
 **Process:**
+
 1. Reads `syllabus_schema.json`
 2. Converts structured data to formatted markdown
 3. Outputs `syllabus.md`
 
 **Features:**
+
 - Bulleted core concepts and learning objectives
 - Clickable links for resources with URLs
 - Sub-bullet descriptions for exercises
 - Notes appear at end of applicable weeks
 
 ### Step 3: Instructor Provides Week Number and Dataset
+
 Instructor specifies:
+
 - Week number (e.g., 4)
 - Dataset source (HuggingFace link, local file, or existing dataset)
 
 ### Step 4: Dataset Exploration
+
 **Script:** `scripts/core/explore_dataset.py`
 
 **Command:**
+
 ```bash
 python scripts/core/explore_dataset.py --dataset lukebarousse/data_jobs --output initial_exploration_jobs.json
 ```
 
 **Process:**
+
 1. Load dataset from HuggingFace 
 2. Generate comprehensive analysis (metadata, column types, data quality)
 3. Identify potential relationships and normalization opportunities
 4. Output detailed dataset summary to `/scripts/data_schema_generation/` directory
 
 **Dataset Summary Format:**
+
 ```json
 {
   "dataset_name": "data_jobs",
@@ -129,13 +142,27 @@ python scripts/core/explore_dataset.py --dataset lukebarousse/data_jobs --output
 ```
 
 ### Step 5: Agent Review & Discussion
-Agent reviews dataset summary and discusses with instructor:
-- Suitability for week topics
-- Potential child table opportunities
-- Any data quality concerns
+Agent receives detailed curriculum generation prompt and creates educational tables:
+
+**Process:**
+
+1. Agent receives prompt specifying week topics and dataset to use
+2. Agent reviews `syllabus_schema.json` for week topics (e.g., INNER JOIN, LEFT JOIN, primary/foreign keys)
+3. Agent reviews `data_schema_[dataset].json` and `initial_exploration_[dataset].json` for dataset structure
+4. Agent creates `table_creation_queries_[dataset].json` with several table creation queries, to create tables designed for progressive complexity
+5. Agent validates the generated JSON object using the `validate_table_creation_queries.py` script
+6. Agent iterates on table creation queries until all quality tests pass in the validation script
+7. Agent discusses suitability, table design choices, and educational value with instructor
+
+**Key Requirements:**
+
+- Design meaningful tables for business scenarios (not "meaningless" data)
+- Create tables that will allow for exercises with progressive complexity, from simple lookups to complex relationships
+- Include intentional NULLs for LEFT JOIN practice, for example
+- Ensure compatibility with existing sql_helper framework
 
 ### Step 6: Generate Child Tables (If Needed)
-**Script:** `generate_child_tables.py`
+Agent create a new script to generate child tables if needed, `generate_child_tables_[dataset].py`, e.g. `generate_child_tables_[dataset].py`. 
 
 **Process:**
 1. Identify normalization opportunities (companies, locations, skills, etc.)
@@ -144,78 +171,28 @@ Agent reviews dataset summary and discusses with instructor:
 4. Generate SQL creation scripts
 
 ### Step 7: Generate Data Schema Documentation
-**Script:** `generate_data_schema.py` (already built as `generate_data_jobs_schema.py`)
+**Two-Phase Approach:**
+
+**Phase 1:** `create_tables_from_queries.py --dataset [dataset]`
+- Executes table creation queries from `table_creation_queries_[dataset].json`
+- Creates educational tables in the database deterministically
+- Reports creation status and row counts
+
+**Phase 2:** `generate_data_schema_generic.py --dataset [dataset]`
+- Introspects database structure and generates comprehensive schema
+- Combines deterministic generation with strategic blanks for agent enhancement
+- Outputs structured prompt for semantic field completion
 
 **Process:**
-1. Generate comprehensive schema with metadata, tables, relationships
-2. Include creation queries showing how child tables were derived
-3. Add sample data for each table
-4. Document relationships between tables
-5. Add educational schema notes
+1. Run Phase 1 to create tables from JSON queries
+2. Run Phase 2 to generate schema template with enhancement prompt
+3. Agent enhances semantic fields (descriptions, educational context, relationships)
+4. Results in complete `data_schema_[dataset].json` ready for curriculum use
 
-**Schema Format:**
-```json
-{
-  "metadata": {
-    "database_name": "data_jobs.db",
-    "description": "Normalized schema for real-world data analytics job postings dataset",
-    "total_tables": 6,
-    "total_records": 987313,
-    "source": "Luke Barousse Data Jobs Dataset from HuggingFace",
-    "hf_source": "lukebarousse/data_jobs",
-    "original_dataset_size": 785741,
-    "normalization_approach": "Dimensional modeling with fact table and dimension tables"
-  },
-  "tables": [
-    {
-      "id": 1,
-      "name": "companies",
-      "description": "Contains information about companies that post job listings",
-      "creation_query": "CREATE TABLE companies AS\nSELECT DISTINCT \n    ROW_NUMBER() OVER (ORDER BY company_name) as company_id,\n    company_name\nFROM raw_jobs_data \nWHERE company_name IS NOT NULL;",
-      "row_count": 139983,
-      "columns": [
-        {
-          "name": "company_id",
-          "type": "INTEGER",
-          "nullable": false,
-          "primary_key": true,
-          "description": "Unique identifier for each company",
-          "foreign_key": ""
-        },
-        {
-          "name": "company_name",
-          "type": "VARCHAR",
-          "nullable": true,
-          "primary_key": false,
-          "description": "Name of the company posting the job",
-          "foreign_key": ""
-        }
-      ],
-      "sample_data": [
-        {
-          "company_id": "1",
-          "company_name": "Boehringer Ingelheim"
-        }
-      ]
-    }
-  ],
-  "relationships": [
-    {
-      "type": "one-to-many",
-      "from_table": "companies",
-      "from_column": "company_id",
-      "to_table": "jobs",
-      "to_column": "company_id",
-      "description": "One company can have many job postings"
-    }
-  ],
-  "schema_notes": [
-    "Database follows normalized design principles with dimensional modeling approach",
-    "All dimension tables were extracted from the original dataset",
-    "Schema is optimized for educational SQL exercises and real-world analysis"
-  ]
-}
-```
+**Key Benefits:**
+- Fully generic - works with any dataset following naming conventions
+- Separates deterministic generation from semantic enhancement
+- Maintains educational focus through structured agent prompts
 
 ### Step 8: Generate Exercises and Solutions
 Agent reviews datasets and topics to generate practice exercises.

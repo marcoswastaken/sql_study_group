@@ -1,28 +1,29 @@
 {
   "metadata": {
     "database_name": "data_jobs.db",
-    "description": "Normalized schema for real-world data analytics job postings dataset",
-    "total_tables": 6,
-    "total_records": 987313,
-    "source": "Luke Barousse Data Jobs Dataset from HuggingFace",
-    "original_dataset_size": 785741,
-    "normalization_approach": "Dimensional modeling with fact table (jobs) and dimension tables (companies, locations, platforms, skills)",
-    "year": "2023",
-    "creation_date": "2024",
-    "use_cases": [
-      "SQL practice exercises",
-      "JOIN operations training",
-      "Database normalization examples",
-      "Real-world data analysis",
-      "Business intelligence tutorials"
-    ]
+    "description": "",
+    "total_tables": 11,
+    "total_records": 987537,
+    "source": "",
+    "generation_date": "2025-07-11",
+    "use_cases": [],
+    "target_week": 4,
+    "core_concepts": [
+      "Primary/foreign keys",
+      "INNER JOIN",
+      "LEFT JOIN",
+      "ON clause",
+      "Table aliases"
+    ],
+    "educational_focus": "Understanding JOIN differences and NULL handling",
+    "complexity_level": "beginner"
   },
   "tables": [
     {
       "id": 1,
       "name": "companies",
-      "description": "Contains information about companies that post job listings",
-      "creation_query": "CREATE TABLE companies AS\nSELECT DISTINCT \n    ROW_NUMBER() OVER (ORDER BY company_name) as company_id,\n    company_name\nFROM raw_jobs_data \nWHERE company_name IS NOT NULL\nORDER BY company_name;",
+      "description": "",
+      "creation_query": "",
       "row_count": 139983,
       "columns": [
         {
@@ -30,16 +31,16 @@
           "type": "INTEGER",
           "nullable": false,
           "primary_key": true,
-          "description": "Unique identifier for each company",
-          "foreign_key": ""
+          "foreign_key": "",
+          "description": ""
         },
         {
           "name": "company_name",
           "type": "VARCHAR",
           "nullable": true,
           "primary_key": false,
-          "description": "Name of the company posting the job",
-          "foreign_key": ""
+          "foreign_key": "",
+          "description": ""
         }
       ],
       "sample_data": [
@@ -55,13 +56,273 @@
           "company_id": "3",
           "company_name": "ALPHA Augmented Services"
         }
-      ]
+      ],
+      "educational_purpose": ""
     },
     {
       "id": 2,
+      "name": "company_tiers",
+      "description": "",
+      "creation_query": "CREATE TABLE company_tiers AS\nSELECT \n    ROW_NUMBER() OVER (ORDER BY min_postings) as tier_id,\n    tier_name,\n    min_postings,\n    max_postings,\n    description\nFROM (\n    VALUES \n        ('Large Enterprise', 100, 99999, 'Companies with 100+ job postings'),\n        ('Medium Company', 20, 99, 'Companies with 20-99 job postings'),\n        ('Small Company', 5, 19, 'Companies with 5-19 job postings'),\n        ('Startup/Small Business', 1, 4, 'Companies with 1-4 job postings')\n) AS t(tier_name, min_postings, max_postings, description)\nORDER BY min_postings DESC;",
+      "row_count": 4,
+      "columns": [
+        {
+          "name": "tier_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        },
+        {
+          "name": "tier_name",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        },
+        {
+          "name": "min_postings",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        },
+        {
+          "name": "max_postings",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        },
+        {
+          "name": "description",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        }
+      ],
+      "sample_data": [
+        {
+          "tier_id": "4",
+          "tier_name": "Large Enterprise",
+          "min_postings": "100",
+          "max_postings": "99999",
+          "description": "Companies with 100+ job postings"
+        },
+        {
+          "tier_id": "3",
+          "tier_name": "Medium Company",
+          "min_postings": "20",
+          "max_postings": "99",
+          "description": "Companies with 20-99 job postings"
+        },
+        {
+          "tier_id": "2",
+          "tier_name": "Small Company",
+          "min_postings": "5",
+          "max_postings": "19",
+          "description": "Companies with 5-19 job postings"
+        }
+      ],
+      "educational_purpose": ""
+    },
+    {
+      "id": 3,
+      "name": "countries",
+      "description": "",
+      "creation_query": "CREATE TABLE countries AS\nSELECT \n    ROW_NUMBER() OVER (ORDER BY job_country) as country_id,\n    job_country as country_name,\n    CASE \n        WHEN job_country = 'United States' THEN 'North America'\n        WHEN job_country IN ('United Kingdom', 'Germany', 'France', 'Spain', 'Italy', 'Netherlands') THEN 'Europe'\n        WHEN job_country IN ('India', 'Singapore', 'Japan') THEN 'Asia'\n        WHEN job_country IN ('Australia', 'New Zealand') THEN 'Oceania'\n        ELSE 'Other'\n    END as region,\n    CASE\n        WHEN job_country = 'United States' THEN 'USD'\n        WHEN job_country IN ('Germany', 'France', 'Spain', 'Italy', 'Netherlands') THEN 'EUR'\n        WHEN job_country = 'United Kingdom' THEN 'GBP'\n        WHEN job_country = 'India' THEN 'INR'\n        WHEN job_country = 'Singapore' THEN 'SGD'\n        ELSE NULL\n    END as primary_currency\nFROM (\n    SELECT DISTINCT job_country \n    FROM locations \n    WHERE job_country IS NOT NULL\n) t\nORDER BY country_name;",
+      "row_count": 160,
+      "columns": [
+        {
+          "name": "country_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        },
+        {
+          "name": "country_name",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        },
+        {
+          "name": "region",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        },
+        {
+          "name": "primary_currency",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        }
+      ],
+      "sample_data": [
+        {
+          "country_id": "1",
+          "country_name": "Afghanistan",
+          "region": "Other",
+          "primary_currency": "None"
+        },
+        {
+          "country_id": "2",
+          "country_name": "Albania",
+          "region": "Other",
+          "primary_currency": "None"
+        },
+        {
+          "country_id": "3",
+          "country_name": "Algeria",
+          "region": "Other",
+          "primary_currency": "None"
+        }
+      ],
+      "educational_purpose": ""
+    },
+    {
+      "id": 4,
+      "name": "employment_types",
+      "description": "",
+      "creation_query": "CREATE TABLE employment_types AS\nSELECT \n    ROW_NUMBER() OVER (ORDER BY job_schedule_type) as employment_type_id,\n    job_schedule_type as type_name,\n    CASE \n        WHEN job_schedule_type = 'Full-time' THEN 'Permanent'\n        WHEN job_schedule_type = 'Part-time' THEN 'Permanent'\n        WHEN job_schedule_type = 'Contractor' THEN 'Temporary'\n        WHEN job_schedule_type = 'Internship' THEN 'Training'\n        WHEN job_schedule_type LIKE '%Temp%' THEN 'Temporary'\n        ELSE 'Other'\n    END as employment_class,\n    CASE\n        WHEN job_schedule_type = 'Full-time' THEN 40\n        WHEN job_schedule_type = 'Part-time' THEN 20\n        WHEN job_schedule_type = 'Contractor' THEN 40\n        WHEN job_schedule_type = 'Internship' THEN 32\n        ELSE NULL\n    END as typical_hours_per_week\nFROM (\n    SELECT DISTINCT job_schedule_type \n    FROM jobs \n    WHERE job_schedule_type IS NOT NULL\n) t\nORDER BY type_name;",
+      "row_count": 47,
+      "columns": [
+        {
+          "name": "employment_type_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "References employment_types.employment_type_id",
+          "description": ""
+        },
+        {
+          "name": "type_name",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        },
+        {
+          "name": "employment_class",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        },
+        {
+          "name": "typical_hours_per_week",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        }
+      ],
+      "sample_data": [
+        {
+          "employment_type_id": "1",
+          "type_name": "Contractor",
+          "employment_class": "Temporary",
+          "typical_hours_per_week": "40.0"
+        },
+        {
+          "employment_type_id": "2",
+          "type_name": "Contractor and Full-time",
+          "employment_class": "Other",
+          "typical_hours_per_week": "nan"
+        },
+        {
+          "employment_type_id": "3",
+          "type_name": "Contractor and Internship",
+          "employment_class": "Other",
+          "typical_hours_per_week": "nan"
+        }
+      ],
+      "educational_purpose": ""
+    },
+    {
+      "id": 5,
+      "name": "job_categories",
+      "description": "",
+      "creation_query": "CREATE TABLE job_categories AS\nSELECT \n    ROW_NUMBER() OVER (ORDER BY job_title_short) as category_id,\n    job_title_short as category_name,\n    CASE \n        WHEN job_title_short LIKE '%Senior%' THEN 'Senior Level'\n        WHEN job_title_short LIKE '%Machine Learning%' THEN 'Specialized'\n        ELSE 'Standard Level'\n    END as experience_level,\n    CASE\n        WHEN job_title_short IN ('Data Scientist', 'Senior Data Scientist', 'Machine Learning Engineer') THEN 'Science'\n        WHEN job_title_short IN ('Data Engineer', 'Senior Data Engineer', 'Cloud Engineer') THEN 'Engineering' \n        WHEN job_title_short IN ('Data Analyst', 'Senior Data Analyst', 'Business Analyst') THEN 'Analytics'\n        ELSE 'Technical'\n    END as job_family\nFROM (\n    SELECT DISTINCT job_title_short \n    FROM jobs \n    WHERE job_title_short IS NOT NULL\n) t\nORDER BY category_name;",
+      "row_count": 10,
+      "columns": [
+        {
+          "name": "category_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        },
+        {
+          "name": "category_name",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        },
+        {
+          "name": "experience_level",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        },
+        {
+          "name": "job_family",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        }
+      ],
+      "sample_data": [
+        {
+          "category_id": "1",
+          "category_name": "Business Analyst",
+          "experience_level": "Standard Level",
+          "job_family": "Analytics"
+        },
+        {
+          "category_id": "2",
+          "category_name": "Cloud Engineer",
+          "experience_level": "Standard Level",
+          "job_family": "Engineering"
+        },
+        {
+          "category_id": "3",
+          "category_name": "Data Analyst",
+          "experience_level": "Standard Level",
+          "job_family": "Analytics"
+        }
+      ],
+      "educational_purpose": ""
+    },
+    {
+      "id": 6,
       "name": "job_skills",
-      "description": "Junction table linking jobs to their required skills (many-to-many relationship)",
-      "creation_query": "CREATE TABLE job_skills AS\nSELECT DISTINCT\n    j.job_id,\n    s.skill_id\nFROM jobs j\nCROSS JOIN skills s\nWHERE \n    -- Pattern matching job descriptions/titles for skill requirements\n    LOWER(j.job_title) LIKE '%' || LOWER(s.skill_name) || '%'\n    OR LOWER(j.job_title_short) LIKE '%' || LOWER(s.skill_name) || '%'\n    -- Additional skill detection logic would be applied here\nORDER BY j.job_id, s.skill_id;",
+      "description": "",
+      "creation_query": "",
       "row_count": 35125,
       "columns": [
         {
@@ -69,16 +330,16 @@
           "type": "INTEGER",
           "nullable": false,
           "primary_key": true,
-          "description": "Unique identifier for each job posting",
-          "foreign_key": ""
+          "foreign_key": "References jobs.job_id",
+          "description": ""
         },
         {
           "name": "skill_id",
           "type": "INTEGER",
           "nullable": false,
           "primary_key": true,
-          "description": "Unique identifier for each skill",
-          "foreign_key": ""
+          "foreign_key": "References skills.skill_id",
+          "description": ""
         }
       ],
       "sample_data": [
@@ -94,13 +355,14 @@
           "job_id": "2",
           "skill_id": "4"
         }
-      ]
+      ],
+      "educational_purpose": ""
     },
     {
-      "id": 3,
+      "id": 7,
       "name": "jobs",
-      "description": "Main table containing all job postings with details like title, salary, and requirements",
-      "creation_query": "CREATE TABLE jobs AS\nSELECT \n    j.job_id,\n    c.company_id,\n    l.location_id, \n    p.platform_id,\n    j.job_title_short,\n    j.job_title,\n    j.job_schedule_type,\n    j.job_work_from_home,\n    j.job_posted_date,\n    j.job_no_degree_mention,\n    j.job_health_insurance,\n    j.salary_rate,\n    j.salary_year_avg,\n    j.salary_hour_avg\nFROM raw_jobs_data j\nLEFT JOIN companies c ON j.company_name = c.company_name\nLEFT JOIN locations l ON j.job_location = l.job_location AND j.job_country = l.job_country  \nLEFT JOIN platforms p ON j.job_via = p.platform_name;",
+      "description": "",
+      "creation_query": "",
       "row_count": 785741,
       "columns": [
         {
@@ -108,112 +370,112 @@
           "type": "INTEGER",
           "nullable": false,
           "primary_key": true,
-          "description": "Unique identifier for each job posting",
-          "foreign_key": ""
+          "foreign_key": "References jobs.job_id",
+          "description": ""
         },
         {
           "name": "company_id",
           "type": "INTEGER",
           "nullable": true,
           "primary_key": false,
-          "description": "Unique identifier for each company",
-          "foreign_key": "References companies.company_id"
+          "foreign_key": "",
+          "description": ""
         },
         {
           "name": "location_id",
           "type": "INTEGER",
           "nullable": true,
           "primary_key": false,
-          "description": "Unique identifier for each location",
-          "foreign_key": "References locations.location_id"
+          "foreign_key": "References locations.location_id",
+          "description": ""
         },
         {
           "name": "platform_id",
           "type": "INTEGER",
           "nullable": true,
           "primary_key": false,
-          "description": "Unique identifier for each job posting platform",
-          "foreign_key": "References platforms.platform_id"
+          "foreign_key": "References platforms.platform_id",
+          "description": ""
         },
         {
           "name": "job_title_short",
           "type": "VARCHAR",
           "nullable": true,
           "primary_key": false,
-          "description": "Standardized job title category (e.g., \"Data Scientist\", \"Data Engineer\")",
-          "foreign_key": ""
+          "foreign_key": "",
+          "description": ""
         },
         {
           "name": "job_title",
           "type": "VARCHAR",
           "nullable": true,
           "primary_key": false,
-          "description": "Full job title as posted by the company",
-          "foreign_key": ""
+          "foreign_key": "",
+          "description": ""
         },
         {
           "name": "job_schedule_type",
           "type": "VARCHAR",
           "nullable": true,
           "primary_key": false,
-          "description": "Employment type (full-time, part-time, contract, etc.)",
-          "foreign_key": ""
+          "foreign_key": "",
+          "description": ""
         },
         {
           "name": "job_work_from_home",
           "type": "BOOLEAN",
           "nullable": true,
           "primary_key": false,
-          "description": "Boolean indicating if remote work is available",
-          "foreign_key": ""
+          "foreign_key": "",
+          "description": ""
         },
         {
           "name": "job_posted_date",
           "type": "TIMESTAMP",
           "nullable": true,
           "primary_key": false,
-          "description": "Date and time when the job was posted",
-          "foreign_key": ""
+          "foreign_key": "",
+          "description": ""
         },
         {
           "name": "job_no_degree_mention",
           "type": "BOOLEAN",
           "nullable": true,
           "primary_key": false,
-          "description": "Boolean indicating if the job posting mentions no degree requirement",
-          "foreign_key": ""
+          "foreign_key": "",
+          "description": ""
         },
         {
           "name": "job_health_insurance",
           "type": "BOOLEAN",
           "nullable": true,
           "primary_key": false,
-          "description": "Boolean indicating if health insurance is mentioned as a benefit",
-          "foreign_key": ""
+          "foreign_key": "",
+          "description": ""
         },
         {
           "name": "salary_rate",
           "type": "VARCHAR",
           "nullable": true,
           "primary_key": false,
-          "description": "Rate type for salary (yearly, hourly, etc.)",
-          "foreign_key": ""
+          "foreign_key": "",
+          "description": ""
         },
         {
           "name": "salary_year_avg",
           "type": "DECIMAL(10,2)",
           "nullable": true,
           "primary_key": false,
-          "description": "Average yearly salary in USD",
-          "foreign_key": ""
+          "foreign_key": "",
+          "description": ""
         },
         {
           "name": "salary_hour_avg",
           "type": "DECIMAL(8,2)",
           "nullable": true,
           "primary_key": false,
-          "description": "Average hourly salary in USD",
-          "foreign_key": ""
+          "foreign_key": "",
+          "description": ""
         }
       ],
       "sample_data": [
@@ -265,13 +527,14 @@
           "salary_year_avg": "None",
           "salary_hour_avg": "None"
         }
-      ]
+      ],
+      "educational_purpose": ""
     },
     {
-      "id": 4,
+      "id": 8,
       "name": "locations",
-      "description": "Geographic information for job locations including city and country",
-      "creation_query": "CREATE TABLE locations AS\nSELECT DISTINCT\n    ROW_NUMBER() OVER (ORDER BY job_location, job_country) as location_id,\n    job_location,\n    job_country\nFROM raw_jobs_data\nWHERE job_location IS NOT NULL\nORDER BY job_country, job_location;",
+      "description": "",
+      "creation_query": "",
       "row_count": 18545,
       "columns": [
         {
@@ -279,24 +542,24 @@
           "type": "INTEGER",
           "nullable": false,
           "primary_key": true,
-          "description": "Unique identifier for each location",
-          "foreign_key": ""
+          "foreign_key": "References locations.location_id",
+          "description": ""
         },
         {
           "name": "job_location",
           "type": "VARCHAR",
           "nullable": true,
           "primary_key": false,
-          "description": "City or geographic area where the job is located",
-          "foreign_key": ""
+          "foreign_key": "",
+          "description": ""
         },
         {
           "name": "job_country",
           "type": "VARCHAR",
           "nullable": true,
           "primary_key": false,
-          "description": "Country where the job is located",
-          "foreign_key": ""
+          "foreign_key": "",
+          "description": ""
         }
       ],
       "sample_data": [
@@ -315,13 +578,14 @@
           "job_location": "Berlin, Germany",
           "job_country": "Germany"
         }
-      ]
+      ],
+      "educational_purpose": ""
     },
     {
-      "id": 5,
+      "id": 9,
       "name": "platforms",
-      "description": "Job posting platforms (LinkedIn, Indeed, etc.) where jobs are advertised",
-      "creation_query": "CREATE TABLE platforms AS\nSELECT DISTINCT\n    ROW_NUMBER() OVER (ORDER BY job_via) as platform_id,\n    job_via as platform_name\nFROM raw_jobs_data\nWHERE job_via IS NOT NULL\nORDER BY job_via;",
+      "description": "",
+      "creation_query": "",
       "row_count": 7904,
       "columns": [
         {
@@ -329,16 +593,16 @@
           "type": "INTEGER",
           "nullable": false,
           "primary_key": true,
-          "description": "Unique identifier for each job posting platform",
-          "foreign_key": ""
+          "foreign_key": "References platforms.platform_id",
+          "description": ""
         },
         {
           "name": "platform_name",
           "type": "VARCHAR",
           "nullable": true,
           "primary_key": false,
-          "description": "Name of the platform (e.g., \"via LinkedIn\", \"via Indeed\")",
-          "foreign_key": ""
+          "foreign_key": "",
+          "description": ""
         }
       ],
       "sample_data": [
@@ -354,13 +618,76 @@
           "platform_id": "3",
           "platform_name": "via LinkedIn"
         }
-      ]
+      ],
+      "educational_purpose": ""
     },
     {
-      "id": 6,
+      "id": 10,
+      "name": "remote_work_policies",
+      "description": "",
+      "creation_query": "CREATE TABLE remote_work_policies AS\nSELECT \n    policy_id,\n    is_remote,\n    policy_name,\n    policy_description\nFROM (\n    VALUES \n        (1, TRUE, 'Remote Friendly', 'Position allows remote work'),\n        (2, FALSE, 'On-site Required', 'Position requires office presence'),\n        (3, NULL, 'Hybrid/Flexible', 'Remote work policy not specified')\n) AS t(policy_id, is_remote, policy_name, policy_description);",
+      "row_count": 3,
+      "columns": [
+        {
+          "name": "policy_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        },
+        {
+          "name": "is_remote",
+          "type": "BOOLEAN",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        },
+        {
+          "name": "policy_name",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        },
+        {
+          "name": "policy_description",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": ""
+        }
+      ],
+      "sample_data": [
+        {
+          "policy_id": "1",
+          "is_remote": "True",
+          "policy_name": "Remote Friendly",
+          "policy_description": "Position allows remote work"
+        },
+        {
+          "policy_id": "2",
+          "is_remote": "False",
+          "policy_name": "On-site Required",
+          "policy_description": "Position requires office presence"
+        },
+        {
+          "policy_id": "3",
+          "is_remote": "None",
+          "policy_name": "Hybrid/Flexible",
+          "policy_description": "Remote work policy not specified"
+        }
+      ],
+      "educational_purpose": ""
+    },
+    {
+      "id": 11,
       "name": "skills",
-      "description": "Available skills that can be required for jobs, categorized by type",
-      "creation_query": "CREATE TABLE skills AS\nSELECT skill_id, skill_name, skill_category\nFROM (VALUES \n    (1, 'Python', 'programming'),\n    (2, 'SQL', 'programming'), \n    (3, 'R', 'programming'),\n    (4, 'Excel', 'analyst_tools'),\n    (5, 'Tableau', 'analyst_tools'),\n    (6, 'Power BI', 'analyst_tools'),\n    (7, 'AWS', 'cloud'),\n    (8, 'Azure', 'cloud'),\n    (9, 'GCP', 'cloud'),\n    (10, 'Spark', 'big_data'),\n    (11, 'Hadoop', 'big_data'),\n    (12, 'Docker', 'devops'),\n    (13, 'Kubernetes', 'devops'),\n    (14, 'Git', 'devops'),\n    (15, 'Machine Learning', 'analytics')\n) AS t(skill_id, skill_name, skill_category);",
+      "description": "",
+      "creation_query": "",
       "row_count": 15,
       "columns": [
         {
@@ -368,24 +695,24 @@
           "type": "INTEGER",
           "nullable": false,
           "primary_key": true,
-          "description": "Unique identifier for each skill",
-          "foreign_key": ""
+          "foreign_key": "References skills.skill_id",
+          "description": ""
         },
         {
           "name": "skill_name",
           "type": "VARCHAR",
           "nullable": true,
           "primary_key": false,
-          "description": "Name of the skill (e.g., \"Python\", \"SQL\", \"Excel\")",
-          "foreign_key": ""
+          "foreign_key": "",
+          "description": ""
         },
         {
           "name": "skill_category",
           "type": "VARCHAR",
           "nullable": true,
           "primary_key": false,
-          "description": "Category of the skill (programming, analyst_tools, cloud, etc.)",
-          "foreign_key": ""
+          "foreign_key": "",
+          "description": ""
         }
       ],
       "sample_data": [
@@ -404,17 +731,42 @@
           "skill_name": "R",
           "skill_category": "programming"
         }
-      ]
+      ],
+      "educational_purpose": ""
     }
   ],
   "relationships": [
     {
       "type": "one-to-many",
-      "from_table": "companies",
-      "from_column": "company_id",
+      "from_table": "employment_types",
+      "from_column": "employment_type_id",
+      "to_table": "employment_types",
+      "to_column": "employment_type_id",
+      "description": ""
+    },
+    {
+      "type": "one-to-many",
+      "from_table": "jobs",
+      "from_column": "job_id",
+      "to_table": "job_skills",
+      "to_column": "job_id",
+      "description": ""
+    },
+    {
+      "type": "one-to-many",
+      "from_table": "skills",
+      "from_column": "skill_id",
+      "to_table": "job_skills",
+      "to_column": "skill_id",
+      "description": ""
+    },
+    {
+      "type": "one-to-many",
+      "from_table": "jobs",
+      "from_column": "job_id",
       "to_table": "jobs",
-      "to_column": "company_id",
-      "description": "One company can have many job postings"
+      "to_column": "job_id",
+      "description": ""
     },
     {
       "type": "one-to-many",
@@ -422,7 +774,7 @@
       "from_column": "location_id",
       "to_table": "jobs",
       "to_column": "location_id",
-      "description": "One location can have many job postings"
+      "description": ""
     },
     {
       "type": "one-to-many",
@@ -430,27 +782,51 @@
       "from_column": "platform_id",
       "to_table": "jobs",
       "to_column": "platform_id",
-      "description": "One platform can have many job postings"
+      "description": ""
     },
     {
-      "type": "many-to-many",
-      "from_table": "jobs",
-      "from_column": "job_id",
+      "type": "one-to-many",
+      "from_table": "locations",
+      "from_column": "location_id",
+      "to_table": "locations",
+      "to_column": "location_id",
+      "description": ""
+    },
+    {
+      "type": "one-to-many",
+      "from_table": "platforms",
+      "from_column": "platform_id",
+      "to_table": "platforms",
+      "to_column": "platform_id",
+      "description": ""
+    },
+    {
+      "type": "one-to-many",
+      "from_table": "skills",
+      "from_column": "skill_id",
       "to_table": "skills",
       "to_column": "skill_id",
-      "junction_table": "job_skills",
-      "description": "Jobs can require multiple skills, and skills can be required by multiple jobs"
+      "description": ""
     }
   ],
   "schema_notes": [
-    "Database follows normalized design principles with dimensional modeling approach",
-    "All dimension tables (companies, locations, platforms, skills) were extracted from the original dataset",
-    "The jobs table serves as the central fact table with foreign key references",
-    "Foreign key relationships ensure data integrity and enable efficient JOINs",
-    "Junction table (job_skills) implements many-to-many relationship between jobs and skills",
-    "Creation queries show the normalization process from raw data to structured schema",
-    "Salary information is in USD where available",
-    "Date format follows ISO 8601 standard (YYYY-MM-DD HH:MM:SS)",
-    "Schema is optimized for educational SQL exercises and real-world analysis"
-  ]
+    "Database contains 9 foreign key relationships ensuring referential integrity",
+    "Junction tables detected: job_skills, jobs - implementing many-to-many relationships",
+    "",
+    "",
+    ""
+  ],
+  "agent_enhancement_needed": {
+    "description": "The following fields need agent enhancement",
+    "fields_to_enhance": [
+      "metadata.description",
+      "metadata.source",
+      "metadata.use_cases",
+      "tables[].description",
+      "tables[].educational_purpose",
+      "tables[].columns[].description",
+      "relationships[].description",
+      "schema_notes (empty strings)"
+    ]
+  }
 }
