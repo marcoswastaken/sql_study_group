@@ -69,16 +69,20 @@ class TableCreationValidator:
         if self.database_path:
             self._initialize_sql_helper()
         
-        # Step 4: Validate SQL queries
+        # Step 4: Preview row counts (new feature)
+        if self.sql_helper:
+            self.preview_row_counts(json_data)
+        
+        # Step 5: Validate SQL queries
         if self.sql_helper:
             self._validate_sql_queries(json_data)
         else:
             print("⚠️  Database not provided - skipping SQL query validation")
         
-        # Step 5: Generate summary report
+        # Step 6: Generate summary report
         self._generate_summary_report()
         
-        # Step 6: Clean up test tables
+        # Step 7: Clean up test tables
         if self.sql_helper:
             self._cleanup_test_tables(json_data)
         
@@ -399,6 +403,159 @@ class TableCreationValidator:
                 print(f"  - Schema: {error}")
             for error in self.validation_results["query_validation"]["errors"]:
                 print(f"  - Query: {error}")
+
+    def preview_row_counts(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Preview expected vs available row counts for each table."""
+        print("\n📊 PREVIEWING ROW COUNTS AND VALIDATING 75% MINIMUM")
+        print("-" * 60)
+        
+        if not self.sql_helper or "tables" not in data:
+            print("⚠️  Cannot preview - no database or tables found")
+            return {}
+        
+        preview_results = {}
+        validation_errors = []
+        
+        for table_name, table_config in data["tables"].items():
+            print(f"\n📋 Analyzing table: {table_name}")
+            
+            query = table_config.get("query", "")
+            expected_count = table_config.get("row_count_estimate", 0)
+            
+            # Skip salary_ranges as it's reference data, not sampled
+            if table_name == "salary_ranges":
+                print(f"   ⚠️  Skipping {table_name} - reference data table")
+                continue
+            
+            # Extract the counting logic based on table type
+            available_count = self._count_available_rows(table_name, query)
+            
+            if available_count > 0:
+                percentage_used = (expected_count / available_count * 100) if available_count > 0 else 0
+                
+                print(f"   📊 Available rows: {available_count:,}")
+                print(f"   🎯 Expected rows: {expected_count:,}")
+                print(f"   📈 Percentage used: {percentage_used:.1f}%")
+                
+                # Validate 75% minimum requirement (use >= to handle floating point precision)
+                if percentage_used >= 75.0:
+                    print(f"   ✅ Meets 75% minimum requirement")
+                else:
+                    error_msg = f"Table '{table_name}' only uses {percentage_used:.1f}% of available data (minimum: 75%)"
+                    validation_errors.append(error_msg)
+                    print(f"   ❌ {error_msg}")
+                
+                # Check if it's using random sampling
+                randomness_check = self._validate_randomness(table_name, query)
+                if randomness_check["has_random"]:
+                    print(f"   ✅ Uses random sampling")
+                    if randomness_check["has_seed"]:
+                        print(f"   ✅ Uses deterministic seeding")
+                        if randomness_check["seed_works"]:
+                            print(f"   ✅ Randomness validation passed")
+                        else:
+                            print(f"   ❌ Randomness validation failed")
+                    else:
+                        print(f"   ⚠️  No SETSEED() found - results may not be reproducible")
+                else:
+                    print(f"   ⚠️  Uses deterministic ordering - consider RANDOM() for better sampling")
+                
+                preview_results[table_name] = {
+                    "available_count": available_count,
+                    "expected_count": expected_count,
+                    "percentage_used": percentage_used,
+                    "meets_minimum": percentage_used >= 75.0,
+                    "randomness_check": randomness_check
+                }
+                
+                # Suggest percentage-based alternatives
+                print(f"   💡 Percentage-based alternatives:")
+                for pct in [75, 80, 85, 90, 95]:
+                    suggested_count = int(available_count * pct / 100)
+                    print(f"      {pct}%: {suggested_count:,} rows")
+            else:
+                print(f"   ❌ Could not determine available row count")
+        
+        # Add validation errors to results
+        if validation_errors:
+            self.validation_results["schema_validation"]["errors"].extend(validation_errors)
+            print(f"\n❌ {len(validation_errors)} tables fail 75% minimum requirement")
+        else:
+            print(f"\n✅ All sampled tables meet 75% minimum requirement")
+        
+        return preview_results
+    
+    def _count_available_rows(self, table_name: str, query: str) -> int:
+        """Count available rows for a specific table type."""
+        try:
+            # Extract the core counting logic for each table type
+            if table_name == "companies":
+                count_query = "SELECT COUNT(DISTINCT company_name) as count FROM data_jobs WHERE company_name IS NOT NULL"
+            elif table_name == "locations":
+                count_query = "SELECT COUNT(DISTINCT job_location) as count FROM data_jobs WHERE job_location IS NOT NULL AND job_country IS NOT NULL"
+            elif table_name == "job_platforms":
+                count_query = "SELECT COUNT(DISTINCT job_via) as count FROM data_jobs WHERE job_via IS NOT NULL"
+            elif table_name == "job_postings":
+                count_query = "SELECT COUNT(*) as count FROM data_jobs WHERE job_posted_date IS NOT NULL"
+            else:
+                return 0
+            
+            result = self.sql_helper.execute_query(count_query)
+            if result["status"] == "success":
+                return int(result["data"].iloc[0]["count"])
+            else:
+                print(f"   ❌ Error counting available rows: {result['error']}")
+                return 0
+                
+        except Exception as e:
+            print(f"   ❌ Exception counting available rows: {e}")
+            return 0
+    
+    def _validate_randomness(self, table_name: str, query: str) -> Dict[str, bool]:
+        """Validate that randomness is properly implemented and deterministic."""
+        result = {
+            "has_random": False,
+            "has_seed": False,
+            "seed_works": False
+        }
+        
+        # Check for RANDOM() function (case insensitive)
+        query_upper = query.upper()
+        result["has_random"] = "RANDOM()" in query_upper
+        
+        # Check for SETSEED() function
+        result["has_seed"] = "SETSEED(" in query_upper
+        
+        # If both are present, test that seeding works deterministically
+        if result["has_random"] and result["has_seed"]:
+            result["seed_works"] = self._test_deterministic_randomness()
+        
+        return result
+    
+    def _test_deterministic_randomness(self) -> bool:
+        """Test that SETSEED produces deterministic results."""
+        try:
+            # Test with a simple query using RANDOM()
+            test_query1 = "SELECT SETSEED(0.123); SELECT RANDOM() as rnd_value"
+            test_query2 = "SELECT SETSEED(0.123); SELECT RANDOM() as rnd_value"
+            
+            result1 = self.sql_helper.execute_query(test_query1)
+            result2 = self.sql_helper.execute_query(test_query2)
+            
+            if result1["status"] == "success" and result2["status"] == "success":
+                # Check if same seed produces same result
+                value1 = result1["data"].iloc[0]["rnd_value"] if not result1["data"].empty else None
+                value2 = result2["data"].iloc[0]["rnd_value"] if not result2["data"].empty else None
+                
+                if value1 is not None and value2 is not None:
+                    # They should be equal (deterministic)
+                    return abs(float(value1) - float(value2)) < 1e-10
+            
+            return False
+            
+        except Exception as e:
+            print(f"   ⚠️  Could not test randomness: {e}")
+            return False
 
 
 def main():

@@ -80,8 +80,8 @@ def check_database():
             print_status(f"Database error: {e}", False)
             return False
     else:
-        print_status("Database file not found (run setup_sql_environment.py)", False)
-        return False
+        print_status("Database file not found (will be created during process)", None)
+        return None
 
 def check_jupyter():
     """Check if Jupyter notebook is available"""
