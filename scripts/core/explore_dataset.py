@@ -540,7 +540,7 @@ def main():
     )
     parser.add_argument(
         "--output", 
-        help="Output JSON file path (default: initial_exploration_<dataset_name>.json in scripts/data_schema_generation/)"
+        help="Output JSON file path (default: initial_exploration_<dataset_name>.json in project's scripts/data_schema_generation/)"
     )
     parser.add_argument(
         "--sample-size", 
@@ -559,7 +559,9 @@ def main():
     # Set default output path if not provided
     if not args.output:
         dataset_name = args.dataset.split('/')[-1]
-        args.output = f"scripts/data_schema_generation/initial_exploration_{dataset_name}.json"
+        # Always use absolute path relative to project root, not current working directory
+        project_root = Path(__file__).parent.parent.parent
+        args.output = str(project_root / "scripts" / "data_schema_generation" / f"initial_exploration_{dataset_name}.json")
     
     # Create explorer and run analysis
     explorer = DatasetExplorer(args.dataset, args.split, args.sample_size)

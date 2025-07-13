@@ -1,0 +1,69 @@
+{
+  "metadata": {
+    "description": "Educational table creation queries for Week 4 JOIN operations practice",
+    "target_week": 4,
+    "core_concepts": [
+      "Primary/foreign keys",
+      "INNER JOIN",
+      "LEFT JOIN",
+      "ON clause",
+      "Table aliases"
+    ],
+    "dataset_source": "lukebarousse/data_jobs",
+    "educational_focus": "JOIN Operations",
+    "complexity_progression": "Simple lookups -> Complex relationships -> Multi-table joins",
+    "created_date": "2025-07-11",
+    "sampling_method": "percentage_based_random",
+    "sampling_seed": 42,
+    "minimum_percentage": 75
+  },
+  "tables": {
+    "companies": {
+      "description": "Core company information with primary key",
+      "educational_purpose": "Primary key practice, foundation for all joins",
+      "row_count_estimate": 111985,
+      "percentage_of_available": 80.0,
+      "available_count": 139982,
+      "query": "SELECT SETSEED(0.42); CREATE TABLE companies AS SELECT ROW_NUMBER() OVER (ORDER BY RANDOM()) AS company_id, company_name, COUNT(*) AS total_jobs FROM data_jobs WHERE company_name IS NOT NULL GROUP BY company_name ORDER BY RANDOM() LIMIT 111985"
+    },
+    "locations": {
+      "description": "Geographic locations with intentional gaps for LEFT JOIN practice",
+      "educational_purpose": "Foreign key relationships, LEFT JOIN with NULLs",
+      "row_count_estimate": 14628,
+      "percentage_of_available": 85.0,
+      "available_count": 17210,
+      "query": "SELECT SETSEED(0.42); CREATE TABLE locations AS SELECT ROW_NUMBER() OVER (ORDER BY RANDOM()) AS location_id, job_location, job_country, COUNT(*) AS job_count FROM data_jobs WHERE job_location IS NOT NULL AND job_country IS NOT NULL GROUP BY job_location, job_country HAVING COUNT(*) >= 50 ORDER BY RANDOM() LIMIT 14628"
+    },
+    "job_platforms": {
+      "description": "Job posting platforms for simple JOIN practice",
+      "educational_purpose": "Basic INNER JOIN, platform analysis",
+      "row_count_estimate": 7112,
+      "percentage_of_available": 90.0,
+      "available_count": 7903,
+      "query": "SELECT SETSEED(0.42); CREATE TABLE job_platforms AS SELECT ROW_NUMBER() OVER (ORDER BY RANDOM()) AS platform_id, job_via AS platform_name, COUNT(*) AS jobs_posted FROM data_jobs WHERE job_via IS NOT NULL GROUP BY job_via ORDER BY RANDOM() LIMIT 7112"
+    },
+    "job_postings": {
+      "description": "Core job postings with foreign keys to other tables",
+      "educational_purpose": "Multi-table JOINs, foreign key relationships",
+      "row_count_estimate": 589306,
+      "percentage_of_available": 75.0,
+      "available_count": 785741,
+      "query": "SELECT SETSEED(0.42); CREATE TABLE job_postings AS SELECT ROW_NUMBER() OVER (ORDER BY RANDOM()) AS job_id, job_title_short, job_title, job_schedule_type, job_work_from_home, job_posted_date, job_no_degree_mention, job_health_insurance, salary_year_avg, salary_hour_avg, company_name, job_location, job_via FROM data_jobs WHERE job_posted_date IS NOT NULL ORDER BY RANDOM() LIMIT 589306"
+    },
+    "salary_ranges": {
+      "description": "Salary classification for conditional JOIN practice",
+      "educational_purpose": "Conditional JOINs, data classification",
+      "row_count_estimate": 4,
+      "percentage_of_available": "N/A (reference data)",
+      "available_count": 4,
+      "query": "CREATE TABLE salary_ranges AS SELECT ROW_NUMBER() OVER () AS range_id, range_name, min_salary, max_salary, experience_level FROM (SELECT 'Entry Level' AS range_name, 0 AS min_salary, 60000 AS max_salary, 'Junior' AS experience_level UNION ALL SELECT 'Mid Level', 60000, 100000, 'Mid' UNION ALL SELECT 'Senior Level', 100000, 150000, 'Senior' UNION ALL SELECT 'Executive', 150000, 999999, 'Executive')"
+    }
+  },
+  "educational_notes": {
+    "primary_keys": "All tables have explicit primary keys (company_id, location_id, etc.)",
+    "foreign_keys": "job_postings references companies and locations through name matching",
+    "null_handling": "Some locations/companies intentionally missing for LEFT JOIN practice",
+    "complexity_build": "Start with companies->job_postings INNER JOIN, progress to multi-table LEFT JOINs",
+    "real_world_context": "Business scenarios: company analysis, location trends, skill requirements"
+  }
+} 

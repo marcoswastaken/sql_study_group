@@ -124,7 +124,7 @@ python scripts/core/explore_dataset.py --dataset lukebarousse/data_jobs --output
 1. Load dataset from HuggingFace 
 2. Generate comprehensive analysis (metadata, column types, data quality)
 3. Identify potential relationships and normalization opportunities
-4. Output detailed dataset summary to `scripts/data_schema_generation/initial_exploration_[dataset].json`
+4. Output detailed dataset summary to `scripts/data_schema_generation/initial_exploration_[dataset].json` (always relative to project root)
 5. Create normalized database as `datasets/[dataset].db` automatically
    - Single download for both analysis and database creation
    - Required for Step 5 validation and Step 7 table creation
@@ -182,88 +182,61 @@ Agent receives detailed curriculum generation prompt and creates educational tab
 4. Clean up any test tables to keep database tidy
 5. Verify all tables were created successfully
 
-**Key Features:**
-- Deterministic execution using seeded random sampling
-- Comprehensive error handling and reporting
-- Database cleanup to maintain clean state
-- Validation of table creation success
-
-**Requirements:**
-- Table creation queries must pass validation from Step 5
-- Database must be accessible and writable
-- All queries must execute successfully before proceeding
-
-### Step 7: Generate Data Schema Documentation
+### Step 7: Generate Schema Documentation
 
 **Script:** `scripts/data_schema_generation/generate_data_schema_generic.py --dataset [dataset]`
 
 **Process:**
-1. Introspect database structure from tables created in Step 6
+1. Introspect database structure from created tables
 2. Generate comprehensive schema template with strategic blanks for agent enhancement
-3. Output structured prompt for semantic field completion
-4. Create `schemas/data_schema_[dataset].json` template
+3. Agent enhances semantic fields (descriptions, educational context, relationships)
+4. Validate completeness using `scripts/data_schema_generation/validate_data_schema.py`
+5. Output complete `schemas/data_schema_[dataset].json`
 
-**Agent Enhancement:**
-- Agent enhances semantic fields (descriptions, educational context, relationships)
-- Agent completes all empty description fields and educational purposes
-- Agent fixes any malformed relationships or inconsistencies
+### Step 8: Generate Initial Exercises
 
-**Final Validation:**
-- Run `scripts/data_schema_generation/validate_data_schema.py --dataset [dataset]` to verify completion
-- All fields must be populated before proceeding to Step 8
-- Results in complete `schemas/data_schema_[dataset].json` ready for curriculum use
-
-**Key Benefits:**
-- Fully generic - works with any dataset following naming conventions
-- Separates deterministic generation from semantic enhancement
-- Maintains educational focus through structured agent prompts
-- Provides comprehensive validation to ensure completeness
-
-### Step 8: Generate Exercises and Solutions
-Agent reviews datasets and topics to generate practice exercises.
+**Script:** `scripts/exercise_generation/generate_exercises.py` (or adapt existing week-specific scripts)
 
 **Process:**
-1. Load week topics from structured syllabus
-2. Generate exercises that cover each topic using the dataset
-3. Create SQL solutions for each exercise
-4. Format as exercise key
+1. Agent reviews syllabus topics and dataset schema
+2. Generates exercises covering each topic with progressive difficulty
+3. Creates SQL solutions and validates syntax
+4. Outputs `exercises/week_X/week_X_key.json` with complete exercise metadata (organized by week)
 
-**Exercise Key Format:**
-```json
-{
-  "exercises": [
-    {
-      "id": "exercise_1",
-      "statement": "Find all job postings for companies in California",
-      "solution": "SELECT j.* FROM jobs j JOIN companies c ON j.company_id = c.company_id WHERE c.state = 'California'",
-      "difficulty": NULL,
-      "topics": ["INNER JOIN", "WHERE clause"]
-    }
-  ]
-}
-```
+**Key Requirements:**
+- Questions must demonstrate educational value of target concepts
+- Solutions must be tested and include sample results
+- Progressive difficulty from Easy → Medium → Hard
 
-### Step 9: Test All Solutions
-**Script:** `test_solutions.py`
+### Step 9: Test and Validate Exercises
+
+**Script:** `scripts/exercise_generation/test_solutions.py --exercise-key [file] --dataset [dataset]`
 
 **Process:**
-1. Load exercise key
-2. Execute each solution query using `sql_helper.py`
-3. Capture results and performance metrics
-4. Update key with sample results
+1. Execute all SQL solutions against database
+2. Capture execution time, row counts, and sample results
+3. Update exercise key with test results and metadata
+4. Verify 100% success rate before proceeding
 
-### Step 10: Instructor Review & Iteration
-1. Instructor reviews generated exercises
-2. Provides feedback on difficulty, relevance, coverage
-3. Agent adjusts exercises based on feedback (revise difficulty and topics)
-4. Repeat Steps 8-9 until satisfied
+### Step 10: Review and Improve Exercises
 
-### Step 11: Generate Practice Materials
-**Script:** `generate_practice_worksheet.py`
+**Manual Review Process:**
+1. Instructor/agent reviews exercise educational value
+2. Identifies exercises that could be done without target concepts (e.g., joins that don't add value)
+3. Redesigns exercises to ensure concepts are essential for solving problems
+4. Creates improved version (e.g., `week_X_key_v2.json`) if needed
+5. Re-runs Step 9 to validate improvements
 
-**Generates:**
-- `practice/week_X_practice.md` - Student worksheet with exercises only
-- `solutions/week_X_solutions.md` - Instructor solutions with explanations
+### Step 11: Generate Documentation and Reports
+
+**Scripts:** 
+- `scripts/exercise_generation/generate_exercise_report.py` - Comprehensive report with results
+- Manual documentation of improvements and rationale
+
+**Outputs:**
+- `reports/week_X/week_X_[dataset]_report.md` - Complete exercise report with sample results (organized by week)
+- `exercises/week_X/week_X_analysis.md` - Analysis of improvements made (if applicable)
+- Final validated exercise key ready for student use
 
 ## Project Structure (Current)
 
@@ -275,7 +248,9 @@ sql_study_group/
 ├── schemas/
 │   └── data_schema_data_jobs.json       # Schema documentation for data_jobs dataset
 ├── exercises/
-│   └── week_4_key.json                  # Exercise key for Week 4
+│   └── week_4/
+│       ├── week_4_key.json              # Exercise key for Week 4
+│       └── week_4_key_v2.json           # Enhanced exercise key for Week 4
 ├── practice/
 │   ├── week_2_practice.md               # Student worksheets
 │   ├── week_3_practice.md
@@ -284,12 +259,18 @@ sql_study_group/
 │   ├── week_2_practice_solutions.md     # Solution worksheets
 │   ├── week_3_practice_solutions.md
 │   └── week_4_practice_solutions.md
+├── reports/
+│   └── week_4/
+│       ├── week_4_key_report_data_jobs.md   # Exercise report for Week 4
+│       └── week_4_key_report_data_jobs_v2.md # Enhanced exercise report
 └── scripts/
     ├── asset_generation/
     │   ├── syllabus_schema.json         # Structured syllabus schema
     │   └── generate_syllabus.py         # Step 2 (built)
     ├── exercise_generation/
-    │   └── generate_week_4_key.py       # Exercise extraction (adapt for Step 8)
+    │   ├── generate_exercises.py        # Generic exercise generation framework
+    │   ├── test_solutions.py            # Solution testing and validation
+    │   └── generate_exercise_report.py  # Report generation
     ├── data_schema_generation/
     │   ├── create_tables_from_queries.py          # Step 7 Phase 1 (built)
     │   ├── generate_data_schema_generic.py        # Step 7 Phase 2 (built)
@@ -342,37 +323,36 @@ sql_study_group/
   - Checks for deterministic random sampling (SETSEED)
   - Ensures educational table design quality
 
-### Exercise Generation (Partial)
-- `scripts/exercise_generation/generate_week_4_key.py` - Exercise extraction (can adapt for Step 8)
+### Exercise Generation
+- `scripts/exercise_generation/generate_exercises.py` - Generic exercise generation framework (Step 8)
+- `scripts/exercise_generation/test_solutions.py` - Solution testing and validation (Step 9)
+- `scripts/exercise_generation/generate_exercise_report.py` - Report generation (Step 11)
 
 ### Test Infrastructure
 - `scripts/tests/test_core_sql_helper.py` - SQL helper tests
 - `scripts/tests/test_core_explore_dataset.py` - Dataset exploration tests
 
 ## Scripts We Need to Build
-- `scripts/exercise_generation/generate_exercises.py` - Exercise generation (Step 8)
-- `scripts/exercise_generation/test_solutions.py` - Solution testing (Step 9)
-- `scripts/exercise_generation/generate_practice_worksheet.py` - Worksheet generation (Step 11)
+- `scripts/exercise_generation/generate_practice_worksheet.py` - Student worksheet generation (optional)
 
-## Current Status (Updated)
+## Current Status
 1. ✅ **Step 1**: Structured syllabus schema with URL support and intro/note fields
 2. ✅ **Step 2**: Syllabus generation script (converts schema to markdown)
 3. ✅ **Step 3**: Process defined for instructor input
 4. ✅ **Step 4**: Dataset exploration and database creation
 5. ✅ **Step 5**: Agent review and table creation queries with validation
-6. ✅ **Step 6**: Execute table creation queries (built)
-7. ✅ **Step 7**: Schema documentation generation (built)
-8. 🔄 **Step 8**: Exercise generation (ready to build)
-9. 🔄 **Step 9**: Solution testing (ready to build)
-10. 🔄 **Step 10**: Instructor review process (ready to implement)
-11. 🔄 **Step 11**: Practice material generation (ready to build)
+6. ✅ **Step 6**: Execute table creation queries
+7. ✅ **Step 7**: Schema documentation generation
+8. ✅ **Step 8**: Exercise generation (generic framework implemented)
+9. ✅ **Step 9**: Solution testing and validation
+10. ✅ **Step 10**: Exercise review and improvement process
+11. ✅ **Step 11**: Documentation and report generation
 
 ## Key Process Improvements Made
-- **Restored Step 6**: Execute table creation queries to actually create tables in database
-- **Enhanced Step 5**: Added percentage-based sampling validation with 75% minimum requirement
-- **Clarified Step 7**: Focused on schema documentation generation from created tables
-- **Fixed file paths**: All scripts now have correct relative paths
-- **Updated validation**: Multiple validation scripts ensure quality at each step
+- **Comprehensive validation**: Multiple validation scripts ensure quality at each step
 - **Improved determinism**: SETSEED ensures consistent results across runs
+- **Educational focus**: Step 10 ensures exercises demonstrate true value of target concepts
+- **Complete testing**: All SQL solutions are validated and include sample results
+- **Automated reporting**: Detailed reports with execution metrics and sample data
 
-This process now reflects the actual implemented workflow and provides a solid foundation for generating quality SQL curriculum materials. 
+This process provides a complete, replicable workflow for generating high-quality SQL curriculum materials. 

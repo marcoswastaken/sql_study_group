@@ -1,0 +1,679 @@
+{
+  "metadata": {
+    "database_name": "data_data_jobs.db",
+    "description": "Comprehensive data science job market database designed for SQL education, featuring real-world job postings with normalized tables for practicing JOIN operations, aggregate functions, and relational database concepts.",
+    "total_tables": 6,
+    "total_records": 1495466,
+    "source": "HuggingFace dataset 'lukebarousse/data_jobs' containing 785,741 real job postings from various platforms, normalized into educational tables for SQL learning",
+    "generation_date": "2025-07-11",
+    "use_cases": [
+      "Learning JOIN operations with realistic business scenarios",
+      "Practicing foreign key relationships and referential integrity",
+      "Analyzing job market trends using aggregate functions",
+      "Understanding database normalization with real-world data",
+      "Exploring salary analysis and geographic job distribution"
+    ],
+    "target_week": 4,
+    "core_concepts": [
+      "Primary/foreign keys",
+      "INNER JOIN",
+      "LEFT JOIN",
+      "ON clause",
+      "Table aliases"
+    ],
+    "educational_focus": "JOIN Operations",
+    "complexity_level": "intermediate"
+  },
+  "tables": [
+    {
+      "id": 1,
+      "name": "companies",
+      "description": "Master table of companies that have posted job listings, aggregated from the original dataset with counts of total jobs per company. Uses random sampling to include 80% of available companies for realistic business scenarios.",
+      "creation_query": "SELECT SETSEED(0.42); CREATE TABLE companies AS SELECT ROW_NUMBER() OVER (ORDER BY RANDOM()) AS company_id, company_name, COUNT(*) AS total_jobs FROM data_jobs WHERE company_name IS NOT NULL GROUP BY company_name ORDER BY RANDOM() LIMIT 111985",
+      "row_count": 111985,
+      "columns": [
+        {
+          "name": "company_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Unique identifier for each company, generated as a sequential number for JOIN operations"
+        },
+        {
+          "name": "company_name",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Name of the company that posted job listings, ranging from startups to Fortune 500 companies"
+        },
+        {
+          "name": "total_jobs",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Total number of job postings from this company in the dataset, useful for analyzing employer activity"
+        }
+      ],
+      "sample_data": [
+        {
+          "company_id": "38287",
+          "company_name": "FlyOnData SRL",
+          "total_jobs": "3"
+        },
+        {
+          "company_id": "115452",
+          "company_name": "Rebasive Technologies",
+          "total_jobs": "1"
+        },
+        {
+          "company_id": "40993",
+          "company_name": "Vouch, Inc.",
+          "total_jobs": "1"
+        }
+      ],
+      "educational_purpose": "Primary table for learning company-based JOINs and aggregate functions. Students can practice linking companies to job postings and analyzing employer hiring patterns."
+    },
+    {
+      "id": 2,
+      "name": "data_jobs",
+      "description": "Original source table containing all job posting data from the HuggingFace dataset. This denormalized table serves as the foundation for creating normalized child tables and provides complete job market information.",
+      "creation_query": "",
+      "row_count": 785741,
+      "columns": [
+        {
+          "name": "job_title_short",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Standardized job title category (e.g., 'Data Scientist', 'Data Engineer', 'Data Analyst') for easier grouping and analysis"
+        },
+        {
+          "name": "job_title",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Full job title as posted by employer, including seniority level and specific requirements"
+        },
+        {
+          "name": "job_location",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "City and state/country where the job is located, used for geographic analysis"
+        },
+        {
+          "name": "job_via",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Job platform or source where the posting was found (e.g., 'via LinkedIn', 'via Indeed')"
+        },
+        {
+          "name": "job_schedule_type",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Employment type such as 'Full-time', 'Part-time', 'Contract', or 'Contractor'"
+        },
+        {
+          "name": "job_work_from_home",
+          "type": "BOOLEAN",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Boolean flag indicating whether the job allows remote work from home"
+        },
+        {
+          "name": "search_location",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Location used in the job search query, may differ from actual job location"
+        },
+        {
+          "name": "job_posted_date",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Date and time when the job was posted, stored as string in YYYY-MM-DD HH:MM:SS format"
+        },
+        {
+          "name": "job_no_degree_mention",
+          "type": "BOOLEAN",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Boolean flag indicating whether the job posting mentions degree requirements"
+        },
+        {
+          "name": "job_health_insurance",
+          "type": "BOOLEAN",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Boolean flag indicating whether the job posting mentions health insurance benefits"
+        },
+        {
+          "name": "job_country",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Country where the job is located, useful for international job market analysis"
+        },
+        {
+          "name": "salary_rate",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Pay frequency for salary information (e.g., 'yearly', 'hourly') when available"
+        },
+        {
+          "name": "salary_year_avg",
+          "type": "DOUBLE",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Average yearly salary for the position when salary information is available"
+        },
+        {
+          "name": "salary_hour_avg",
+          "type": "DOUBLE",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Average hourly wage for the position when hourly salary information is available"
+        },
+        {
+          "name": "company_name",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Name of the company posting the job, can be normalized into a separate companies table"
+        },
+        {
+          "name": "job_skills",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "List of technical skills mentioned in the job posting, stored as string representation of array"
+        },
+        {
+          "name": "job_type_skills",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Skills categorized by type (e.g., programming, analyst_tools, cloud), stored as string representation of JSON object"
+        }
+      ],
+      "sample_data": [
+        {
+          "job_title_short": "Senior Data Engineer",
+          "job_title": "Senior Clinical Data Engineer / Principal Clinical Data Engineer ...",
+          "job_location": "Watertown, CT",
+          "job_via": "via Work Nearby",
+          "job_schedule_type": "Full-time",
+          "job_work_from_home": "False",
+          "search_location": "Texas, United States",
+          "job_posted_date": "2023-06-16 13:44:15",
+          "job_no_degree_mention": "False",
+          "job_health_insurance": "False",
+          "job_country": "United States",
+          "salary_rate": "None",
+          "salary_year_avg": "None",
+          "salary_hour_avg": "None",
+          "company_name": "Boehringer Ingelheim",
+          "job_skills": "None",
+          "job_type_skills": "None"
+        },
+        {
+          "job_title_short": "Data Analyst",
+          "job_title": "Data Analyst",
+          "job_location": "Guadalajara, Jalisco, Mexico",
+          "job_via": "via BeBee México",
+          "job_schedule_type": "Full-time",
+          "job_work_from_home": "False",
+          "search_location": "Mexico",
+          "job_posted_date": "2023-01-14 13:18:07",
+          "job_no_degree_mention": "False",
+          "job_health_insurance": "False",
+          "job_country": "Mexico",
+          "salary_rate": "None",
+          "salary_year_avg": "None",
+          "salary_hour_avg": "None",
+          "company_name": "Hewlett Packard Enterprise",
+          "job_skills": "['r', 'python', 'sql', 'nosql', 'power bi', 'tableau']",
+          "job_type_skills": "{'analyst_tools': ['power bi', 'tableau'], 'programming': ['r', 'python', 'sql', 'nosql']}"
+        },
+        {
+          "job_title_short": "Data Engineer",
+          "job_title": "Data Engineer/Scientist/Analyst, Mid or Senior (m/f/x)",
+          "job_location": "Berlin, Germany",
+          "job_via": "via LinkedIn",
+          "job_schedule_type": "Full-time",
+          "job_work_from_home": "False",
+          "search_location": "Germany",
+          "job_posted_date": "2023-10-10 13:14:55",
+          "job_no_degree_mention": "False",
+          "job_health_insurance": "False",
+          "job_country": "Germany",
+          "salary_rate": "None",
+          "salary_year_avg": "None",
+          "salary_hour_avg": "None",
+          "company_name": "ALPHA Augmented Services",
+          "job_skills": "['python', 'sql', 'c#', 'azure', 'airflow', 'dax', 'docker', 'kubernetes', 'jenkins']",
+          "job_type_skills": "{'analyst_tools': ['dax'], 'cloud': ['azure'], 'libraries': ['airflow'], 'other': ['docker', 'kubernetes', 'jenkins'], 'programming': ['python', 'sql', 'c#']}"
+        }
+      ],
+      "educational_purpose": "Source table for understanding denormalized data structure and the need for normalization. Students learn to identify repeated data and design normalized tables from this comprehensive dataset."
+    },
+    {
+      "id": 3,
+      "name": "job_platforms",
+      "description": "Normalized table containing job posting platforms and their usage statistics. Created by extracting unique platform names from the job_via column and counting job postings per platform.",
+      "creation_query": "SELECT SETSEED(0.42); CREATE TABLE job_platforms AS SELECT ROW_NUMBER() OVER (ORDER BY RANDOM()) AS platform_id, job_via AS platform_name, COUNT(*) AS jobs_posted FROM data_jobs WHERE job_via IS NOT NULL GROUP BY job_via ORDER BY RANDOM() LIMIT 7112",
+      "row_count": 7112,
+      "columns": [
+        {
+          "name": "platform_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Unique identifier for each job platform, used as primary key for JOIN operations"
+        },
+        {
+          "name": "platform_name",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Name of the job platform (e.g., 'via LinkedIn', 'via Indeed', 'via Glassdoor')"
+        },
+        {
+          "name": "jobs_posted",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Total number of job postings from this platform in the dataset, useful for platform popularity analysis"
+        }
+      ],
+      "sample_data": [
+        {
+          "platform_id": "3535",
+          "platform_name": "via Wayfair",
+          "jobs_posted": "3"
+        },
+        {
+          "platform_id": "2970",
+          "platform_name": "via Oklahoma City - Geebo",
+          "jobs_posted": "1"
+        },
+        {
+          "platform_id": "7291",
+          "platform_name": "via Sentry - Talentify",
+          "jobs_posted": "1"
+        }
+      ],
+      "educational_purpose": "Demonstrates normalization principles by extracting platform data into a separate table. Students practice JOINs between platforms and job postings while learning about data deduplication."
+    },
+    {
+      "id": 4,
+      "name": "job_postings",
+      "description": "Primary table containing individual job postings with core job information. Represents 75% of available job postings selected through random sampling for realistic dataset size while maintaining representativeness.",
+      "creation_query": "SELECT SETSEED(0.42); CREATE TABLE job_postings AS SELECT ROW_NUMBER() OVER (ORDER BY RANDOM()) AS job_id, job_title_short, job_title, job_schedule_type, job_work_from_home, job_posted_date, job_no_degree_mention, job_health_insurance, salary_year_avg, salary_hour_avg, company_name, job_location, job_via FROM data_jobs WHERE job_posted_date IS NOT NULL ORDER BY RANDOM() LIMIT 589306",
+      "row_count": 589306,
+      "columns": [
+        {
+          "name": "job_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Unique identifier for each job posting, serves as primary key for the table"
+        },
+        {
+          "name": "job_title_short",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Standardized job title category for easier grouping and analysis"
+        },
+        {
+          "name": "job_title",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Full job title as posted by the employer"
+        },
+        {
+          "name": "job_schedule_type",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Employment type (Full-time, Part-time, Contract, Contractor)"
+        },
+        {
+          "name": "job_work_from_home",
+          "type": "BOOLEAN",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Boolean flag indicating remote work availability"
+        },
+        {
+          "name": "job_posted_date",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Date and time when the job was posted, enables time-based analysis"
+        },
+        {
+          "name": "job_no_degree_mention",
+          "type": "BOOLEAN",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Boolean flag indicating whether degree requirements are mentioned"
+        },
+        {
+          "name": "job_health_insurance",
+          "type": "BOOLEAN",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Boolean flag indicating whether health insurance benefits are mentioned"
+        },
+        {
+          "name": "salary_year_avg",
+          "type": "DOUBLE",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Average yearly salary when available, useful for salary analysis"
+        },
+        {
+          "name": "salary_hour_avg",
+          "type": "DOUBLE",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Average hourly wage when available, useful for contract position analysis"
+        },
+        {
+          "name": "company_name",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Name of the company posting the job, can be used for JOINs with companies table"
+        },
+        {
+          "name": "job_location",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Location where the job is based, used for geographic analysis"
+        },
+        {
+          "name": "job_via",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Platform where the job was posted, can be used for JOINs with job_platforms table"
+        }
+      ],
+      "sample_data": [
+        {
+          "job_id": "493953",
+          "job_title_short": "Data Scientist",
+          "job_title": "Applied Data Scientist",
+          "job_schedule_type": "Full-time",
+          "job_work_from_home": "False",
+          "job_posted_date": "2023-09-27 13:30:46",
+          "job_no_degree_mention": "False",
+          "job_health_insurance": "False",
+          "salary_year_avg": "None",
+          "salary_hour_avg": "None",
+          "company_name": "Booz Allen Hamilton",
+          "job_location": "McLean, VA",
+          "job_via": "via LinkedIn"
+        },
+        {
+          "job_id": "676294",
+          "job_title_short": "Senior Data Analyst",
+          "job_title": "Senior Data Analyst (Remote) - Full-time",
+          "job_schedule_type": "Full-time",
+          "job_work_from_home": "False",
+          "job_posted_date": "2023-04-17 17:02:19",
+          "job_no_degree_mention": "False",
+          "job_health_insurance": "True",
+          "salary_year_avg": "None",
+          "salary_hour_avg": "None",
+          "company_name": "Jobot",
+          "job_location": "St. Petersburg, FL",
+          "job_via": "via Snagajob"
+        },
+        {
+          "job_id": "85244",
+          "job_title_short": "Data Engineer",
+          "job_title": "Data Engineer",
+          "job_schedule_type": "Contractor",
+          "job_work_from_home": "False",
+          "job_posted_date": "2023-07-04 20:16:50",
+          "job_no_degree_mention": "True",
+          "job_health_insurance": "False",
+          "salary_year_avg": "None",
+          "salary_hour_avg": "None",
+          "company_name": "MARS Recruitment",
+          "job_location": "Oxfordshire, UK",
+          "job_via": "via WREG Jobs"
+        }
+      ],
+      "educational_purpose": "Central table for learning JOIN operations. Students practice connecting job postings with companies, locations, and platforms while analyzing real job market data and learning about foreign key relationships."
+    },
+    {
+      "id": 5,
+      "name": "locations",
+      "description": "Normalized table containing job locations with country information and job counts. Includes only locations with significant job activity (50+ postings) to focus on meaningful geographic analysis.",
+      "creation_query": "SELECT SETSEED(0.42); CREATE TABLE locations AS SELECT ROW_NUMBER() OVER (ORDER BY RANDOM()) AS location_id, job_location, job_country, COUNT(*) AS job_count FROM data_jobs WHERE job_location IS NOT NULL AND job_country IS NOT NULL GROUP BY job_location, job_country HAVING COUNT(*) >= 50 ORDER BY RANDOM() LIMIT 14628",
+      "row_count": 1318,
+      "columns": [
+        {
+          "name": "location_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Unique identifier for each location, serves as primary key for location-based JOINs"
+        },
+        {
+          "name": "job_location",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "City and state/province where jobs are located, providing geographic granularity"
+        },
+        {
+          "name": "job_country",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Country where the jobs are located, enables country-level analysis"
+        },
+        {
+          "name": "job_count",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Total number of jobs posted in this location, useful for market size analysis"
+        }
+      ],
+      "sample_data": [
+        {
+          "location_id": "1013",
+          "job_location": "Berlin, Germany",
+          "job_country": "Germany",
+          "job_count": "4480"
+        },
+        {
+          "location_id": "226",
+          "job_location": "Zoetermeer, Netherlands",
+          "job_country": "Netherlands",
+          "job_count": "83"
+        },
+        {
+          "location_id": "1313",
+          "job_location": "Baiern, Germany",
+          "job_country": "Germany",
+          "job_count": "99"
+        }
+      ],
+      "educational_purpose": "Demonstrates geographic normalization and enables location-based JOINs. Students learn to analyze job market distribution across cities and countries while practicing GROUP BY and HAVING clauses."
+    },
+    {
+      "id": 6,
+      "name": "salary_ranges",
+      "description": "Reference table defining salary ranges by experience level for educational purposes. Provides standardized salary bands to categorize job postings and demonstrate lookup table concepts.",
+      "creation_query": "CREATE TABLE salary_ranges AS SELECT ROW_NUMBER() OVER () AS range_id, range_name, min_salary, max_salary, experience_level FROM (SELECT 'Entry Level' AS range_name, 0 AS min_salary, 60000 AS max_salary, 'Junior' AS experience_level UNION ALL SELECT 'Mid Level', 60000, 100000, 'Mid' UNION ALL SELECT 'Senior Level', 100000, 150000, 'Senior' UNION ALL SELECT 'Executive', 150000, 999999, 'Executive')",
+      "row_count": 4,
+      "columns": [
+        {
+          "name": "range_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Unique identifier for each salary range, serves as primary key"
+        },
+        {
+          "name": "range_name",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Descriptive name for the salary range (e.g., 'Entry Level', 'Mid Level')"
+        },
+        {
+          "name": "min_salary",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Minimum salary amount for this range in USD"
+        },
+        {
+          "name": "max_salary",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Maximum salary amount for this range in USD"
+        },
+        {
+          "name": "experience_level",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Experience level associated with this salary range (Junior, Mid, Senior, Executive)"
+        }
+      ],
+      "sample_data": [
+        {
+          "range_id": "1",
+          "range_name": "Entry Level",
+          "min_salary": "0",
+          "max_salary": "60000",
+          "experience_level": "Junior"
+        },
+        {
+          "range_id": "2",
+          "range_name": "Mid Level",
+          "min_salary": "60000",
+          "max_salary": "100000",
+          "experience_level": "Mid"
+        },
+        {
+          "range_id": "3",
+          "range_name": "Senior Level",
+          "min_salary": "100000",
+          "max_salary": "150000",
+          "experience_level": "Senior"
+        }
+      ],
+      "educational_purpose": "Reference table for learning conditional JOINs and salary categorization. Students practice BETWEEN clauses and learn to classify job postings by salary ranges using JOIN conditions."
+    }
+  ],
+  "relationships": [
+    {
+      "type": "one-to-many",
+      "from_table": "companies",
+      "from_column": "company_name",
+      "to_table": "job_postings",
+      "to_column": "company_name",
+      "description": "Links companies to their job postings, enabling analysis of employer hiring patterns and company-specific job market trends"
+    },
+    {
+      "type": "one-to-many",
+      "from_table": "job_platforms",
+      "from_column": "platform_name",
+      "to_table": "job_postings",
+      "to_column": "job_via",
+      "description": "Connects job platforms to job postings, allowing analysis of platform effectiveness and job distribution across platforms"
+    },
+    {
+      "type": "many-to-one",
+      "from_table": "job_postings",
+      "from_column": "job_location",
+      "to_table": "locations",
+      "to_column": "job_location",
+      "description": "Links job postings to their geographic locations, enabling location-based job market analysis and geographic distribution studies"
+    },
+    {
+      "type": "many-to-one",
+      "from_table": "job_postings",
+      "from_column": "salary_year_avg",
+      "to_table": "salary_ranges",
+      "to_column": "min_salary/max_salary",
+      "description": "Conditional relationship for categorizing job postings by salary ranges using BETWEEN clauses, useful for salary band analysis"
+    }
+  ],
+  "schema_notes": [
+    "Database contains 4 logical relationships enabling comprehensive JOIN practice across business scenarios",
+    "Random sampling with seeded deterministic generation ensures consistent results across educational sessions",
+    "Tables designed with progressive complexity: simple lookups (salary_ranges) to complex multi-table JOINs (companies + job_postings + locations)",
+    "Includes intentional data scenarios for LEFT JOIN practice, such as jobs without salary information and companies with varying job counts",
+    "Schema optimized for Week 4 curriculum focusing on PRIMARY/FOREIGN keys, INNER JOIN, LEFT JOIN, ON clauses, and table aliases"
+  ],
+  "agent_enhancement_needed": {
+    "description": "Schema enhancement completed - all fields have been populated with detailed descriptions and educational context",
+    "fields_to_enhance": [
+      "All enhancement fields have been completed"
+    ]
+  }
+}

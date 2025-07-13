@@ -1,0 +1,373 @@
+{
+  "metadata": {
+    "title": "Week 4 Practice - Data Jobs Dataset",
+    "description": "JOIN operations on real-world data job postings",
+    "week": 4,
+    "total_exercises": 8,
+    "database": "data_jobs.db",
+    "focus_topics": [
+      "INNER JOIN",
+      "LEFT JOIN",
+      "Table aliases",
+      "Primary/Foreign keys"
+    ],
+    "generated_date": "2025-07-12T00:13:51.570998",
+    "difficulty_levels": [
+      "Easy",
+      "Medium",
+      "Hard"
+    ],
+    "test_results": {
+      "total_exercises": 8,
+      "working_exercises": 8,
+      "failed_exercises": 0,
+      "success_rate": 100.0,
+      "total_execution_time": 0.135,
+      "average_execution_time": 0.017,
+      "test_date": "2025-07-12 00:15:17"
+    }
+  },
+  "exercises": [
+    {
+      "id": 1,
+      "title": "Company Job Postings",
+      "statement": "Find all Data Scientist job postings along with company names. Show the job title, company name, and posted date. Use INNER JOIN to only show jobs that have company information.",
+      "solution": "SELECT jp.job_title, c.company_name, jp.job_posted_date\nFROM job_postings AS jp\nINNER JOIN companies AS c ON jp.company_name = c.company_name\nWHERE jp.job_title_short = 'Data Scientist'\nORDER BY jp.job_posted_date DESC\nLIMIT 10;",
+      "topics": [
+        "INNER JOIN",
+        "Table aliases",
+        "WHERE clause",
+        "ORDER BY"
+      ],
+      "difficulty": "Easy",
+      "educational_focus": "Basic INNER JOIN syntax with table aliases",
+      "result": {
+        "working": true,
+        "execution_time": 0.025,
+        "row_count": 10,
+        "columns": [
+          "job_title",
+          "company_name",
+          "job_posted_date"
+        ],
+        "sample_results": [
+          {
+            "job_title": "Data Scientist III with Security Clearance",
+            "company_name": "ManTech International",
+            "job_posted_date": "2023-12-31 23:40:03"
+          },
+          {
+            "job_title": "Data Scientist II with Security Clearance",
+            "company_name": "ManTech International",
+            "job_posted_date": "2023-12-31 23:40:03"
+          },
+          {
+            "job_title": "Data Scientist with Security Clearance",
+            "company_name": "CACI",
+            "job_posted_date": "2023-12-31 23:40:00"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 2,
+      "title": "All Companies with Job Counts",
+      "statement": "List all companies and count how many job postings they have. Include companies even if they don't have any job postings in the job_postings table (show 0 for them). Use LEFT JOIN to ensure all companies are included.",
+      "solution": "SELECT c.company_name, COUNT(jp.job_id) AS job_count\nFROM companies AS c\nLEFT JOIN job_postings AS jp ON c.company_name = jp.company_name\nGROUP BY c.company_name\nORDER BY job_count DESC\nLIMIT 20;",
+      "topics": [
+        "LEFT JOIN",
+        "COUNT",
+        "GROUP BY",
+        "Table aliases"
+      ],
+      "difficulty": "Medium",
+      "educational_focus": "LEFT JOIN to include all records from left table, handling NULLs",
+      "result": {
+        "working": true,
+        "execution_time": 0.024,
+        "row_count": 20,
+        "columns": [
+          "company_name",
+          "job_count"
+        ],
+        "sample_results": [
+          {
+            "company_name": "Emprego",
+            "job_count": "4962"
+          },
+          {
+            "company_name": "Booz Allen Hamilton",
+            "job_count": "2198"
+          },
+          {
+            "company_name": "Dice",
+            "job_count": "2139"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 3,
+      "title": "Platform Job Distribution",
+      "statement": "Show which job platforms are posting the most Data Engineer jobs. Include platform name and job count. Use INNER JOIN to connect job postings with platforms.",
+      "solution": "SELECT jpl.platform_name, COUNT(jp.job_id) AS job_count\nFROM job_platforms AS jpl\nINNER JOIN job_postings AS jp ON jpl.platform_name = jp.job_via\nWHERE jp.job_title_short = 'Data Engineer'\nGROUP BY jpl.platform_name\nORDER BY job_count DESC\nLIMIT 10;",
+      "topics": [
+        "INNER JOIN",
+        "COUNT",
+        "GROUP BY",
+        "WHERE clause"
+      ],
+      "difficulty": "Medium",
+      "educational_focus": "INNER JOIN with aggregation and filtering",
+      "result": {
+        "working": true,
+        "execution_time": 0.008,
+        "row_count": 10,
+        "columns": [
+          "platform_name",
+          "job_count"
+        ],
+        "sample_results": [
+          {
+            "platform_name": "via LinkedIn",
+            "job_count": "44075"
+          },
+          {
+            "platform_name": "via BeBee",
+            "job_count": "13518"
+          },
+          {
+            "platform_name": "via Indeed",
+            "job_count": "8465"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 4,
+      "title": "Jobs by Location",
+      "statement": "List all job postings with their location details. Show job title, location, and country. Use LEFT JOIN to include jobs even if location information is missing.",
+      "solution": "SELECT jp.job_title_short, jp.job_location, l.job_country\nFROM job_postings AS jp\nLEFT JOIN locations AS l ON jp.job_location = l.job_location\nWHERE jp.job_title_short IN ('Data Scientist', 'Data Engineer', 'Data Analyst')\nORDER BY l.job_country, jp.job_location\nLIMIT 15;",
+      "topics": [
+        "LEFT JOIN",
+        "WHERE IN",
+        "ORDER BY",
+        "Table aliases"
+      ],
+      "difficulty": "Medium",
+      "educational_focus": "LEFT JOIN with multiple column sorting and filtering",
+      "result": {
+        "working": true,
+        "execution_time": 0.014,
+        "row_count": 15,
+        "columns": [
+          "job_title_short",
+          "job_location",
+          "job_country"
+        ],
+        "sample_results": [
+          {
+            "job_title_short": "Data Scientist",
+            "job_location": "Tirana, Albania",
+            "job_country": "Albania"
+          },
+          {
+            "job_title_short": "Data Engineer",
+            "job_location": "Tirana, Albania",
+            "job_country": "Albania"
+          },
+          {
+            "job_title_short": "Data Scientist",
+            "job_location": "Tirana, Albania",
+            "job_country": "Albania"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 5,
+      "title": "Salary Range Classification",
+      "statement": "Classify Data Scientist jobs by salary ranges. Show job title, salary, and experience level. Use a conditional JOIN to match salaries with appropriate ranges.",
+      "solution": "SELECT jp.job_title, jp.salary_year_avg, sr.range_name, sr.experience_level\nFROM job_postings AS jp\nINNER JOIN salary_ranges AS sr ON jp.salary_year_avg BETWEEN sr.min_salary AND sr.max_salary\nWHERE jp.job_title_short = 'Data Scientist' \n  AND jp.salary_year_avg IS NOT NULL\nORDER BY jp.salary_year_avg DESC\nLIMIT 10;",
+      "topics": [
+        "INNER JOIN",
+        "BETWEEN",
+        "IS NOT NULL",
+        "Table aliases"
+      ],
+      "difficulty": "Hard",
+      "educational_focus": "Conditional JOIN using BETWEEN clause",
+      "result": {
+        "working": true,
+        "execution_time": 0.005,
+        "row_count": 10,
+        "columns": [
+          "job_title",
+          "salary_year_avg",
+          "range_name",
+          "experience_level"
+        ],
+        "sample_results": [
+          {
+            "job_title": "Geographic Information Systems Analyst - GIS Analyst",
+            "salary_year_avg": "585000.0",
+            "range_name": "Executive",
+            "experience_level": "Executive"
+          },
+          {
+            "job_title": "Staff Data Scientist/Quant Researcher",
+            "salary_year_avg": "550000.0",
+            "range_name": "Executive",
+            "experience_level": "Executive"
+          },
+          {
+            "job_title": "Staff Data Scientist - Business Analytics",
+            "salary_year_avg": "525000.0",
+            "range_name": "Executive",
+            "experience_level": "Executive"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 6,
+      "title": "Comprehensive Job Analysis",
+      "statement": "Create a comprehensive report showing job title, company name, location, country, and platform for Data Analyst positions. Use multiple JOINs to combine information from different tables.",
+      "solution": "SELECT jp.job_title, c.company_name, jp.job_location, l.job_country, jp.job_via\nFROM job_postings AS jp\nINNER JOIN companies AS c ON jp.company_name = c.company_name\nLEFT JOIN locations AS l ON jp.job_location = l.job_location\nWHERE jp.job_title_short = 'Data Analyst'\n  AND jp.job_location IS NOT NULL\nORDER BY l.job_country, jp.job_location\nLIMIT 12;",
+      "topics": [
+        "Multiple JOINs",
+        "INNER JOIN",
+        "LEFT JOIN",
+        "WHERE clause"
+      ],
+      "difficulty": "Hard",
+      "educational_focus": "Combining multiple JOIN types in a single query",
+      "result": {
+        "working": true,
+        "execution_time": 0.024,
+        "row_count": 12,
+        "columns": [
+          "job_title",
+          "company_name",
+          "job_location",
+          "job_country",
+          "job_via"
+        ],
+        "sample_results": [
+          {
+            "job_title": "Data Analyst",
+            "company_name": "Intercom Data Service Group",
+            "job_location": "Tirana, Albania",
+            "job_country": "Albania",
+            "job_via": "via LinkedIn Albania"
+          },
+          {
+            "job_title": "Data Analyst",
+            "company_name": "AUTO1 Group",
+            "job_location": "Tirana, Albania",
+            "job_country": "Albania",
+            "job_via": "via LinkedIn Albania"
+          },
+          {
+            "job_title": "Data Analyst",
+            "company_name": "BI2Value GmbH",
+            "job_location": "Tirana, Albania",
+            "job_country": "Albania",
+            "job_via": "via LinkedIn Albania"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 7,
+      "title": "Platform Performance Analysis",
+      "statement": "Compare platform performance by showing platform name, total jobs posted, and average jobs per platform. Use PRIMARY KEY and FOREIGN KEY concepts through JOINs.",
+      "solution": "SELECT jpl.platform_name, jpl.jobs_posted, COUNT(jp.job_id) AS actual_jobs\nFROM job_platforms AS jpl\nLEFT JOIN job_postings AS jp ON jpl.platform_name = jp.job_via\nGROUP BY jpl.platform_name, jpl.jobs_posted\nHAVING COUNT(jp.job_id) > 100\nORDER BY actual_jobs DESC\nLIMIT 15;",
+      "topics": [
+        "LEFT JOIN",
+        "GROUP BY",
+        "HAVING",
+        "COUNT"
+      ],
+      "difficulty": "Hard",
+      "educational_focus": "Understanding primary/foreign key relationships through JOINs",
+      "result": {
+        "working": true,
+        "execution_time": 0.011,
+        "row_count": 15,
+        "columns": [
+          "platform_name",
+          "jobs_posted",
+          "actual_jobs"
+        ],
+        "sample_results": [
+          {
+            "platform_name": "via LinkedIn",
+            "jobs_posted": "186679",
+            "actual_jobs": "139839"
+          },
+          {
+            "platform_name": "via BeBee",
+            "jobs_posted": "103507",
+            "actual_jobs": "77541"
+          },
+          {
+            "platform_name": "via Trabajo.org",
+            "jobs_posted": "61562",
+            "actual_jobs": "46264"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 8,
+      "title": "Remote Work by Company",
+      "statement": "Analyze remote work opportunities by company. Show company name, total jobs, and count of remote jobs. Include companies even if they don't offer remote work.",
+      "solution": "SELECT c.company_name, \n       COUNT(jp.job_id) AS total_jobs,\n       COUNT(CASE WHEN jp.job_work_from_home = 'True' THEN 1 END) AS remote_jobs\nFROM companies AS c\nLEFT JOIN job_postings AS jp ON c.company_name = jp.company_name\nGROUP BY c.company_name\nHAVING COUNT(jp.job_id) > 5\nORDER BY remote_jobs DESC\nLIMIT 10;",
+      "topics": [
+        "LEFT JOIN",
+        "COUNT",
+        "CASE WHEN",
+        "GROUP BY",
+        "HAVING"
+      ],
+      "difficulty": "Hard",
+      "educational_focus": "LEFT JOIN with conditional aggregation",
+      "result": {
+        "working": true,
+        "execution_time": 0.024,
+        "row_count": 10,
+        "columns": [
+          "company_name",
+          "total_jobs",
+          "remote_jobs"
+        ],
+        "sample_results": [
+          {
+            "company_name": "Listopro",
+            "total_jobs": "1511",
+            "remote_jobs": "1196"
+          },
+          {
+            "company_name": "Dice",
+            "total_jobs": "2139",
+            "remote_jobs": "1093"
+          },
+          {
+            "company_name": "Upwork",
+            "total_jobs": "1035",
+            "remote_jobs": "1007"
+          }
+        ],
+        "error": null
+      }
+    }
+  ]
+}

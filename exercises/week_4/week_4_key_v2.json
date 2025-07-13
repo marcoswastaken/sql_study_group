@@ -1,0 +1,427 @@
+{
+  "metadata": {
+    "title": "Week 4 Practice - Data Jobs Dataset (Enhanced)",
+    "description": "JOIN operations demonstrating how combining tables reveals insights not available in individual tables",
+    "week": 4,
+    "total_exercises": 8,
+    "database": "data_jobs.db",
+    "focus_topics": [
+      "INNER JOIN",
+      "LEFT JOIN",
+      "Table aliases",
+      "Cross-table analysis",
+      "Data relationships"
+    ],
+    "generated_date": "2025-01-12T12:00:00.000000",
+    "difficulty_levels": [
+      "Easy",
+      "Medium",
+      "Hard"
+    ],
+    "enhancement_notes": "Exercises redesigned to ensure joins add unique value by combining information that doesn't exist in individual tables",
+    "test_results": {
+      "total_exercises": 8,
+      "working_exercises": 8,
+      "failed_exercises": 0,
+      "success_rate": 100.0,
+      "total_execution_time": 0.026,
+      "average_execution_time": 0.003,
+      "test_date": "2025-07-12 12:35:20"
+    }
+  },
+  "exercises": [
+    {
+      "id": 1,
+      "title": "Company Size Impact on Remote Work",
+      "statement": "Analyze how company hiring activity correlates with remote work policies. Show company name, total jobs posted by the company, and percentage of jobs that are remote. This requires combining company hiring volume (from companies table) with remote work data (from job_postings table). Only include companies with 10+ jobs posted.",
+      "solution": "SELECT c.company_name, \n       c.total_jobs AS company_total_jobs,\n       COUNT(jp.job_id) AS jobs_in_dataset,\n       ROUND(COUNT(CASE WHEN jp.job_work_from_home = 'True' THEN 1 END) * 100.0 / COUNT(jp.job_id), 2) AS remote_job_percentage\nFROM companies AS c\nINNER JOIN job_postings AS jp ON c.company_name = jp.company_name\nWHERE c.total_jobs >= 10\nGROUP BY c.company_name, c.total_jobs\nORDER BY remote_job_percentage DESC\nLIMIT 15;",
+      "topics": [
+        "INNER JOIN",
+        "GROUP BY",
+        "CASE WHEN",
+        "Percentage calculation",
+        "Cross-table analysis"
+      ],
+      "difficulty": "Medium",
+      "educational_focus": "Shows how joining reveals correlation between company hiring volume and remote work policies - insights not available in either table alone",
+      "result": {
+        "working": true,
+        "execution_time": 0.003,
+        "row_count": 15,
+        "columns": [
+          "company_name",
+          "company_total_jobs",
+          "jobs_in_dataset",
+          "remote_job_percentage"
+        ],
+        "sample_results": [
+          {
+            "company_name": "EPAM Anywhere",
+            "company_total_jobs": "337",
+            "jobs_in_dataset": "4",
+            "remote_job_percentage": "100.0"
+          },
+          {
+            "company_name": "Navy Federal Credit Union",
+            "company_total_jobs": "312",
+            "jobs_in_dataset": "1",
+            "remote_job_percentage": "100.0"
+          },
+          {
+            "company_name": "Splunk",
+            "company_total_jobs": "337",
+            "jobs_in_dataset": "1",
+            "remote_job_percentage": "100.0"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 2,
+      "title": "Geographic Job Market Density vs Platform Usage",
+      "statement": "Identify which job platforms are most effective in high-density job markets. Show location, job market density (from locations table), most popular platform in that location, and platform's job count. This combines geographic market data with platform preference data.",
+      "solution": "SELECT l.job_location,\n       l.job_country,\n       l.job_count AS market_density,\n       jp.job_via AS most_popular_platform,\n       COUNT(jp.job_id) AS platform_jobs_in_location\nFROM locations AS l\nINNER JOIN job_postings AS jp ON l.job_location = jp.job_location\nWHERE l.job_count > 500\nGROUP BY l.job_location, l.job_country, l.job_count, jp.job_via\nHAVING COUNT(jp.job_id) > 20\nORDER BY l.job_count DESC, platform_jobs_in_location DESC\nLIMIT 20;",
+      "topics": [
+        "INNER JOIN",
+        "GROUP BY",
+        "HAVING",
+        "Market analysis",
+        "Geographic correlation"
+      ],
+      "difficulty": "Medium",
+      "educational_focus": "Demonstrates how joins reveal relationships between geographic job density and platform effectiveness - combining location market data with platform usage patterns",
+      "result": {
+        "working": true,
+        "execution_time": 0.004,
+        "row_count": 20,
+        "columns": [
+          "job_location",
+          "job_country",
+          "market_density",
+          "most_popular_platform",
+          "platform_jobs_in_location"
+        ],
+        "sample_results": [
+          {
+            "job_location": "Singapore",
+            "job_country": "Singapore",
+            "market_density": "23415",
+            "most_popular_platform": "via LinkedIn",
+            "platform_jobs_in_location": "49"
+          },
+          {
+            "job_location": "Singapore",
+            "job_country": "Singapore",
+            "market_density": "23415",
+            "most_popular_platform": "via BeBee Singapore",
+            "platform_jobs_in_location": "28"
+          },
+          {
+            "job_location": "Singapore",
+            "job_country": "Singapore",
+            "market_density": "23415",
+            "most_popular_platform": "via Recruit.net",
+            "platform_jobs_in_location": "24"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 3,
+      "title": "Platform Reach vs Company Diversity",
+      "statement": "Analyze which platforms attract the most diverse range of employers. Show platform name, platform's total capacity (from job_platforms table), number of unique companies using the platform, and average jobs per company. This reveals platform business models and employer diversity.",
+      "solution": "SELECT jpl.platform_name,\n       jpl.jobs_posted AS platform_capacity,\n       COUNT(DISTINCT jp.company_name) AS unique_companies,\n       COUNT(jp.job_id) AS actual_jobs_posted,\n       ROUND(COUNT(jp.job_id) * 1.0 / COUNT(DISTINCT jp.company_name), 2) AS avg_jobs_per_company\nFROM job_platforms AS jpl\nINNER JOIN job_postings AS jp ON jpl.platform_name = jp.job_via\nGROUP BY jpl.platform_name, jpl.jobs_posted\nHAVING COUNT(DISTINCT jp.company_name) > 50\nORDER BY unique_companies DESC\nLIMIT 12;",
+      "topics": [
+        "INNER JOIN",
+        "COUNT DISTINCT",
+        "GROUP BY",
+        "HAVING",
+        "Business model analysis"
+      ],
+      "difficulty": "Medium",
+      "educational_focus": "Shows how joins reveal platform business models - combining platform capacity with employer diversity metrics that require data from both tables",
+      "result": {
+        "working": true,
+        "execution_time": 0.004,
+        "row_count": 12,
+        "columns": [
+          "platform_name",
+          "platform_capacity",
+          "unique_companies",
+          "actual_jobs_posted",
+          "avg_jobs_per_company"
+        ],
+        "sample_results": [
+          {
+            "platform_name": "via LinkedIn",
+            "platform_capacity": "186679",
+            "unique_companies": "1079",
+            "actual_jobs_posted": "1952",
+            "avg_jobs_per_company": "1.81"
+          },
+          {
+            "platform_name": "via Trabajo.org",
+            "platform_capacity": "61562",
+            "unique_companies": "911",
+            "actual_jobs_posted": "1308",
+            "avg_jobs_per_company": "1.44"
+          },
+          {
+            "platform_name": "via BeBee",
+            "platform_capacity": "103507",
+            "unique_companies": "593",
+            "actual_jobs_posted": "708",
+            "avg_jobs_per_company": "1.19"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 4,
+      "title": "International Salary Benchmarking",
+      "statement": "Compare salary expectations across countries by experience level. Show country, experience level classification (from salary_ranges table), number of jobs in that category, and average salary. This requires joining geographic, salary, and classification data.",
+      "solution": "SELECT l.job_country,\n       sr.experience_level,\n       sr.range_name,\n       COUNT(jp.job_id) AS jobs_in_category,\n       ROUND(AVG(jp.salary_year_avg), 0) AS avg_salary\nFROM job_postings AS jp\nINNER JOIN locations AS l ON jp.job_location = l.job_location\nINNER JOIN salary_ranges AS sr ON jp.salary_year_avg BETWEEN sr.min_salary AND sr.max_salary\nWHERE jp.salary_year_avg IS NOT NULL\nGROUP BY l.job_country, sr.experience_level, sr.range_name, sr.min_salary\nHAVING COUNT(jp.job_id) >= 10\nORDER BY l.job_country, sr.min_salary\nLIMIT 20;",
+      "topics": [
+        "Multiple JOINs",
+        "INNER JOIN",
+        "BETWEEN",
+        "AVG function",
+        "International comparison"
+      ],
+      "difficulty": "Hard",
+      "educational_focus": "Demonstrates complex multi-table joins that combine geographic, salary, and classification data to enable international salary benchmarking",
+      "result": {
+        "working": true,
+        "execution_time": 0.003,
+        "row_count": 4,
+        "columns": [
+          "job_country",
+          "experience_level",
+          "range_name",
+          "jobs_in_category",
+          "avg_salary"
+        ],
+        "sample_results": [
+          {
+            "job_country": "Sudan",
+            "experience_level": "Senior",
+            "range_name": "Senior Level",
+            "jobs_in_category": "24",
+            "avg_salary": "123511.0"
+          },
+          {
+            "job_country": "United States",
+            "experience_level": "Mid",
+            "range_name": "Mid Level",
+            "jobs_in_category": "22",
+            "avg_salary": "85524.0"
+          },
+          {
+            "job_country": "United States",
+            "experience_level": "Senior",
+            "range_name": "Senior Level",
+            "jobs_in_category": "50",
+            "avg_salary": "123261.0"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 5,
+      "title": "Skills Requirements vs Company Hiring Patterns",
+      "statement": "Identify companies that consistently hire for high-skill positions. Show company name, company's total hiring activity (from companies table), percentage of jobs requiring no degree, and percentage offering health insurance. This correlates company hiring volume with skill requirements.",
+      "solution": "SELECT c.company_name,\n       c.total_jobs AS company_hiring_volume,\n       COUNT(jp.job_id) AS jobs_in_sample,\n       ROUND(COUNT(CASE WHEN jp.job_no_degree_mention = 'True' THEN 1 END) * 100.0 / COUNT(jp.job_id), 2) AS pct_no_degree_required,\n       ROUND(COUNT(CASE WHEN jp.job_health_insurance = 'True' THEN 1 END) * 100.0 / COUNT(jp.job_id), 2) AS pct_health_insurance\nFROM companies AS c\nINNER JOIN job_postings AS jp ON c.company_name = jp.company_name\nWHERE c.total_jobs >= 20\nGROUP BY c.company_name, c.total_jobs\nORDER BY pct_health_insurance DESC, pct_no_degree_required DESC\nLIMIT 15;",
+      "topics": [
+        "INNER JOIN",
+        "CASE WHEN",
+        "Percentage calculation",
+        "GROUP BY",
+        "Skills analysis"
+      ],
+      "difficulty": "Medium",
+      "educational_focus": "Shows how joins reveal company hiring strategies by combining hiring volume data with job requirements - insights about company culture and standards",
+      "result": {
+        "working": true,
+        "execution_time": 0.002,
+        "row_count": 15,
+        "columns": [
+          "company_name",
+          "company_hiring_volume",
+          "jobs_in_sample",
+          "pct_no_degree_required",
+          "pct_health_insurance"
+        ],
+        "sample_results": [
+          {
+            "company_name": "Jefferson Frank",
+            "company_hiring_volume": "184",
+            "jobs_in_sample": "1",
+            "pct_no_degree_required": "100.0",
+            "pct_health_insurance": "100.0"
+          },
+          {
+            "company_name": "Lumen",
+            "company_hiring_volume": "147",
+            "jobs_in_sample": "2",
+            "pct_no_degree_required": "50.0",
+            "pct_health_insurance": "100.0"
+          },
+          {
+            "company_name": "Koch Industries",
+            "company_hiring_volume": "105",
+            "jobs_in_sample": "2",
+            "pct_no_degree_required": "0.0",
+            "pct_health_insurance": "100.0"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 6,
+      "title": "Location Premium Analysis",
+      "statement": "Identify locations where companies pay premium salaries relative to experience level expectations. Show location, country, market size (from locations table), experience level, expected salary range, and actual average salary. Find locations where actual salaries exceed range maximums.",
+      "solution": "SELECT l.job_location,\n       l.job_country,\n       l.job_count AS market_size,\n       sr.experience_level,\n       sr.min_salary AS expected_min,\n       sr.max_salary AS expected_max,\n       ROUND(AVG(jp.salary_year_avg), 0) AS actual_avg_salary,\n       ROUND(AVG(jp.salary_year_avg) - sr.max_salary, 0) AS premium_over_range\nFROM job_postings AS jp\nINNER JOIN locations AS l ON jp.job_location = l.job_location\nINNER JOIN salary_ranges AS sr ON jp.salary_year_avg BETWEEN sr.min_salary AND sr.max_salary\nWHERE jp.salary_year_avg IS NOT NULL\nGROUP BY l.job_location, l.job_country, l.job_count, sr.experience_level, sr.min_salary, sr.max_salary\nHAVING COUNT(jp.job_id) >= 5 AND AVG(jp.salary_year_avg) > sr.max_salary\nORDER BY premium_over_range DESC\nLIMIT 15;",
+      "topics": [
+        "Multiple JOINs",
+        "HAVING with conditions",
+        "AVG function",
+        "Premium analysis",
+        "Market comparison"
+      ],
+      "difficulty": "Hard",
+      "educational_focus": "Complex join combining location market data, salary ranges, and actual salaries to identify premium markets - requires all three tables for the analysis",
+      "result": {
+        "working": true,
+        "execution_time": 0.003,
+        "row_count": 0,
+        "columns": [
+          "job_location",
+          "job_country",
+          "market_size",
+          "experience_level",
+          "expected_min",
+          "expected_max",
+          "actual_avg_salary",
+          "premium_over_range"
+        ],
+        "sample_results": [],
+        "error": null
+      }
+    },
+    {
+      "id": 7,
+      "title": "Platform Efficiency vs Geographic Reach",
+      "statement": "Analyze platform efficiency by comparing their declared capacity with actual performance across different markets. Show platform name, declared capacity (from job_platforms table), number of countries reached, average jobs per country, and capacity utilization rate.",
+      "solution": "SELECT jpl.platform_name,\n       jpl.jobs_posted AS declared_capacity,\n       COUNT(DISTINCT l.job_country) AS countries_reached,\n       COUNT(jp.job_id) AS actual_jobs,\n       ROUND(COUNT(jp.job_id) * 1.0 / COUNT(DISTINCT l.job_country), 2) AS avg_jobs_per_country,\n       ROUND(COUNT(jp.job_id) * 100.0 / jpl.jobs_posted, 2) AS capacity_utilization_pct\nFROM job_platforms AS jpl\nINNER JOIN job_postings AS jp ON jpl.platform_name = jp.job_via\nLEFT JOIN locations AS l ON jp.job_location = l.job_location\nGROUP BY jpl.platform_name, jpl.jobs_posted\nHAVING COUNT(jp.job_id) > 100\nORDER BY capacity_utilization_pct DESC\nLIMIT 15;",
+      "topics": [
+        "Mixed JOINs",
+        "INNER JOIN",
+        "LEFT JOIN",
+        "Efficiency analysis",
+        "Geographic reach"
+      ],
+      "difficulty": "Hard",
+      "educational_focus": "Demonstrates combining INNER and LEFT JOINs to analyze platform efficiency and geographic reach - requires data from all three tables",
+      "result": {
+        "working": true,
+        "execution_time": 0.004,
+        "row_count": 15,
+        "columns": [
+          "platform_name",
+          "declared_capacity",
+          "countries_reached",
+          "actual_jobs",
+          "avg_jobs_per_country",
+          "capacity_utilization_pct"
+        ],
+        "sample_results": [
+          {
+            "platform_name": "via CareerBuilder",
+            "declared_capacity": "1331",
+            "countries_reached": "39",
+            "actual_jobs": "628",
+            "avg_jobs_per_country": "16.1",
+            "capacity_utilization_pct": "47.18"
+          },
+          {
+            "platform_name": "via EMPREGO",
+            "declared_capacity": "993",
+            "countries_reached": "40",
+            "actual_jobs": "284",
+            "avg_jobs_per_country": "7.1",
+            "capacity_utilization_pct": "28.6"
+          },
+          {
+            "platform_name": "via AngelList",
+            "declared_capacity": "800",
+            "countries_reached": "38",
+            "actual_jobs": "196",
+            "avg_jobs_per_country": "5.16",
+            "capacity_utilization_pct": "24.5"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 8,
+      "title": "Missing Data Impact Analysis",
+      "statement": "Identify potential data quality issues by finding companies with significant hiring activity but missing job details. Show company name, total jobs (from companies table), jobs in our sample, jobs missing salary info, jobs missing location info, and data completeness percentage.",
+      "solution": "SELECT c.company_name,\n       c.total_jobs AS total_company_jobs,\n       COUNT(jp.job_id) AS jobs_in_sample,\n       COUNT(CASE WHEN jp.salary_year_avg IS NULL THEN 1 END) AS jobs_missing_salary,\n       COUNT(CASE WHEN jp.job_location IS NULL THEN 1 END) AS jobs_missing_location,\n       ROUND((COUNT(jp.job_id) - COUNT(CASE WHEN jp.salary_year_avg IS NULL OR jp.job_location IS NULL THEN 1 END)) * 100.0 / COUNT(jp.job_id), 2) AS data_completeness_pct\nFROM companies AS c\nLEFT JOIN job_postings AS jp ON c.company_name = jp.company_name\nWHERE c.total_jobs >= 50\nGROUP BY c.company_name, c.total_jobs\nORDER BY data_completeness_pct ASC\nLIMIT 15;",
+      "topics": [
+        "LEFT JOIN",
+        "Data quality analysis",
+        "NULL handling",
+        "CASE WHEN",
+        "Missing data patterns"
+      ],
+      "difficulty": "Medium",
+      "educational_focus": "Shows how LEFT JOIN reveals data quality issues by combining company hiring volume with actual data completeness - demonstrates the value of preserving all records",
+      "result": {
+        "working": true,
+        "execution_time": 0.003,
+        "row_count": 15,
+        "columns": [
+          "company_name",
+          "total_company_jobs",
+          "jobs_in_sample",
+          "jobs_missing_salary",
+          "jobs_missing_location",
+          "data_completeness_pct"
+        ],
+        "sample_results": [
+          {
+            "company_name": "Clarivate",
+            "total_company_jobs": "97",
+            "jobs_in_sample": "0",
+            "jobs_missing_salary": "1",
+            "jobs_missing_location": "1",
+            "data_completeness_pct": "-inf"
+          },
+          {
+            "company_name": "Steneral Consulting",
+            "total_company_jobs": "145",
+            "jobs_in_sample": "0",
+            "jobs_missing_salary": "1",
+            "jobs_missing_location": "1",
+            "data_completeness_pct": "-inf"
+          },
+          {
+            "company_name": "Status Pro",
+            "total_company_jobs": "110",
+            "jobs_in_sample": "0",
+            "jobs_missing_salary": "1",
+            "jobs_missing_location": "1",
+            "data_completeness_pct": "-inf"
+          }
+        ],
+        "error": null
+      }
+    }
+  ]
+}
