@@ -6,7 +6,7 @@
     "total_records": 785741,
     "total_columns": 17,
     "memory_usage_mb": 625.81,
-    "analysis_date": "2025-07-13T15:53:04.968215",
+    "analysis_date": "2025-07-14T11:08:27.867826",
     "column_names": [
       "job_title_short",
       "job_title",
@@ -71,11 +71,11 @@
       "unique_count": 234673,
       "unique_percentage": 29.87,
       "sample_values": [
-        "Senior Data Scientist- Consumer Deposits & Small B...",
-        "Senior/ Staff Analyst - Data Scientist Information...",
-        "ML Data Scientist/ML Engineer (Hybrid role)",
-        "Staff IT Data Management Analyst",
-        "Reporting & Automation Analyst"
+        "Field Data Scientist",
+        "Vacature naamJunior Data Scientist",
+        "Data Scientist (Associate III - Data Analysis)",
+        "Engineering Quality Analyst",
+        "computer systems analyst"
       ],
       "statistics": {
         "count": 785740,
@@ -249,11 +249,11 @@
       "unique_count": 607192,
       "unique_percentage": 77.28,
       "sample_values": [
-        "2023-01-02 06:25:31",
-        "2023-11-11 13:39:57",
-        "2023-11-13 19:02:17",
-        "2023-02-13 15:08:09",
-        "2023-09-27 00:03:13"
+        "2023-12-01 18:20:11",
+        "2023-05-11 16:40:11",
+        "2023-01-27 00:18:02",
+        "2023-01-27 15:04:17",
+        "2023-03-15 15:03:30"
       ],
       "statistics": {
         "count": 785741,
@@ -376,17 +376,17 @@
       "unique_count": 2702,
       "unique_percentage": 0.34,
       "sample_values": [
-        "98650.0",
-        "71533.0",
-        "92187.0",
-        "265500.0",
-        "149354.0"
+        "213158.78125",
+        "163782.0",
+        "214807.5",
+        "59480.0",
+        "128000.0"
       ],
       "statistics": {
         "count": 22003,
         "memory_usage_mb": 5.995,
         "mean": 123286.27407182401,
-        "std": 48312.44948172934,
+        "std": 48312.44948172864,
         "min": 15000.0,
         "max": 960000.0,
         "median": 115000.0
@@ -405,17 +405,17 @@
       "unique_count": 1184,
       "unique_percentage": 0.15,
       "sample_values": [
-        "33.709999084472656",
-        "98.0",
-        "51.0",
-        "37.75",
-        "26.63999938964844"
+        "39.06999969482422",
+        "38.17499923706055",
+        "27.270000457763672",
+        "26.5",
+        "38.43499755859375"
       ],
       "statistics": {
         "count": 10662,
         "memory_usage_mb": 5.995,
         "mean": 47.01659821515861,
-        "std": 21.890738232134275,
+        "std": 21.89073823213424,
         "min": 8.0,
         "max": 391.0,
         "median": 45.97999954223633
@@ -434,11 +434,11 @@
       "unique_count": 139982,
       "unique_percentage": 17.82,
       "sample_values": [
-        "Nicoll Curtin Group",
-        "Datanami",
-        "Lendo",
-        "ArcelorMittal France",
-        "DispatchTrack en Español"
+        "Oxenham Group",
+        "Ergo Human Resources SRL",
+        "Perficient formerly Inflection Point",
+        "Dobbs Defense Solutions",
+        "Apex 2000"
       ],
       "statistics": {
         "count": 785723,
@@ -454,11 +454,11 @@
       "unique_count": 177562,
       "unique_percentage": 22.6,
       "sample_values": [
-        "['python', 'sql', 'r', 'shell', 'nosql', 'gcp', 'a...",
-        "['sql', 'python', 'oracle', 'sap']",
-        "['python', 'sql', 'gcp', 'aws', 'azure', 'looker',...",
-        "['visio', 'excel', 'powerpoint']",
-        "['python', 'aws', 'kafka', 'spark', 'tableau', 'gi..."
+        "['python', 'sas', 'sas', 'sql', 'nosql', 'aws']",
+        "['sql', 'visual basic', 'vba', 'python', 'sql serv...",
+        "['python', 'sql', 'windows', 'linux', 'excel']",
+        "['python', 'php', 'gdpr', 'looker']",
+        "['r', 'tableau', 'qlik']"
       ],
       "statistics": {
         "count": 668704,
@@ -474,11 +474,11 @@
       "unique_count": 177562,
       "unique_percentage": 22.6,
       "sample_values": [
-        "{'cloud': ['azure', 'gcp', 'aws'], 'libraries': ['...",
-        "{'cloud': ['aws', 'databricks', 'snowflake'], 'oth...",
-        "{'cloud': ['gcp'], 'databases': ['postgresql'], 'o...",
-        "{'analyst_tools': ['excel', 'word', 'ms access'], ...",
-        "{'cloud': ['aws', 'azure', 'gcp'], 'libraries': ['..."
+        "{'cloud': ['aws', 'databricks'], 'databases': ['dy...",
+        "{'libraries': ['hadoop', 'spark'], 'os': ['unix'],...",
+        "{'analyst_tools': ['tableau', 'looker'], 'librarie...",
+        "{'cloud': ['aws', 'gcp', 'azure'], 'os': ['linux']...",
+        "{'async': ['jira'], 'databases': ['mysql']}"
       ],
       "statistics": {
         "count": 668704,

@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Practice - Week 4 JOIN Operations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .workspace {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .exercises-sidebar {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section h2 {
+            color: #4a5568;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+
+        .section h3 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .table-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .table-name {
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .table-meta {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-bottom: 0.8rem;
+        }
+
+        .columns-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .column-item {
+            background: white;
+            padding: 0.6rem;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+        }
+
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.3rem;
+        }
+
+        .column-name {
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .column-type {
+            color: #667eea;
+            font-size: 0.8rem;
+        }
+
+        .column-key {
+            color: #f56565;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        .column-description {
+            color: #4a5568;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            margin-top: 0.3rem;
+        }
+
+        .exercise-list {
+            list-style: none;
+        }
+
+        .exercise-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .exercise-item:hover {
+            background: #e2e8f0;
+            border-color: #667eea;
+        }
+
+        .exercise-item.selected {
+            background: #ebf8ff;
+            border-color: #667eea;
+        }
+
+        .exercise-title {
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .exercise-meta {
+            font-size: 0.85rem;
+            color: #4a5568;
+        }
+
+        .difficulty {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .difficulty.Easy {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+
+        .difficulty.Medium {
+            background: #fed7aa;
+            color: #c05621;
+        }
+
+        .difficulty.Hard {
+            background: #feb2b2;
+            color: #c53030;
+        }
+
+        .topics {
+            margin-top: 0.5rem;
+        }
+
+        .topic-tag {
+            display: inline-block;
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 0.15rem 0.4rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            margin-right: 0.3rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .problem-statement {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .problem-statement h3 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .query-editor {
+            margin-bottom: 1.5rem;
+        }
+
+        .query-editor textarea {
+            width: 100%;
+            height: 200px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .query-editor textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        .results-section {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .results-header {
+            background: #f7fafc;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .results-meta {
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .results-content {
+            padding: 1rem;
+        }
+
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .success-message {
+            background: #c6f6d5;
+            color: #2f855a;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .results-table th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .results-table tr:hover {
+            background: #f7fafc;
+        }
+
+        .solution-section {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .solution-section h4 {
+            color: #2f855a;
+            margin-bottom: 1rem;
+        }
+
+        .solution-query {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            margin-bottom: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #4a5568;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                flex-wrap: wrap;
+            }
+            
+            .columns-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SQL Practice Lab</h1>
+            <p class="subtitle">Week 4: JOIN Operations - Data Jobs Dataset</p>
+        </header>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="section">
+                    <h2>📚 Data Dictionary</h2>
+                    <div id="tables-info">
+                        {% for table in tables %}
+                        <div class="table-info">
+                            <div class="table-name">{{ table.name }}</div>
+                            <div class="table-meta">{{ table.row_count }} rows</div>
+                            <div class="columns-list">
+                                {% for column in table.columns %}
+                                <div class="column-item">
+                                    <div class="column-header">
+                                        <div class="column-name">{{ column.name }}</div>
+                                        <div class="column-type">{{ column.type }}</div>
+                                        {% if column.primary_key %}
+                                        <div class="column-key">PK</div>
+                                        {% endif %}
+                                        {% if column.foreign_key %}
+                                        <div class="column-key">FK</div>
+                                        {% endif %}
+                                    </div>
+                                    {% if column.description %}
+                                    <div class="column-description">{{ column.description }}</div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="workspace">
+                <div id="exercise-content" class="section">
+                    <h2>Select an exercise to get started</h2>
+                    <p>Choose an exercise from the right sidebar to view the problem statement and start practicing.</p>
+                </div>
+
+                <div id="query-section" class="section hidden">
+                    <h2>💻 Your Solution</h2>
+                    <div class="query-editor">
+                        <textarea id="query-input" placeholder="Enter your SQL query here..."></textarea>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-primary" id="execute-btn">Execute Query</button>
+                        <button class="btn btn-secondary" id="validate-btn">Validate Query</button>
+                        <button class="btn btn-success" id="show-solution-btn">Show Solution</button>
+                    </div>
+                </div>
+
+                <div id="results-section" class="section hidden">
+                    <h2>📊 Results</h2>
+                    <div class="results-section">
+                        <div class="results-header">
+                            <span id="results-title">Query Results</span>
+                            <span id="results-meta" class="results-meta"></span>
+                        </div>
+                        <div id="results-content" class="results-content">
+                            <!-- Results will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div id="solution-section" class="section hidden">
+                    <div class="solution-section">
+                        <h4>🔍 Official Solution</h4>
+                        <div id="solution-query" class="solution-query"></div>
+                        <div id="solution-results"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="exercises-sidebar">
+                <div class="section">
+                    <h2>🎯 Exercises</h2>
+                    <ul class="exercise-list">
+                        {% for exercise in exercises %}
+                        <li class="exercise-item" data-exercise-id="{{ exercise.id }}">
+                            <div class="exercise-title">{{ exercise.id }}. {{ exercise.title }}</div>
+                            <div class="exercise-meta">
+                                <span class="difficulty {{ exercise.difficulty }}">{{ exercise.difficulty }}</span>
+                                <div class="topics">
+                                    {% for topic in exercise.topics %}
+                                    <span class="topic-tag">{{ topic }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application state
+        let currentExercise = null;
+        let currentResults = null;
+
+        // DOM elements
+        const exerciseItems = document.querySelectorAll('.exercise-item');
+        const exerciseContent = document.getElementById('exercise-content');
+        const querySection = document.getElementById('query-section');
+        const resultsSection = document.getElementById('results-section');
+        const solutionSection = document.getElementById('solution-section');
+        const queryInput = document.getElementById('query-input');
+        const executeBtn = document.getElementById('execute-btn');
+        const validateBtn = document.getElementById('validate-btn');
+        const showSolutionBtn = document.getElementById('show-solution-btn');
+        const resultsTitle = document.getElementById('results-title');
+        const resultsMeta = document.getElementById('results-meta');
+        const resultsContent = document.getElementById('results-content');
+        const solutionQuery = document.getElementById('solution-query');
+        const solutionResults = document.getElementById('solution-results');
+
+        // Event listeners
+        exerciseItems.forEach(item => {
+            item.addEventListener('click', () => selectExercise(item.dataset.exerciseId));
+        });
+
+        executeBtn.addEventListener('click', executeQuery);
+        validateBtn.addEventListener('click', validateQuery);
+        showSolutionBtn.addEventListener('click', showSolution);
+
+        // Select exercise
+        async function selectExercise(exerciseId) {
+            try {
+                // Update UI
+                exerciseItems.forEach(item => item.classList.remove('selected'));
+                document.querySelector(`[data-exercise-id="${exerciseId}"]`).classList.add('selected');
+
+                // Fetch exercise details
+                const response = await fetch(`/api/exercises/${exerciseId}`);
+                const exercise = await response.json();
+
+                if (response.ok) {
+                    currentExercise = exercise;
+                    displayExercise(exercise);
+                    querySection.classList.remove('hidden');
+                    resultsSection.classList.add('hidden');
+                    solutionSection.classList.add('hidden');
+                    queryInput.value = '';
+                } else {
+                    throw new Error(exercise.error || 'Failed to load exercise');
+                }
+            } catch (error) {
+                console.error('Error selecting exercise:', error);
+                exerciseContent.innerHTML = `<div class="error-message">Error loading exercise: ${error.message}</div>`;
+            }
+        }
+
+        // Display exercise
+        function displayExercise(exercise) {
+            exerciseContent.innerHTML = `
+                <h2>${exercise.id}. ${exercise.title}</h2>
+                <div class="problem-statement">
+                    <h3>Problem Statement</h3>
+                    <p>${exercise.statement}</p>
+                </div>
+                <div class="exercise-meta">
+                    <span class="difficulty ${exercise.difficulty}">${exercise.difficulty}</span>
+                    <div class="topics">
+                        ${exercise.topics.map(topic => `<span class="topic-tag">${topic}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Execute query
+        async function executeQuery() {
+            const query = queryInput.value.trim();
+            if (!query) {
+                alert('Please enter a query');
+                return;
+            }
+
+            executeBtn.disabled = true;
+            executeBtn.textContent = 'Executing...';
+
+            try {
+                const response = await fetch('/api/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const result = await response.json();
+                displayResults(result);
+            } catch (error) {
+                console.error('Error executing query:', error);
+                displayResults({
+                    success: false,
+                    error: 'Network error: ' + error.message,
+                    data: [],
+                    columns: [],
+                    row_count: 0,
+                    execution_time: 0
+                });
+            } finally {
+                executeBtn.disabled = false;
+                executeBtn.textContent = 'Execute Query';
+            }
+        }
+
+        // Validate query
+        async function validateQuery() {
+            const query = queryInput.value.trim();
+            if (!query) {
+                alert('Please enter a query');
+                return;
+            }
+
+            validateBtn.disabled = true;
+            validateBtn.textContent = 'Validating...';
+
+            try {
+                const response = await fetch('/api/validate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const result = await response.json();
+                
+                if (result.valid) {
+                    resultsContent.innerHTML = '<div class="success-message">✅ Query syntax is valid!</div>';
+                } else {
+                    resultsContent.innerHTML = `<div class="error-message">❌ Query validation failed: ${result.error}</div>`;
+                }
+                
+                resultsSection.classList.remove('hidden');
+                resultsTitle.textContent = 'Validation Results';
+                resultsMeta.textContent = '';
+            } catch (error) {
+                console.error('Error validating query:', error);
+                resultsContent.innerHTML = `<div class="error-message">Network error: ${error.message}</div>`;
+                resultsSection.classList.remove('hidden');
+            } finally {
+                validateBtn.disabled = false;
+                validateBtn.textContent = 'Validate Query';
+            }
+        }
+
+        // Display results
+        function displayResults(result) {
+            resultsSection.classList.remove('hidden');
+            resultsTitle.textContent = 'Query Results';
+            
+            if (result.success) {
+                resultsMeta.textContent = `${result.row_count} rows • ${result.execution_time}s`;
+                
+                if (result.data.length > 0) {
+                    const table = createResultsTable(result.columns, result.data);
+                    resultsContent.innerHTML = `<div class="success-message">✅ Query executed successfully!</div>${table}`;
+                } else {
+                    resultsContent.innerHTML = '<div class="success-message">✅ Query executed successfully! No results returned.</div>';
+                }
+            } else {
+                resultsMeta.textContent = `Error • ${result.execution_time}s`;
+                resultsContent.innerHTML = `<div class="error-message">❌ ${result.error}</div>`;
+            }
+        }
+
+        // Create results table
+        function createResultsTable(columns, data) {
+            if (!columns || columns.length === 0) return '';
+
+            const header = columns.map(col => `<th>${col}</th>`).join('');
+            const rows = data.map(row => {
+                const cells = columns.map(col => `<td>${row[col] || ''}</td>`).join('');
+                return `<tr>${cells}</tr>`;
+            }).join('');
+
+            return `<table class="results-table"><thead><tr>${header}</tr></thead><tbody>${rows}</tbody></table>`;
+        }
+
+        // Show solution
+        async function showSolution() {
+            if (!currentExercise) return;
+
+            showSolutionBtn.disabled = true;
+            showSolutionBtn.textContent = 'Loading...';
+
+            try {
+                // Display the solution
+                solutionQuery.textContent = currentExercise.solution;
+                
+                // Execute the solution query to show expected results
+                const response = await fetch('/api/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: currentExercise.solution })
+                });
+
+                const result = await response.json();
+                
+                if (result.success && result.data.length > 0) {
+                    const table = createResultsTable(result.columns, result.data);
+                    solutionResults.innerHTML = `<h5>Expected Results (${result.row_count} rows):</h5>${table}`;
+                } else {
+                    solutionResults.innerHTML = '<h5>Expected Results: No data returned</h5>';
+                }
+
+                solutionSection.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error showing solution:', error);
+                solutionResults.innerHTML = `<div class="error-message">Error loading solution results: ${error.message}</div>`;
+                solutionSection.classList.remove('hidden');
+            } finally {
+                showSolutionBtn.disabled = false;
+                showSolutionBtn.textContent = 'Show Solution';
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('SQL Practice App initialized');
+        });
+    </script>
+</body>
+</html> 
