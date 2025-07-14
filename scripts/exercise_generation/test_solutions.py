@@ -24,6 +24,98 @@ import pandas as pd
 sys.path.append(str(Path(__file__).parent.parent / "core"))
 from sql_helper import SQLHelper
 
+def validate_exercise_metadata(exercise_key):
+    """Validate exercise metadata structure and required fields"""
+    print("🔍 Validating exercise metadata...")
+    
+    validation_errors = []
+    
+    # Check if exercise key has required top-level structure
+    if "metadata" not in exercise_key:
+        validation_errors.append("Missing 'metadata' section")
+    else:
+        metadata = exercise_key["metadata"]
+        
+        # Check required metadata fields
+        required_metadata_fields = ["title", "description", "week", "database", "generated_date"]
+        for field in required_metadata_fields:
+            if field not in metadata:
+                validation_errors.append(f"Missing required metadata field: '{field}'")
+            elif not metadata[field] or str(metadata[field]).strip() == "":
+                validation_errors.append(f"Empty required metadata field: '{field}'")
+    
+    # Check if exercises exist
+    if "exercises" not in exercise_key:
+        validation_errors.append("Missing 'exercises' section")
+    else:
+        exercises = exercise_key["exercises"]
+        
+        if not isinstance(exercises, list):
+            validation_errors.append("'exercises' must be an array")
+        elif len(exercises) == 0:
+            validation_errors.append("'exercises' array is empty")
+        else:
+            # Check each exercise
+            for i, exercise in enumerate(exercises):
+                # Check required exercise fields
+                required_exercise_fields = ["id", "title", "statement", "difficulty", "topics", "solution"]
+                for field in required_exercise_fields:
+                    if field not in exercise:
+                        validation_errors.append(f"Exercise {i+1}: Missing required field '{field}'")
+                    elif not exercise[field] or str(exercise[field]).strip() == "":
+                        validation_errors.append(f"Exercise {i+1}: Empty required field '{field}'")
+                
+                # Check exercise ID format (should be numeric)
+                if "id" in exercise:
+                    try:
+                        int(exercise["id"])
+                    except ValueError:
+                        validation_errors.append(f"Exercise {i+1}: ID '{exercise['id']}' should be numeric")
+                
+                # Check difficulty values
+                if "difficulty" in exercise:
+                    valid_difficulties = ["Easy", "Medium", "Hard"]
+                    if exercise["difficulty"] not in valid_difficulties:
+                        validation_errors.append(f"Exercise {i+1}: Invalid difficulty '{exercise['difficulty']}'. Must be one of: {valid_difficulties}")
+                
+                # Check topics is an array
+                if "topics" in exercise:
+                    if not isinstance(exercise["topics"], list):
+                        validation_errors.append(f"Exercise {i+1}: 'topics' must be an array")
+                    elif len(exercise["topics"]) == 0:
+                        validation_errors.append(f"Exercise {i+1}: 'topics' array is empty")
+    
+    # Check for database consistency
+    if "metadata" in exercise_key and "database" in exercise_key["metadata"]:
+        database_name = exercise_key["metadata"]["database"]
+        
+        # Extract database name without extension for schema file
+        if database_name.endswith(".db"):
+            db_basename = database_name[:-3]  # Remove .db extension
+        else:
+            db_basename = database_name
+            database_name = f"{database_name}.db"  # Add .db extension
+        
+        # Check if database file exists
+        db_path = Path(f"../../datasets/{database_name}")
+        if not db_path.exists():
+            validation_errors.append(f"Database file not found: {db_path}")
+        
+        # Check if schema file exists
+        schema_path = Path(f"../../schemas/data_schema_{db_basename}.json")
+        if not schema_path.exists():
+            validation_errors.append(f"Schema file not found: {schema_path}")
+    
+    # Report validation results
+    if validation_errors:
+        print("❌ Metadata validation failed:")
+        for error in validation_errors:
+            print(f"   • {error}")
+        return False
+    else:
+        print("✅ Metadata validation passed")
+        return True
+
 def load_exercise_key(file_path):
     """Load the exercise key JSON file"""
     with open(file_path, 'r') as f:
@@ -182,6 +274,11 @@ def main():
         return
     
     exercise_key = load_exercise_key(exercise_key_path)
+    
+    # Validate exercise metadata structure
+    if not validate_exercise_metadata(exercise_key):
+        print("❌ Metadata validation failed - cannot proceed with solution testing")
+        return
     
     # Validate database exists
     db_path = Path(f"../../datasets/{args.dataset}.db")

@@ -20,10 +20,11 @@ class DataService:
         self.base_path = base_path or os.getcwd()
         self.exercises_data = None
         self.schema_data = None
+        self.current_dataset = None
         
     def load_exercises(self, week: int = 4) -> Dict[str, Any]:
         """
-        Load exercise data for the specified week.
+        Load exercise data for the specified week, automatically finding the latest version.
         
         Args:
             week: Week number to load exercises for
@@ -32,30 +33,83 @@ class DataService:
             Dictionary containing exercise data
         """
         if self.exercises_data is None:
-            exercises_file = os.path.join(
-                self.base_path, 
-                f"exercises/week_{week}/week_{week}_key_v4.json"
-            )
+            exercises_file = self._find_latest_exercise_file(week)
             
             if not os.path.exists(exercises_file):
                 raise FileNotFoundError(f"Exercises file not found: {exercises_file}")
                 
             with open(exercises_file, 'r') as f:
                 self.exercises_data = json.load(f)
+            
+            # Extract dataset name from exercise metadata
+            self.current_dataset = self._extract_dataset_name(self.exercises_data)
                 
         return self.exercises_data
+    
+    def _find_latest_exercise_file(self, week: int) -> str:
+        """
+        Find the latest version of exercise file for the given week.
+        
+        Args:
+            week: Week number
+            
+        Returns:
+            Path to the latest exercise file
+        """
+        import glob
+        import re
+        
+        # Look for all exercise files for this week
+        pattern = os.path.join(self.base_path, f"exercises/week_{week}/week_{week}_key_v*.json")
+        files = glob.glob(pattern)
+        
+        if not files:
+            # Fallback to non-versioned file
+            fallback = os.path.join(self.base_path, f"exercises/week_{week}_key.json")
+            if os.path.exists(fallback):
+                return fallback
+            raise FileNotFoundError(f"No exercise files found for week {week}")
+        
+        # Extract version numbers and find the highest
+        def extract_version(filename):
+            match = re.search(r'_v(\d+)\.json$', filename)
+            return int(match.group(1)) if match else 0
+        
+        # Sort by version number and return the latest
+        latest_file = max(files, key=extract_version)
+        return latest_file
+    
+    def _extract_dataset_name(self, exercises_data: Dict[str, Any]) -> str:
+        """
+        Extract dataset name from exercise metadata.
+        
+        Args:
+            exercises_data: Exercise data dictionary
+            
+        Returns:
+            Dataset name (e.g., "data_jobs")
+        """
+        database_file = exercises_data.get("metadata", {}).get("database", "data_jobs.db")
+        # Remove .db extension to get dataset name
+        dataset_name = database_file.replace(".db", "")
+        return dataset_name
     
     def load_table_schema(self) -> Dict[str, Any]:
         """
         Load table schema information for the data dictionary.
+        Auto-detects the correct schema based on the current dataset.
         
         Returns:
             Dictionary containing table schema data
         """
         if self.schema_data is None:
+            # Ensure we have dataset info by loading exercises first
+            if self.current_dataset is None:
+                self.load_exercises()
+            
             schema_file = os.path.join(
                 self.base_path,
-                "schemas/data_schema_data_jobs.json"
+                f"schemas/data_schema_{self.current_dataset}.json"
             )
             
             if not os.path.exists(schema_file):
@@ -152,12 +206,28 @@ class DataService:
     
     def get_database_path(self) -> str:
         """
-        Get the path to the SQLite database file.
+        Get the path to the database file.
+        Auto-detects the correct database based on the current dataset.
         
         Returns:
             Path to the database file
         """
-        db_path = os.path.join(self.base_path, "datasets/data_jobs.db")
+        # Ensure we have dataset info by loading exercises first
+        if self.current_dataset is None:
+            self.load_exercises()
+            
+        db_path = os.path.join(self.base_path, f"datasets/{self.current_dataset}.db")
         if not os.path.exists(db_path):
             raise FileNotFoundError(f"Database file not found: {db_path}")
-        return db_path 
+        return db_path
+    
+    def get_current_dataset(self) -> str:
+        """
+        Get the name of the current dataset.
+        
+        Returns:
+            Current dataset name
+        """
+        if self.current_dataset is None:
+            self.load_exercises()
+        return self.current_dataset 

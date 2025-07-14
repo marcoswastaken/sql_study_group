@@ -48,6 +48,9 @@ class SQLService:
             
             # Add LIMIT if not present and query is SELECT
             if self._is_select_query(query) and not self._has_limit(query):
+                # Remove trailing semicolon if present before adding LIMIT
+                if query.rstrip().endswith(';'):
+                    query = query.rstrip()[:-1]
                 query = f"{query} LIMIT {limit}"
             
             # Execute the query

@@ -213,10 +213,23 @@ Agent receives detailed curriculum generation prompt and creates educational tab
 **Script:** `scripts/exercise_generation/test_solutions.py --exercise-key [file] --dataset [dataset]`
 
 **Process:**
-1. Execute all SQL solutions against database
-2. Capture execution time, row counts, and sample results
-3. Update exercise key with test results and metadata
-4. Verify 100% success rate before proceeding
+1. **Validate exercise metadata structure and required fields**:
+   - Verify required metadata fields (title, description, week, database, generated_date)
+   - Check exercise structure (id, title, statement, difficulty, topics, solution)
+   - Validate database and schema file existence
+   - Ensure exercise IDs are numeric and difficulty values are valid
+   - Confirm topics arrays are properly structured
+2. Execute all SQL solutions against database
+3. Capture execution time, row counts, and sample results
+4. Update exercise key with test results and metadata
+5. Verify 100% success rate before proceeding
+
+**Validation Requirements:**
+- All required metadata fields must be present and non-empty
+- Exercise IDs must be numeric
+- Difficulty must be one of: Easy, Medium, Hard
+- Topics must be non-empty arrays
+- Database file and schema file must exist for specified dataset
 
 ### Step 10: Review and Improve Exercises
 
