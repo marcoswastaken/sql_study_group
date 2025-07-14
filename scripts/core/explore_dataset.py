@@ -444,6 +444,9 @@ class DatasetExplorer:
         ):
             recommended_topics.append("Database normalization")
 
+        # Remove duplicates while preserving order
+        recommended_topics = list(dict.fromkeys(recommended_topics))
+
         return {
             "sql_suitability_score": round(score, 1),
             "complexity_level": complexity,

@@ -35,8 +35,6 @@ def check_packages():
         ("pandas", "1.5.0"),
         ("datasets", "2.0.0"),
         ("duckdb", "0.8.0"),
-        ("jupyter", "1.0.0"),
-        ("notebook", "6.0.0"),
     ]
 
     all_good = True
@@ -98,40 +96,6 @@ def check_database():
         return None
 
 
-def check_jupyter():
-    """Check if Jupyter notebook is available"""
-    try:
-        import importlib.util
-
-        if importlib.util.find_spec("notebook"):
-            print_status("Jupyter notebook available", True)
-            return True
-        else:
-            raise ImportError()
-    except ImportError:
-        print_status("Jupyter notebook not available", False)
-        return False
-
-
-def check_kernel():
-    """Check if the sql-study-group kernel is registered"""
-    try:
-        import subprocess
-
-        result = subprocess.run(
-            ["jupyter", "kernelspec", "list"], capture_output=True, text=True
-        )
-        if "sql-study-group" in result.stdout:
-            print_status("SQL Study Group kernel registered", True)
-            return True
-        else:
-            print_status("SQL Study Group kernel not registered", False)
-            return False
-    except Exception as e:
-        print_status(f"Kernel check failed: {e}", False)
-        return False
-
-
 def check_sql_magic():
     """Check if SQL magic can connect to DuckDB"""
     db_path = Path("data/data_jobs.db")
@@ -179,8 +143,6 @@ def main():
         ("Required Packages", check_packages()),
         ("Database", check_database()),
         ("SQL Magic Connection", check_sql_magic()),
-        ("Jupyter", check_jupyter()),
-        ("Kernel Registration", check_kernel()),
     ]
 
     # pyenv check is optional
@@ -196,16 +158,14 @@ def main():
     if failed == 0:
         print("🎉 All checks passed! Your environment is ready for SQL practice.")
         print("\nNext steps:")
-        print("1. Run: jupyter notebook notebooks/week_4_sql_practice.ipynb")
-        print("2. Start practicing SQL queries!")
+        print("1. Run: python app.py")
+        print("2. Open your browser to http://localhost:5000")
+        print("3. Start practicing SQL queries!")
     else:
         print(f"⚠️  {failed} check(s) failed. Please fix the issues above.")
         print("\nTroubleshooting:")
         print("- Run: pip install -r requirements.txt")
-        print("- Run: python setup_sql_environment.py")
-        print(
-            '- Run: python -m ipykernel install --user --name=sql-study-group --display-name="SQL Study Group"'
-        )
+        print("- Run: python scripts/utilities/setup_sql_environment.py")
         print("- Check the README.md for detailed setup instructions")
 
 

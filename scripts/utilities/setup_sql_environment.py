@@ -214,33 +214,14 @@ def setup_sql_environment():
 
     conn.close()
 
-    # Step 6: Register Jupyter kernel
-    print("\n🔧 Registering Jupyter kernel...")
-    try:
-        import subprocess
-
-        subprocess.run(
-            [
-                "python",
-                "-m",
-                "ipykernel",
-                "install",
-                "--user",
-                "--name=sql-study-group",
-                "--display-name=SQL Study Group",
-            ],
-            check=True,
-            capture_output=True,
-        )
-        print("✅ Jupyter kernel registered successfully!")
-    except subprocess.CalledProcessError as e:
-        print(f"⚠️  Kernel registration failed: {e}")
-        print("   You can register manually with:")
-        print(
-            '   python -m ipykernel install --user --name=sql-study-group --display-name="SQL Study Group"'
-        )
-    except Exception as e:
-        print(f"⚠️  Kernel registration error: {e}")
+    # Step 6: Environment setup complete
+    print("\n🎉 Environment setup complete!")
+    print("✅ Database created and populated successfully!")
+    print("✅ All data is ready for SQL practice!")
+    print("\nNext steps:")
+    print("1. Run: python app.py")
+    print("2. Open your browser to http://localhost:5000")
+    print("3. Start practicing SQL queries!")
 
     print("\n✅ SQL Practice Environment Setup Complete!")
     print("📁 Database saved as: datasets/data_jobs.db")

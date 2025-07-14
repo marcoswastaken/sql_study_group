@@ -10,28 +10,31 @@ from typing import Any, Dict, List, Optional
 class DataService:
     """Service for loading and managing exercise data and table schemas."""
 
-    def __init__(self, base_path: str = None):
+    def __init__(self, base_path: str = None, week: int = 4):
         """
         Initialize the data service.
 
         Args:
             base_path: Base path for the project. If None, uses current directory.
+            week: Week number to load exercises for (default: 4)
         """
         self.base_path = base_path or os.getcwd()
+        self.week = week
         self.exercises_data = None
         self.schema_data = None
         self.current_dataset = None
 
-    def load_exercises(self, week: int = 4) -> Dict[str, Any]:
+    def load_exercises(self, week: int = None) -> Dict[str, Any]:
         """
         Load exercise data for the specified week, automatically finding the latest version.
 
         Args:
-            week: Week number to load exercises for
+            week: Week number to load exercises for (uses instance default if None)
 
         Returns:
             Dictionary containing exercise data
         """
+        week = week or self.week
         if self.exercises_data is None:
             exercises_file = self._find_latest_exercise_file(week)
 
@@ -67,7 +70,9 @@ class DataService:
 
         if not files:
             # Fallback to non-versioned file
-            fallback = os.path.join(self.base_path, f"exercises/week_{week}_key.json")
+            fallback = os.path.join(
+                self.base_path, f"exercises/week_{week}/week_{week}_key.json"
+            )
             if os.path.exists(fallback):
                 return fallback
             raise FileNotFoundError(f"No exercise files found for week {week}")
@@ -123,16 +128,17 @@ class DataService:
 
         return self.schema_data
 
-    def get_exercise_list(self, week: int = 4) -> List[Dict[str, Any]]:
+    def get_exercise_list(self, week: int = None) -> List[Dict[str, Any]]:
         """
         Get a list of exercises with basic information.
 
         Args:
-            week: Week number to get exercises for
+            week: Week number to get exercises for (uses instance default if None)
 
         Returns:
             List of exercise dictionaries with id, title, and difficulty
         """
+        week = week or self.week
         exercises = self.load_exercises(week)
 
         return [
@@ -146,18 +152,19 @@ class DataService:
         ]
 
     def get_exercise_details(
-        self, exercise_id: int, week: int = 4
+        self, exercise_id: int, week: int = None
     ) -> Optional[Dict[str, Any]]:
         """
         Get detailed information for a specific exercise.
 
         Args:
             exercise_id: ID of the exercise to get details for
-            week: Week number
+            week: Week number (uses instance default if None)
 
         Returns:
             Exercise details or None if not found
         """
+        week = week or self.week
         exercises = self.load_exercises(week)
 
         for exercise in exercises.get("exercises", []):
