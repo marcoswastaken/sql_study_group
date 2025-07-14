@@ -224,11 +224,19 @@ def main():
         if args.output:
             output_path = Path(args.output)
         else:
-            dataset_name = args.dataset.replace('_', '-')
+            dataset_name = args.dataset  # Keep underscores
             week_num = exercise_key['metadata'].get('week', 'X')
+            
+            # Extract version from exercise key file name if present
+            exercise_key_filename = Path(args.exercise_key).name
+            version = ""
+            if "_v" in exercise_key_filename:
+                version_part = exercise_key_filename.split("_v")[-1].split(".")[0]
+                version = f"_v{version_part}"
+            
             # Use absolute path relative to project root, not current working directory
             project_root = Path(__file__).parent.parent.parent
-            output_path = project_root / "reports" / f"week_{week_num}" / f"week_{week_num}_{dataset_name}_report.md"
+            output_path = project_root / "reports" / f"week_{week_num}" / f"week_{week_num}_key_report_{dataset_name}{version}.md"
             
         # Create reports directory structure if it doesn't exist
         output_path.parent.mkdir(parents=True, exist_ok=True)

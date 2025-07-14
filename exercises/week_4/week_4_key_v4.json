@@ -1,0 +1,332 @@
+{
+  "metadata": {
+    "title": "Week 4 Practice - Data Jobs Dataset (Ultra-Refined v4)",
+    "description": "JOIN operations that combine information from different tables to reveal business insights impossible to obtain from individual tables",
+    "week": 4,
+    "total_exercises": 6,
+    "database": "data_jobs.db",
+    "focus_topics": [
+      "INNER JOIN",
+      "LEFT JOIN",
+      "Table aliases",
+      "Cross-table analysis",
+      "Business insights",
+      "Window functions (advanced)"
+    ],
+    "generated_date": "2025-01-12T20:00:00.000000",
+    "difficulty_levels": [
+      "Easy",
+      "Medium",
+      "Hard"
+    ],
+    "improvement_notes": "Final refinements: fixed Exercise 2 threshold (1000+ jobs), simplified Exercise 3 by removing redundant salary columns, enhanced Exercise 4 with other_types column, refined problem statements for SQL students",
+    "data_quality_notes": {
+      "salary_uniformity": "Salary averages appear similar across countries (~142k-145k) due to normalized ranges in the original lukebarousse/data_jobs dataset. This is a known limitation of the source data, not a query issue.",
+      "platform_fragmentation": "Multiple country-specific LinkedIn variants (e.g., 'via LinkedIn Hungary') reflect real-world job posting patterns and are expected.",
+      "sampling_verification": "75% sampling rate confirmed working correctly across all tables"
+    },
+    "test_results": {
+      "total_exercises": 6,
+      "working_exercises": 6,
+      "failed_exercises": 0,
+      "success_rate": 100.0,
+      "total_execution_time": 0.339,
+      "average_execution_time": 0.056,
+      "test_date": "2025-07-14 07:28:22"
+    }
+  },
+  "exercises": [
+    {
+      "id": 1,
+      "title": "Platform Competition Analysis",
+      "statement": "Find out which job platforms are most active in different countries. The `locations` table contains country information, and `job_postings` contains which platform each job came from. Your result should show the country name (`job_country`), platform name (`job_via` AS `platform_name`), and how many jobs that platform posted in that country (`platform_jobs_in_country`). Only include platform-country combinations with at least 20 jobs. Order by country first, then by job count (highest first), and limit to 30 rows.",
+      "solution": "SELECT l.job_country,\n       jp.job_via AS platform_name,\n       COUNT(jp.job_id) AS platform_jobs_in_country\nFROM locations AS l\nINNER JOIN job_postings AS jp ON l.job_location = jp.job_location\nGROUP BY l.job_country, jp.job_via\nHAVING COUNT(jp.job_id) >= 20\nORDER BY l.job_country, platform_jobs_in_country DESC\nLIMIT 30;",
+      "topics": [
+        "INNER JOIN",
+        "GROUP BY",
+        "HAVING",
+        "Market analysis"
+      ],
+      "difficulty": "Medium",
+      "educational_focus": "Shows how joining location data with job postings reveals platform competition patterns across different geographic markets. Removed unnecessary WHERE constraint to simplify query while maintaining educational value.",
+      "result": {
+        "working": true,
+        "execution_time": 0.094,
+        "row_count": 30,
+        "columns": [
+          "job_country",
+          "platform_name",
+          "platform_jobs_in_country"
+        ],
+        "sample_results": [
+          {
+            "job_country": "Albania",
+            "platform_name": "via LinkedIn Albania",
+            "platform_jobs_in_country": "54"
+          },
+          {
+            "job_country": "Argentina",
+            "platform_name": "via LinkedIn",
+            "platform_jobs_in_country": "30337"
+          },
+          {
+            "job_country": "Argentina",
+            "platform_name": "via Indeed",
+            "platform_jobs_in_country": "4413"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 2,
+      "title": "Platform Business Model Analysis",
+      "statement": "Compare job platforms to understand their business models. The `job_platforms` table shows each platform's total capacity, while `job_postings` shows actual usage. Your result should show the platform name (`platform_name`), total capacity (`jobs_posted` AS `platform_capacity`), number of different companies using the platform (`unique_companies`), actual jobs posted (`actual_jobs_posted`), and average jobs per company (`avg_jobs_per_company`). Only include platforms with at least 1000 actual jobs posted. Order by actual jobs posted (highest first) and limit to 15 rows.",
+      "solution": "SELECT jpl.platform_name,\n       jpl.jobs_posted AS platform_capacity,\n       COUNT(DISTINCT jp.company_name) AS unique_companies,\n       COUNT(jp.job_id) AS actual_jobs_posted,\n       ROUND(COUNT(jp.job_id) * 1.0 / COUNT(DISTINCT jp.company_name), 2) AS avg_jobs_per_company\nFROM job_platforms AS jpl\nINNER JOIN job_postings AS jp ON jpl.platform_name = jp.job_via\nGROUP BY jpl.platform_name, jpl.jobs_posted\nHAVING COUNT(jp.job_id) >= 1000\nORDER BY actual_jobs_posted DESC\nLIMIT 15;",
+      "topics": [
+        "INNER JOIN",
+        "COUNT DISTINCT",
+        "GROUP BY",
+        "HAVING",
+        "Business model analysis"
+      ],
+      "difficulty": "Medium",
+      "educational_focus": "Demonstrates combining platform capacity data with actual usage patterns to understand business models. Shows realistic utilization rates (~75%) and employer diversity across 60+ platforms.",
+      "result": {
+        "working": true,
+        "execution_time": 0.034,
+        "row_count": 15,
+        "columns": [
+          "platform_name",
+          "platform_capacity",
+          "unique_companies",
+          "actual_jobs_posted",
+          "avg_jobs_per_company"
+        ],
+        "sample_results": [
+          {
+            "platform_name": "via LinkedIn",
+            "platform_capacity": "186679",
+            "unique_companies": "37996",
+            "actual_jobs_posted": "139839",
+            "avg_jobs_per_company": "3.68"
+          },
+          {
+            "platform_name": "via BeBee",
+            "platform_capacity": "103507",
+            "unique_companies": "26626",
+            "actual_jobs_posted": "77541",
+            "avg_jobs_per_company": "2.91"
+          },
+          {
+            "platform_name": "via Trabajo.org",
+            "platform_capacity": "61562",
+            "unique_companies": "18543",
+            "actual_jobs_posted": "46264",
+            "avg_jobs_per_company": "2.49"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 3,
+      "title": "Data Scientist Job Market Analysis",
+      "statement": "Analyze the job market for Data Scientists across different countries. Use the `job_postings` and `locations` tables to find jobs where the `job_title` contains 'Data Scientist'. Your result should show the country (`job_country`), total Data Scientist positions (`data_scientist_positions`), how many have salary data (`positions_with_salary`), and the percentage with salary data (`salary_data_percentage`). Only include countries with at least 100 Data Scientist positions. Order by total positions (highest first) and limit to 15 rows.",
+      "solution": "SELECT l.job_country,\n       COUNT(jp.job_id) AS data_scientist_positions,\n       COUNT(CASE WHEN jp.salary_year_avg IS NOT NULL THEN 1 END) AS positions_with_salary,\n       ROUND(COUNT(CASE WHEN jp.salary_year_avg IS NOT NULL THEN 1 END) * 100.0 / COUNT(jp.job_id), 2) AS salary_data_percentage\nFROM job_postings AS jp\nINNER JOIN locations AS l ON jp.job_location = l.job_location\nWHERE jp.job_title LIKE '%Data Scientist%'\nGROUP BY l.job_country\nHAVING COUNT(jp.job_id) >= 100\nORDER BY data_scientist_positions DESC\nLIMIT 15;",
+      "topics": [
+        "INNER JOIN",
+        "LIKE pattern matching",
+        "WHERE conditions",
+        "GROUP BY",
+        "HAVING",
+        "CASE WHEN",
+        "Percentage calculation"
+      ],
+      "difficulty": "Medium",
+      "educational_focus": "Shows how joins enable cross-table analysis by combining job classification data with geographic information. Simplified by removing redundant salary columns and focusing on data availability patterns.",
+      "result": {
+        "working": true,
+        "execution_time": 0.019,
+        "row_count": 15,
+        "columns": [
+          "job_country",
+          "data_scientist_positions",
+          "positions_with_salary",
+          "salary_data_percentage"
+        ],
+        "sample_results": [
+          {
+            "job_country": "United States",
+            "data_scientist_positions": "48006",
+            "positions_with_salary": "3666",
+            "salary_data_percentage": "7.64"
+          },
+          {
+            "job_country": "Sudan",
+            "data_scientist_positions": "29440",
+            "positions_with_salary": "2351",
+            "salary_data_percentage": "7.99"
+          },
+          {
+            "job_country": "India",
+            "data_scientist_positions": "17950",
+            "positions_with_salary": "879",
+            "salary_data_percentage": "4.9"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 4,
+      "title": "Employment Type Specialization by Platform",
+      "statement": "Examine what types of employment (Full-time, Contractor, etc.) different platforms specialize in. Join the `job_platforms` and `job_postings` tables, but only include jobs where `job_schedule_type` is not null. Your result should show the platform name (`platform_name`), total jobs (`total_jobs`), full-time jobs (`fulltime_jobs`), contractor jobs (`contract_jobs`), other employment types (`other_types`), and percentage of contractor jobs (`contract_percentage`). Order by total jobs first (highest first), then by contract percentage (highest first), and limit to 20 rows.",
+      "solution": "SELECT jpl.platform_name,\n       COUNT(jp.job_id) AS total_jobs,\n       COUNT(CASE WHEN jp.job_schedule_type = 'Full-time' THEN 1 END) AS fulltime_jobs,\n       COUNT(CASE WHEN jp.job_schedule_type = 'Contractor' THEN 1 END) AS contract_jobs,\n       COUNT(CASE WHEN jp.job_schedule_type NOT IN ('Full-time', 'Contractor') THEN 1 END) AS other_types,\n       ROUND(COUNT(CASE WHEN jp.job_schedule_type = 'Contractor' THEN 1 END) * 100.0 / COUNT(jp.job_id), 2) AS contract_percentage\nFROM job_platforms AS jpl\nINNER JOIN job_postings AS jp ON jpl.platform_name = jp.job_via\nWHERE jp.job_schedule_type IS NOT NULL\nGROUP BY jpl.platform_name\nORDER BY total_jobs DESC, contract_percentage DESC\nLIMIT 20;",
+      "topics": [
+        "INNER JOIN",
+        "CASE WHEN",
+        "WHERE IS NOT NULL",
+        "GROUP BY",
+        "Percentage calculation",
+        "NOT IN operator"
+      ],
+      "difficulty": "Medium",
+      "educational_focus": "Reveals platform specialization patterns by combining platform data with employment type information. Enhanced with other_types column to capture all employment data comprehensively.",
+      "result": {
+        "working": true,
+        "execution_time": 0.015,
+        "row_count": 20,
+        "columns": [
+          "platform_name",
+          "total_jobs",
+          "fulltime_jobs",
+          "contract_jobs",
+          "other_types",
+          "contract_percentage"
+        ],
+        "sample_results": [
+          {
+            "platform_name": "via LinkedIn",
+            "total_jobs": "135548",
+            "fulltime_jobs": "116025",
+            "contract_jobs": "12863",
+            "other_types": "6660",
+            "contract_percentage": "9.49"
+          },
+          {
+            "platform_name": "via BeBee",
+            "total_jobs": "76052",
+            "fulltime_jobs": "70066",
+            "contract_jobs": "898",
+            "other_types": "5088",
+            "contract_percentage": "1.18"
+          },
+          {
+            "platform_name": "via Trabajo.org",
+            "total_jobs": "46227",
+            "fulltime_jobs": "45547",
+            "contract_jobs": "1",
+            "other_types": "679",
+            "contract_percentage": "0.0"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 5,
+      "title": "Global Company Expansion Analysis",
+      "statement": "Find companies that operate in many different places around the world. Use the `companies`, `job_postings`, and `locations` tables. Your result should show the company name (`company_name`), number of different locations (`unique_locations`), number of different countries (`unique_countries`), and total jobs posted (`total_jobs`). Only include companies with at least 10 different locations AND at least 100 total jobs. Order by unique locations first (highest first), then by unique countries (highest first), and limit to 20 rows.",
+      "solution": "SELECT c.company_name,\n       COUNT(DISTINCT l.job_location) AS unique_locations,\n       COUNT(DISTINCT l.job_country) AS unique_countries,\n       COUNT(jp.job_id) AS total_jobs\nFROM companies AS c\nINNER JOIN job_postings AS jp ON c.company_name = jp.company_name\nLEFT JOIN locations AS l ON jp.job_location = l.job_location\nGROUP BY c.company_name\nHAVING COUNT(DISTINCT l.job_location) >= 10 AND COUNT(jp.job_id) >= 100\nORDER BY unique_locations DESC, unique_countries DESC\nLIMIT 20;",
+      "topics": [
+        "INNER JOIN",
+        "LEFT JOIN",
+        "COUNT DISTINCT",
+        "GROUP BY",
+        "HAVING",
+        "Multiple conditions"
+      ],
+      "difficulty": "Hard",
+      "educational_focus": "Demonstrates complex multi-table joins to analyze company expansion patterns across geographic markets",
+      "result": {
+        "working": true,
+        "execution_time": 0.133,
+        "row_count": 20,
+        "columns": [
+          "company_name",
+          "unique_locations",
+          "unique_countries",
+          "total_jobs"
+        ],
+        "sample_results": [
+          {
+            "company_name": "Dice",
+            "unique_locations": "215",
+            "unique_countries": "73",
+            "total_jobs": "81307"
+          },
+          {
+            "company_name": "Randstad",
+            "unique_locations": "212",
+            "unique_countries": "73",
+            "total_jobs": "2133"
+          },
+          {
+            "company_name": "Robert Half",
+            "unique_locations": "199",
+            "unique_countries": "73",
+            "total_jobs": "12881"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 6,
+      "title": "Platform Market Leadership Analysis (Advanced)",
+      "statement": "This is an advanced exercise using window functions. Find which platform is the #1 leader in each country, then count how many countries each platform leads. First, create a ranking of platforms within each country based on job count. Then, select only the #1 platform per country and count how many countries each platform leads. Your result should show platform name (`platform_name`), number of countries led (`countries_led`), and market share percentage (`market_share_percentage`). Only include platforms with at least 10 jobs per country. Order by countries led (highest first) and limit to 15 rows.",
+      "solution": "WITH platform_rankings AS (\n  SELECT \n    l.job_country,\n    jp.job_via AS platform_name,\n    COUNT(jp.job_id) AS platform_jobs,\n    ROW_NUMBER() OVER (PARTITION BY l.job_country ORDER BY COUNT(jp.job_id) DESC) AS country_rank\n  FROM locations AS l\n  INNER JOIN job_postings AS jp ON l.job_location = jp.job_location\n  GROUP BY l.job_country, jp.job_via\n  HAVING COUNT(jp.job_id) >= 10\n)\nSELECT \n  platform_name,\n  COUNT(*) AS countries_led,\n  ROUND(COUNT(*) * 100.0 / (SELECT COUNT(DISTINCT job_country) FROM platform_rankings WHERE country_rank = 1), 2) AS market_share_percentage\nFROM platform_rankings\nWHERE country_rank = 1\nGROUP BY platform_name\nORDER BY countries_led DESC\nLIMIT 15;",
+      "topics": [
+        "Common Table Expressions (CTE)",
+        "Window Functions",
+        "ROW_NUMBER() OVER()",
+        "PARTITION BY",
+        "INNER JOIN",
+        "GROUP BY",
+        "HAVING",
+        "Subqueries"
+      ],
+      "difficulty": "Hard",
+      "educational_focus": "Advanced exercise demonstrating window functions and CTEs to analyze market leadership patterns. Shows which platforms dominate in the most countries, revealing global platform strategies.",
+      "result": {
+        "working": true,
+        "execution_time": 0.044,
+        "row_count": 15,
+        "columns": [
+          "platform_name",
+          "countries_led",
+          "market_share_percentage"
+        ],
+        "sample_results": [
+          {
+            "platform_name": "via LinkedIn",
+            "countries_led": "75",
+            "market_share_percentage": "72.12"
+          },
+          {
+            "platform_name": "via Trabajo.org",
+            "countries_led": "3",
+            "market_share_percentage": "2.88"
+          },
+          {
+            "platform_name": "via Emplois Trabajo.org",
+            "countries_led": "3",
+            "market_share_percentage": "2.88"
+          }
+        ],
+        "error": null
+      }
+    }
+  ]
+}

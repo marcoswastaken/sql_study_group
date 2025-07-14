@@ -52,6 +52,10 @@ class DatasetExplorer:
         self.sample_size = sample_size
         self.df = None
         self.analysis_results = {}
+        
+        # Set random seeds for deterministic behavior
+        np.random.seed(42)
+        random.seed(42)
     
     def load_dataset(self) -> bool:
         """

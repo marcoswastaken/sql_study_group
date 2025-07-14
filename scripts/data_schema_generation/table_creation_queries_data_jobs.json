@@ -13,9 +13,10 @@
     "educational_focus": "JOIN Operations",
     "complexity_progression": "Simple lookups -> Complex relationships -> Multi-table joins",
     "created_date": "2025-07-11",
-    "sampling_method": "percentage_based_random",
+    "sampling_method": "seeded_random_sampling",
     "sampling_seed": 42,
-    "minimum_percentage": 75
+    "minimum_percentage": 75,
+    "deterministic_fix": "Uses SETSEED for consistent random sampling across runs"
   },
   "tables": {
     "companies": {
@@ -64,6 +65,7 @@
     "foreign_keys": "job_postings references companies and locations through name matching",
     "null_handling": "Some locations/companies intentionally missing for LEFT JOIN practice",
     "complexity_build": "Start with companies->job_postings INNER JOIN, progress to multi-table LEFT JOINs",
-    "real_world_context": "Business scenarios: company analysis, location trends, skill requirements"
+    "real_world_context": "Business scenarios: company analysis, location trends, skill requirements",
+    "random_sampling": "Uses SETSEED for reproducible random sampling that maintains educational diversity"
   }
 } 
