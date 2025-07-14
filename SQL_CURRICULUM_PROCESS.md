@@ -255,51 +255,60 @@ Agent receives detailed curriculum generation prompt and creates educational tab
 
 ```
 sql_study_group/
-├── syllabus.md                          # Generated syllabus from schema
+├── setup.py                            # One-command setup script for any week
+├── app.py                              # Flask web application for practice
+├── syllabus.md                         # Generated syllabus from schema
 ├── datasets/
-│   └── data_jobs.db                     # Job market dataset
+│   └── data_jobs.db                    # Job market dataset (auto-generated)
 ├── schemas/
-│   └── data_schema_data_jobs.json       # Schema documentation for data_jobs dataset
+│   └── data_schema_data_jobs.json      # Schema documentation for data_jobs dataset
 ├── exercises/
 │   └── week_4/
-│       ├── week_4_key.json              # Exercise key for Week 4
-│       └── week_4_key_v2.json           # Enhanced exercise key for Week 4
+│       ├── week_4_key_v1.json          # Exercise key for Week 4 (version 1)
+│       ├── week_4_key_v2.json          # Enhanced exercise key for Week 4 (version 2)
+│       ├── week_4_key_v3.json          # Exercise key for Week 4 (version 3)
+│       └── week_4_key_v4.json          # Latest exercise key for Week 4 (version 4)
 ├── practice/
-│   ├── week_2_practice.md               # Student worksheets
+│   ├── week_2_practice.md              # Student worksheets
 │   ├── week_3_practice.md
 │   └── week_4_practice.md
 ├── solutions/
-│   ├── week_2_practice_solutions.md     # Solution worksheets
+│   ├── week_2_practice_solutions.md    # Solution worksheets
 │   ├── week_3_practice_solutions.md
 │   └── week_4_practice_solutions.md
 ├── reports/
 │   └── week_4/
-│       ├── week_4_key_report_data_jobs.md   # Exercise report for Week 4
-│       └── week_4_key_report_data_jobs_v2.md # Enhanced exercise report
+│       ├── week_4_key_report_data_jobs_v1.md   # Exercise report for Week 4 (v1)
+│       └── week_4_key_report_data_jobs_v2.md   # Enhanced exercise report (v2)
+├── templates/
+│   └── index.html                      # Web interface template
 └── scripts/
+    ├── practice_app/
+    │   ├── data_service.py             # Exercise and schema data loading
+    │   └── sql_service.py              # SQL execution service
     ├── asset_generation/
-    │   ├── syllabus_schema.json         # Structured syllabus schema
-    │   └── generate_syllabus.py         # Step 2 (built)
+    │   ├── syllabus_schema.json        # Structured syllabus schema
+    │   └── generate_syllabus.py        # Step 2 (built)
     ├── exercise_generation/
-    │   ├── generate_exercises.py        # Generic exercise generation framework
-    │   ├── test_solutions.py            # Solution testing and validation
-    │   └── generate_exercise_report.py  # Report generation
+    │   ├── generate_exercises.py       # Generic exercise generation framework
+    │   ├── test_solutions.py           # Solution testing and validation
+    │   └── generate_exercise_report.py # Report generation
     ├── data_schema_generation/
-    │   ├── create_tables_from_queries.py          # Step 7 Phase 1 (built)
-    │   ├── generate_data_schema_generic.py        # Step 7 Phase 2 (built)
+    │   ├── create_tables_from_queries.py          # Step 6 (built)
+    │   ├── generate_data_schema_generic.py        # Step 7 (built)
     │   ├── validate_data_schema.py                # Schema validation (built)
     │   ├── validate_table_creation_queries.py     # Table query validation (built)
     │   ├── initial_exploration_data_jobs.json     # Dataset exploration output
     │   └── table_creation_queries_data_jobs.json  # SQL creation queries
     ├── core/
-    │   ├── sql_helper.py                # SQL execution framework
-    │   └── explore_dataset.py           # Step 4 (built)
+    │   ├── sql_helper.py               # SQL execution framework
+    │   └── explore_dataset.py          # Step 4 (built)
     ├── tests/
-    │   ├── test_core_sql_helper.py      # SQL helper tests
+    │   ├── test_core_sql_helper.py     # SQL helper tests
     │   └── test_core_explore_dataset.py # Dataset exploration tests
     └── utilities/
-        ├── setup_sql_environment.py    # Database setup
-        └── verify_environment.py       # Environment verification
+        ├── setup_sql_environment.py   # Legacy database setup (data_jobs only)
+        └── verify_environment.py      # Environment verification
 ```
 
 ## Scripts We Already Have (Updated)
@@ -369,3 +378,39 @@ sql_study_group/
 - **Automated reporting**: Detailed reports with execution metrics and sample data
 
 This process provides a complete, replicable workflow for generating high-quality SQL curriculum materials.
+
+## Quick Start: Running the App for Any Week
+
+For students or instructors who want to quickly start practicing with any week's exercises:
+
+### One-Command Setup
+```bash
+# Clone the repository
+git clone <repo-url>
+cd sql_study_group
+
+# Setup and start Week 4 (default)
+python setup.py
+
+# Or setup and start any specific week
+python setup.py 5
+```
+
+### Manual Setup (if needed)
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Start the app for specific week
+python app.py 4              # Week 4
+python app.py 5              # Week 5
+SQL_WEEK=5 python app.py     # Week 5 via environment variable
+```
+
+### What the setup script does:
+1. **Detects dataset**: Reads the week's exercise file to determine which dataset to use
+2. **Downloads data**: Automatically downloads the dataset from HuggingFace
+3. **Creates tables**: Uses the table creation queries to build the database
+4. **Starts app**: Launches the Flask web interface at `http://localhost:5000`
+
+The app automatically adapts to different weeks and datasets based on the exercise metadata.
