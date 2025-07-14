@@ -279,4 +279,3 @@ This week will cover the basics of databases and SQL. We will start with the bas
 - Build Projects: Apply learned concepts to real-world scenarios
 - Document Progress: Keep notes on challenging concepts and solutions
 - Review Regularly: Revisit previous weeks' material to reinforce learning
-

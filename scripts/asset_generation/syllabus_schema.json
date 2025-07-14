@@ -32,7 +32,7 @@
           "url": "https://sqlzoo.net/wiki/SELECT_basics"
         },
         {
-          "title": "1. SELECT names", 
+          "title": "1. SELECT names",
           "url": "https://sqlzoo.net/wiki/SELECT_names"
         },
         {
@@ -442,4 +442,4 @@
     "Document Progress: Keep notes on challenging concepts and solutions",
     "Review Regularly: Revisit previous weeks' material to reinforce learning"
   ]
-} 
+}

@@ -4,85 +4,93 @@ Comprehensive test script for SQL helper function.
 Tests actual queries from week 4 practice solutions to ensure everything works correctly.
 """
 
-import sys
 import traceback
-import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'core'))
-from sql_helper import SQLHelper
+
+from scripts.core.sql_helper import SQLHelper
+
 
 def test_query(helper, query_name, query, expected_min_rows=0, expected_columns=None):
     """Test a single query and report results."""
     print(f"\n{'='*80}")
     print(f"🧪 Testing: {query_name}")
     print(f"{'='*80}")
-    
+
     try:
         result = helper.execute_query(query)
-        
+
         if result["status"] == "success":
             print(f"✅ Query executed successfully in {result['execution_time']}s")
-            print(f"📊 Returned {result['row_count']} rows, {len(result['columns'])} columns")
+            print(
+                f"📊 Returned {result['row_count']} rows, {len(result['columns'])} columns"
+            )
             print(f"📋 Columns: {', '.join(result['columns'])}")
-            
+
             # Check expectations
-            if result['row_count'] >= expected_min_rows:
+            if result["row_count"] >= expected_min_rows:
                 print(f"✅ Row count check passed (>= {expected_min_rows})")
             else:
-                print(f"⚠️  Row count lower than expected (got {result['row_count']}, expected >= {expected_min_rows})")
-            
-            if expected_columns and set(expected_columns).issubset(set(result['columns'])):
-                print(f"✅ Column check passed")
+                print(
+                    f"⚠️  Row count lower than expected (got {result['row_count']}, expected >= {expected_min_rows})"
+                )
+
+            if expected_columns and set(expected_columns).issubset(
+                set(result["columns"])
+            ):
+                print("✅ Column check passed")
             elif expected_columns:
-                print(f"⚠️  Missing expected columns: {set(expected_columns) - set(result['columns'])}")
-            
+                print(
+                    f"⚠️  Missing expected columns: {set(expected_columns) - set(result['columns'])}"
+                )
+
             # Show sample data
-            if result['data'] is not None and not result['data'].empty:
-                print(f"\n📋 Sample Results (first 3 rows):")
-                print(result['data'].head(3).to_string(index=False))
-                
+            if result["data"] is not None and not result["data"].empty:
+                print("\n📋 Sample Results (first 3 rows):")
+                print(result["data"].head(3).to_string(index=False))
+
         else:
             print(f"❌ Query failed: {result['error']}")
             print(f"   Error type: {result.get('error_type', 'Unknown')}")
-            
+
     except Exception as e:
         print(f"❌ Test failed with exception: {e}")
         traceback.print_exc()
+
 
 def main():
     """Run comprehensive tests on SQL helper function."""
     print("🧪 COMPREHENSIVE SQL HELPER TESTING")
     print("=" * 80)
-    
+
     # Initialize helper
     try:
-        helper = SQLHelper('datasets/data_jobs.db')
+        helper = SQLHelper("datasets/data_jobs.db")
         print("✅ SQL Helper initialized successfully")
     except Exception as e:
         print(f"❌ Failed to initialize SQL Helper: {e}")
         return
-    
+
     # Test 1: Basic schema exploration
     print("\n🔍 SCHEMA EXPLORATION TESTS")
-    
+
     test_query(
-        helper, 
-        "Show Tables", 
+        helper,
+        "Show Tables",
         "SHOW TABLES",
         expected_min_rows=5,
-        expected_columns=["name"]
+        expected_columns=["name"],
     )
-    
+
     test_query(
-        helper, 
-        "Describe Jobs Table", 
+        helper,
+        "Describe Jobs Table",
         "DESCRIBE jobs",
         expected_min_rows=10,
-        expected_columns=["column_name", "column_type"]
+        expected_columns=["column_name", "column_type"],
     )
-    
+
     # Test 2: Basic JOIN queries from solutions
     print("\n🔗 BASIC JOIN TESTS")
-    
+
     test_query(
         helper,
         "Solution 1: Data Scientist Jobs",
@@ -95,9 +103,9 @@ def main():
         LIMIT 10
         """,
         expected_min_rows=1,
-        expected_columns=["company_name", "job_title", "job_posted_date"]
+        expected_columns=["company_name", "job_title", "job_posted_date"],
     )
-    
+
     test_query(
         helper,
         "Solution 2: Jobs by Location",
@@ -109,9 +117,9 @@ def main():
         LIMIT 10
         """,
         expected_min_rows=5,
-        expected_columns=["job_title_short", "job_location", "job_country"]
+        expected_columns=["job_title_short", "job_location", "job_country"],
     )
-    
+
     test_query(
         helper,
         "Solution 3: Platform Analytics",
@@ -124,12 +132,12 @@ def main():
         ORDER BY job_count DESC
         """,
         expected_min_rows=1,
-        expected_columns=["platform_name", "job_count"]
+        expected_columns=["platform_name", "job_count"],
     )
-    
+
     # Test 3: LEFT JOIN queries
     print("\n⬅️ LEFT JOIN TESTS")
-    
+
     test_query(
         helper,
         "Solution 4: All Companies with Job Counts",
@@ -142,12 +150,12 @@ def main():
         LIMIT 10
         """,
         expected_min_rows=10,
-        expected_columns=["company_name", "job_count"]
+        expected_columns=["company_name", "job_count"],
     )
-    
+
     # Test 4: Advanced multi-table JOINs
     print("\n🔗 ADVANCED JOIN TESTS")
-    
+
     test_query(
         helper,
         "Solution 6: Skills in Demand",
@@ -162,33 +170,33 @@ def main():
         LIMIT 10
         """,
         expected_min_rows=5,
-        expected_columns=["skill_name", "skill_category", "demand_count"]
+        expected_columns=["skill_name", "skill_category", "demand_count"],
     )
-    
+
     test_query(
         helper,
         "Solution 7: High-Paying Companies",
         """
-        SELECT c.company_name, 
+        SELECT c.company_name,
                AVG(j.salary_year_avg) AS avg_salary,
                COUNT(j.job_id) AS job_count
         FROM companies AS c
         INNER JOIN jobs AS j ON c.company_id = j.company_id
-        WHERE j.job_title_short = 'Data Engineer' 
+        WHERE j.job_title_short = 'Data Engineer'
           AND j.salary_year_avg > 100000
         GROUP BY c.company_name
         ORDER BY avg_salary DESC
         LIMIT 10
         """,
         expected_min_rows=1,
-        expected_columns=["company_name", "avg_salary", "job_count"]
+        expected_columns=["company_name", "avg_salary", "job_count"],
     )
-    
+
     test_query(
         helper,
         "Solution 8: Geographic Salary Analysis",
         """
-        SELECT l.job_country, 
+        SELECT l.job_country,
                AVG(j.salary_year_avg) AS avg_salary,
                COUNT(j.job_id) AS job_count
         FROM locations AS l
@@ -200,18 +208,18 @@ def main():
         ORDER BY avg_salary DESC
         """,
         expected_min_rows=1,
-        expected_columns=["job_country", "avg_salary", "job_count"]
+        expected_columns=["job_country", "avg_salary", "job_count"],
     )
-    
+
     # Test 5: Complex queries with CTEs
     print("\n🧩 COMPLEX QUERY TESTS")
-    
+
     test_query(
         helper,
         "Solution 9: Tech Stack Analysis (CTE)",
         """
         WITH skill_counts AS (
-            SELECT c.company_name, 
+            SELECT c.company_name,
                    s.skill_category,
                    COUNT(s.skill_id) AS category_count,
                    ROW_NUMBER() OVER (PARTITION BY c.company_name ORDER BY COUNT(s.skill_id) DESC) AS rn
@@ -229,12 +237,12 @@ def main():
         LIMIT 10
         """,
         expected_min_rows=1,
-        expected_columns=["company_name", "most_common_skill_category", "skill_count"]
+        expected_columns=["company_name", "most_common_skill_category", "skill_count"],
     )
-    
+
     # Test 6: Error handling
     print("\n❌ ERROR HANDLING TESTS")
-    
+
     test_query(
         helper,
         "Invalid Column Name",
@@ -243,34 +251,34 @@ def main():
         FROM jobs
         LIMIT 5
         """,
-        expected_min_rows=0
+        expected_min_rows=0,
     )
-    
+
     test_query(
         helper,
         "Invalid Table Name",
         """
-        SELECT * 
+        SELECT *
         FROM nonexistent_table
         LIMIT 5
         """,
-        expected_min_rows=0
+        expected_min_rows=0,
     )
-    
+
     test_query(
         helper,
         "SQL Syntax Error",
         """
-        SELECT * 
+        SELECT *
         FROM jobs
         WHERE
         """,
-        expected_min_rows=0
+        expected_min_rows=0,
     )
-    
+
     # Test 7: Performance with large results
     print("\n🚀 PERFORMANCE TESTS")
-    
+
     test_query(
         helper,
         "Large Result Set",
@@ -281,12 +289,12 @@ def main():
         ORDER BY count DESC
         """,
         expected_min_rows=5,
-        expected_columns=["job_title_short", "count"]
+        expected_columns=["job_title_short", "count"],
     )
-    
+
     # Test 8: Data validation
     print("\n✅ DATA VALIDATION TESTS")
-    
+
     test_query(
         helper,
         "Record Count Validation",
@@ -295,29 +303,30 @@ def main():
         FROM jobs
         """,
         expected_min_rows=1,
-        expected_columns=["total_jobs"]
+        expected_columns=["total_jobs"],
     )
-    
+
     test_query(
         helper,
         "Foreign Key Integrity",
         """
-        SELECT 
+        SELECT
             (SELECT COUNT(*) FROM jobs WHERE company_id NOT IN (SELECT company_id FROM companies)) as orphaned_jobs,
             (SELECT COUNT(*) FROM jobs WHERE location_id NOT IN (SELECT location_id FROM locations)) as orphaned_locations,
             (SELECT COUNT(*) FROM jobs WHERE platform_id NOT IN (SELECT platform_id FROM platforms)) as orphaned_platforms
         """,
         expected_min_rows=1,
-        expected_columns=["orphaned_jobs", "orphaned_locations", "orphaned_platforms"]
+        expected_columns=["orphaned_jobs", "orphaned_locations", "orphaned_platforms"],
     )
-    
+
     # Close connection
     helper.close()
-    
-    print("\n" + "="*80)
+
+    print("\n" + "=" * 80)
     print("🎉 COMPREHENSIVE TESTING COMPLETE!")
-    print("="*80)
+    print("=" * 80)
     print("\nIf all tests passed, the SQL helper function is ready for use!")
 
+
 if __name__ == "__main__":
-    main() 
+    main()

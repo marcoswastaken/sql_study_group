@@ -27,9 +27,9 @@ This dataset contains information about individual pitches or at-bats, including
 **Expected Output Columns:** pitcher_name, total_pitches
 
 ```sql
-SELECT pitcher_name, 
+SELECT pitcher_name,
        COUNT(*) AS total_pitches
-FROM train 
+FROM train
 WHERE is_pitch = TRUE
 GROUP BY pitcher_name
 ORDER BY total_pitches DESC;
@@ -42,10 +42,10 @@ ORDER BY total_pitches DESC;
 **Expected Output Columns:** pitch_type, average_end_speed
 
 ```sql
-SELECT pitch_description, 
+SELECT pitch_description,
        AVG(end_speed) AS average_end_speed
-FROM train 
-WHERE is_pitch = TRUE 
+FROM train
+WHERE is_pitch = TRUE
   AND end_speed IS NOT NULL
 GROUP BY pitch_description
 ORDER BY average_end_speed DESC;
@@ -58,7 +58,7 @@ ORDER BY average_end_speed DESC;
 **Expected Output Columns:** batter_name, total_at_bats
 
 ```sql
-SELECT batter_name, 
+SELECT batter_name,
        COUNT(*) AS total_at_bats
 FROM train
 GROUP BY batter_name
@@ -73,7 +73,7 @@ ORDER BY total_at_bats DESC;
 **Expected Output Columns:** game_pk, game_date
 
 ```sql
-SELECT game_pk, 
+SELECT game_pk,
        game_date
 FROM train
 GROUP BY game_pk, game_date
@@ -88,7 +88,7 @@ ORDER BY game_date DESC;
 **Expected Output Columns:** pitcher_name, strikeout_count
 
 ```sql
-SELECT pitcher_name, 
+SELECT pitcher_name,
        COUNT(*) AS strikeout_count
 FROM train
 WHERE event_type = 'Strikeout'
@@ -104,8 +104,8 @@ ORDER BY strikeout_count DESC;
 **Expected Output Columns:** batter_name, pitcher_name, interaction_count
 
 ```sql
-SELECT batter_name, 
-       pitcher_name, 
+SELECT batter_name,
+       pitcher_name,
        COUNT(DISTINCT ab_number) AS interaction_count
 FROM train
 GROUP BY batter_name, pitcher_name
@@ -120,7 +120,7 @@ ORDER BY interaction_count DESC;
 **Expected Output Columns:** batter_hand, average_launch_speed
 
 ```sql
-SELECT batter_hand, 
+SELECT batter_hand,
        AVG(launch_speed) AS average_launch_speed
 FROM train
 WHERE event_type = 'Groundout'
@@ -136,14 +136,14 @@ ORDER BY average_launch_speed DESC;
 **Expected Output Columns:** pitch_type, pitch_count, average_spin_rate
 
 ```sql
-SELECT pitch_type, 
-       COUNT(*) AS pitch_count, 
+SELECT pitch_type,
+       COUNT(*) AS pitch_count,
        AVG(spin_rate) AS average_spin_rate
 FROM train
 WHERE spin_rate IS NOT NULL
   AND is_pitch = TRUE
 GROUP BY pitch_type
-HAVING COUNT(*) >= 5 
+HAVING COUNT(*) >= 5
   AND AVG(spin_rate) > 2000
 ORDER BY average_spin_rate DESC;
 ```
@@ -159,7 +159,7 @@ SELECT game_pk
 FROM train
 WHERE event_type IN ('Home Run', 'Strikeout')
 GROUP BY game_pk
-HAVING SUM(CASE WHEN event_type = 'Home Run' THEN 1 ELSE 0 END) > 
+HAVING SUM(CASE WHEN event_type = 'Home Run' THEN 1 ELSE 0 END) >
        SUM(CASE WHEN event_type = 'Strikeout' THEN 1 ELSE 0 END)
 ORDER BY game_pk;
 ```
@@ -171,13 +171,13 @@ ORDER BY game_pk;
 **Expected Output Columns:** pitcher_hand, batter_hand, average_launch_angle
 
 ```sql
-SELECT pitcher_hand, 
-       batter_hand, 
+SELECT pitcher_hand,
+       batter_hand,
        AVG(launch_angle) AS average_launch_angle
 FROM train
 WHERE launch_angle IS NOT NULL
 GROUP BY pitcher_hand, batter_hand
-HAVING AVG(launch_angle) > 15 
+HAVING AVG(launch_angle) > 15
   AND COUNT(*) >= 10
 ORDER BY average_launch_angle DESC;
-``` 
+```

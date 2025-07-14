@@ -27,7 +27,7 @@ python scripts/asset_generation/generate_syllabus.py
 
 **785,741 real data job postings** from 2023, normalized into 6 related tables:
 - `companies` - Company information
-- `jobs` - Job postings with foreign keys  
+- `jobs` - Job postings with foreign keys
 - `locations` - Geographic data
 - `platforms` - Job posting platforms
 - `skills` - Technical skills
@@ -40,7 +40,7 @@ sql_study_group/
 ├── syllabus.md                  # 8-week curriculum outline
 ├── datasets/
 │   └── data_jobs.db            # Practice database
-├── schemas/  
+├── schemas/
 │   └── data_schema_jobs.json   # Database documentation
 ├── exercises/
 │   └── week_4_key.json         # Exercise solutions with tests
@@ -115,7 +115,7 @@ helper.execute_query("SELECT * FROM companies LIMIT 5")
 # Update syllabus
 python scripts/asset_generation/generate_syllabus.py
 
-# Create schema documentation  
+# Create schema documentation
 python scripts/data_schema_generation/generate_data_schema_jobs.py
 
 # Generate exercise keys
@@ -147,4 +147,4 @@ This curriculum is designed to be systematic and reproducible. See `SQL_CURRICUL
 
 **Dataset:** [Luke Barousse's Data Jobs](https://huggingface.co/datasets/lukebarousse/data_jobs) - 785K real job postings from 2023
 
-Ready to start? Check out `syllabus.md` for the full 8-week curriculum! 🚀 
+Ready to start? Check out `syllabus.md` for the full 8-week curriculum! 🚀

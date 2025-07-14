@@ -82,8 +82,8 @@ WHERE Popularity IS NOT NULL
 ### Question 3.1: Retrieve the title, and Release_Date as Released, and Vote_Average as Rating, for all movies with fewer than 100 votes.
 
 ```sql
-SELECT Title, 
-       Release_Date AS Released, 
+SELECT Title,
+       Release_Date AS Released,
        Vote_Average AS Rating
 FROM train
 WHERE TRY_CAST(Vote_Count AS INTEGER) < 100;
@@ -146,4 +146,4 @@ SELECT AVG(TRY_CAST(Vote_Count AS INTEGER)) AS avg_votes_non_english
 FROM train
 WHERE Original_Language != 'en'
   AND TRY_CAST(Vote_Count AS INTEGER) IS NOT NULL;
-``` 
+```

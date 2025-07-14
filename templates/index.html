@@ -487,11 +487,11 @@
             .main-content {
                 grid-template-columns: 1fr;
             }
-            
+
             .button-group {
                 flex-wrap: wrap;
             }
-            
+
             .columns-list {
                 grid-template-columns: 1fr;
             }
@@ -574,7 +574,7 @@
                     <div class="query-editor">
                         <textarea id="query-input" placeholder="Enter your SQL query here..."></textarea>
                     </div>
-                    
+
                     <div class="button-group">
                         <button class="btn btn-primary" id="execute-btn">Execute Query</button>
                         <button class="btn btn-secondary" id="validate-btn">Validate Query</button>
@@ -673,7 +673,7 @@
                 .replace(/(\d+\.\s)/g, '<br>$1')  // Better list formatting
                 .replace(/\s+/g, ' ')  // Clean up extra spaces
                 .trim();
-            
+
             exerciseContent.innerHTML = `
                 <h2>${exercise.id}. ${exercise.title}</h2>
                 <div class="problem-statement">
@@ -757,13 +757,13 @@
                 });
 
                 const result = await response.json();
-                
+
                 if (result.valid) {
                     resultsContent.innerHTML = '<div class="success-message">✅ Query syntax is valid!</div>';
                 } else {
                     resultsContent.innerHTML = `<div class="error-message">❌ Query validation failed: ${result.error}</div>`;
                 }
-                
+
                 resultsSection.classList.remove('hidden');
                 resultsTitle.textContent = 'Validation Results';
                 resultsMeta.textContent = '';
@@ -781,10 +781,10 @@
         function displayResults(result) {
             resultsSection.classList.remove('hidden');
             resultsTitle.textContent = 'Query Results';
-            
+
             if (result.success) {
                 resultsMeta.textContent = `${result.row_count} rows • ${result.execution_time}s`;
-                
+
                 if (result.data.length > 0) {
                     const table = createResultsTable(result.columns, result.data);
                     resultsContent.innerHTML = `<div class="success-message">✅ Query executed successfully!</div>${table}`;
@@ -821,7 +821,7 @@
             try {
                 // Display the solution
                 solutionQuery.textContent = currentExercise.solution;
-                
+
                 // Execute the solution query to show expected results
                 const response = await fetch('/api/execute', {
                     method: 'POST',
@@ -832,7 +832,7 @@
                 });
 
                 const result = await response.json();
-                
+
                 if (result.success && result.data.length > 0) {
                     const table = createResultsTable(result.columns, result.data);
                     solutionResults.innerHTML = `<h5>Expected Results (${result.row_count} rows):</h5>${table}`;
@@ -857,4 +857,4 @@
         });
     </script>
 </body>
-</html> 
+</html>

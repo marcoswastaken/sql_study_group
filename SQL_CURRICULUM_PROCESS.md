@@ -81,7 +81,7 @@ Instructor creates syllabus content in structured JSON format and saves as `syll
 **Field Definitions:**
 
 - `intro`: Optional introductory text for the week (use `null` if none)
-- `note`: Optional note at end of week (use `null` if none)  
+- `note`: Optional note at end of week (use `null` if none)
 - `url`: Optional URL for resources (use `null` if none)
 - `description`: Optional description for SQLZoo/LeetCode items
 
@@ -121,7 +121,7 @@ python scripts/core/explore_dataset.py --dataset lukebarousse/data_jobs --output
 
 **Process:**
 
-1. Load dataset from HuggingFace 
+1. Load dataset from HuggingFace
 2. Generate comprehensive analysis (metadata, column types, data quality)
 3. Identify potential relationships and normalization opportunities
 4. Output detailed dataset summary to `scripts/data_schema_generation/initial_exploration_[dataset].json` (always relative to project root)
@@ -242,7 +242,7 @@ Agent receives detailed curriculum generation prompt and creates educational tab
 
 ### Step 11: Generate Documentation and Reports
 
-**Scripts:** 
+**Scripts:**
 - `scripts/exercise_generation/generate_exercise_report.py` - Comprehensive report with results
 - Manual documentation of improvements and rationale
 
@@ -368,4 +368,4 @@ sql_study_group/
 - **Complete testing**: All SQL solutions are validated and include sample results
 - **Automated reporting**: Detailed reports with execution metrics and sample data
 
-This process provides a complete, replicable workflow for generating high-quality SQL curriculum materials. 
+This process provides a complete, replicable workflow for generating high-quality SQL curriculum materials.

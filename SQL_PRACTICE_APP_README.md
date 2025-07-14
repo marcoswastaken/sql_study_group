@@ -85,7 +85,7 @@ A simple web interface for practicing SQL queries using the Week 4 JOIN operatio
 
 This app is designed for Week 4 of the SQL curriculum, focusing on:
 - INNER JOIN operations
-- LEFT JOIN operations  
+- LEFT JOIN operations
 - Table aliases and relationships
 - Cross-table analysis
 - Business insights from joined data
@@ -125,4 +125,4 @@ pre-commit run --all-files
 - Query history and bookmarking
 - Export results to CSV
 - Multiple database support
-- User authentication and progress tracking 
+- User authentication and progress tracking

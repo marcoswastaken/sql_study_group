@@ -322,7 +322,7 @@ This is an advanced exercise using window functions. Find which platform is the 
 
 ```sql
 WITH platform_rankings AS (
-  SELECT 
+  SELECT
     l.job_country,
     jp.job_via AS platform_name,
     COUNT(jp.job_id) AS platform_jobs,
@@ -332,7 +332,7 @@ WITH platform_rankings AS (
   GROUP BY l.job_country, jp.job_via
   HAVING COUNT(jp.job_id) >= 10
 )
-SELECT 
+SELECT
   platform_name,
   COUNT(*) AS countries_led,
   ROUND(COUNT(*) * 100.0 / (SELECT COUNT(DISTINCT job_country) FROM platform_rankings WHERE country_rank = 1), 2) AS market_share_percentage

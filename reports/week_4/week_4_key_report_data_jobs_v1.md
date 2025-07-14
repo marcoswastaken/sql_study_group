@@ -246,7 +246,7 @@ Classify Data Scientist jobs by salary ranges. Show job title, salary, and exper
 SELECT jp.job_title, jp.salary_year_avg, sr.range_name, sr.experience_level
 FROM job_postings AS jp
 INNER JOIN salary_ranges AS sr ON jp.salary_year_avg BETWEEN sr.min_salary AND sr.max_salary
-WHERE jp.job_title_short = 'Data Scientist' 
+WHERE jp.job_title_short = 'Data Scientist'
   AND jp.salary_year_avg IS NOT NULL
 ORDER BY jp.salary_year_avg DESC
 LIMIT 10;
@@ -412,7 +412,7 @@ Analyze remote work opportunities by company. Show company name, total jobs, and
 ### SQL Solution
 
 ```sql
-SELECT c.company_name, 
+SELECT c.company_name,
        COUNT(jp.job_id) AS total_jobs,
        COUNT(CASE WHEN jp.job_work_from_home = 'True' THEN 1 END) AS remote_jobs
 FROM companies AS c

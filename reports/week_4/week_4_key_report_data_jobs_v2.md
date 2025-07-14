@@ -22,7 +22,7 @@ Analyze how company hiring activity correlates with remote work policies. Show c
 ### SQL Solution
 
 ```sql
-SELECT c.company_name, 
+SELECT c.company_name,
        c.total_jobs AS company_total_jobs,
        COUNT(jp.job_id) AS jobs_in_dataset,
        ROUND(COUNT(CASE WHEN jp.job_work_from_home = 'True' THEN 1 END) * 100.0 / COUNT(jp.job_id), 2) AS remote_job_percentage

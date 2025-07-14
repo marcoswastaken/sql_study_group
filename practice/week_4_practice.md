@@ -173,6 +173,6 @@ By completing these exercises, you should be able to:
 This dataset represents actual job market conditions for data roles in 2023. The skills, salaries, and geographic distributions reflect real hiring patterns that you might encounter in your career. Understanding how to analyze this type of data is directly applicable to:
 
 - **Job Seekers:** Understanding market demand and salary expectations
-- **Recruiters:** Identifying talent gaps and competitive salary ranges  
+- **Recruiters:** Identifying talent gaps and competitive salary ranges
 - **Companies:** Benchmarking compensation and optimizing job postings
-- **Career Counselors:** Providing data-driven advice to students 
+- **Career Counselors:** Providing data-driven advice to students

@@ -135,7 +135,7 @@ Show all job titles and whether they offer remote work options. Include all jobs
 
 **Solution:**
 ```sql
-SELECT j.job_title_short, 
+SELECT j.job_title_short,
        j.job_work_from_home,
        COUNT(*) AS total_jobs
 FROM jobs AS j
@@ -173,12 +173,12 @@ List companies offering Data Engineer positions with above-average salaries (>$1
 
 **Solution:**
 ```sql
-SELECT c.company_name, 
+SELECT c.company_name,
        AVG(j.salary_year_avg) AS avg_salary,
        COUNT(j.job_id) AS job_count
 FROM companies AS c
 INNER JOIN jobs AS j ON c.company_id = j.company_id
-WHERE j.job_title_short = 'Data Engineer' 
+WHERE j.job_title_short = 'Data Engineer'
   AND j.salary_year_avg > 100000
 GROUP BY c.company_name
 ORDER BY avg_salary DESC;
@@ -193,7 +193,7 @@ Find the average salary for Data Scientist roles by country. Only include countr
 
 **Solution:**
 ```sql
-SELECT l.job_country, 
+SELECT l.job_country,
        AVG(j.salary_year_avg) AS avg_salary,
        COUNT(j.job_id) AS job_count
 FROM locations AS l
@@ -217,7 +217,7 @@ For each company hiring Data Engineers, show the most common skill category they
 **Solution:**
 ```sql
 WITH skill_counts AS (
-    SELECT c.company_name, 
+    SELECT c.company_name,
            s.skill_category,
            COUNT(s.skill_id) AS category_count,
            ROW_NUMBER() OVER (PARTITION BY c.company_name ORDER BY COUNT(s.skill_id) DESC) AS rn
@@ -427,4 +427,4 @@ ORDER BY cs.total_jobs DESC;
 - Market trend analysis through temporal data
 - Competitive analysis through salary and benefit comparisons
 - Demand forecasting through skill requirement patterns
-- Platform performance evaluation for recruiting strategy 
+- Platform performance evaluation for recruiting strategy
