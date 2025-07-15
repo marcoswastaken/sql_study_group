@@ -2,6 +2,28 @@
 
 A systematic curriculum for learning SQL through real-world datasets and hands-on practice.
 
+## System Requirements
+
+Before running the setup script, ensure you have:
+
+- **Python 3.8+** - The setup script requires Python with `venv` module support
+- **Git** - For cloning the repository
+- **Internet connection** - To download datasets from HuggingFace
+
+### Python Installation Check
+```bash
+python --version    # Should show Python 3.8 or higher
+python -m venv --help    # Should show venv module help (not error)
+```
+
+**Note:** The setup script automatically handles:
+- ✅ Virtual environment creation
+- ✅ Dependency installation
+- ✅ Database setup
+- ✅ App startup
+
+You don't need to install any packages manually - the script handles everything!
+
 ## Quick Start
 
 ### One-Command Setup
@@ -29,10 +51,12 @@ SQL_WEEK=5 python app.py     # Week 5 via environment variable
 ```
 
 ### What You Get
+- **Complete Automation**: One command handles everything from setup to app startup
 - **Interactive Web Interface**: Practice SQL queries in your browser at `http://localhost:5000`
 - **Real Datasets**: 785K+ job postings and other real-world data
 - **Progressive Exercises**: From basic SELECT to complex JOINs and window functions
 - **Instant Feedback**: Execute queries and see results immediately
+- **Isolated Environment**: Uses its own virtual environment, won't affect your system
 
 ## What You'll Learn
 
