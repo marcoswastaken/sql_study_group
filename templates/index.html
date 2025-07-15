@@ -99,6 +99,82 @@
             font-size: 1.1rem;
         }
 
+        .table-selector {
+            margin-bottom: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .table-selector > label {
+            display: block;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .table-checkboxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #2d3748;
+            font-weight: normal;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checkbox-item:hover {
+            background-color: rgba(102, 126, 234, 0.1);
+            border-radius: 4px;
+        }
+
+        .checkbox-label {
+            user-select: none;
+            cursor: pointer;
+        }
+
+        .table-selector-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            background: white;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-small:hover {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+        }
+
+        .btn-small:active {
+            background: #e2e8f0;
+        }
+
         .table-info {
             background: #f8f9fa;
             border-radius: 8px;
@@ -514,9 +590,24 @@
             <div class="sidebar">
                 <div class="section">
                     <h2>📚 Data Dictionary</h2>
+                    <div class="table-selector">
+                        <label>Show Tables:</label>
+                        <div class="table-checkboxes">
+                            {% for table in tables %}
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="table-filter" value="{{ table.name }}" checked>
+                                <span class="checkbox-label">{{ table.name }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        <div class="table-selector-actions">
+                            <button id="select-all-tables" class="btn-small">Select All</button>
+                            <button id="clear-all-tables" class="btn-small">Clear All</button>
+                        </div>
+                    </div>
                     <div id="tables-info">
                         {% for table in tables %}
-                        <div class="table-info">
+                        <div class="table-info" data-table-name="{{ table.name }}">
                             <div class="table-name">{{ table.name }}</div>
                             <div class="table-meta">{{ table.row_count }} rows</div>
                             <div class="columns-list">
@@ -627,6 +718,12 @@
         const solutionQuery = document.getElementById('solution-query');
         const solutionResults = document.getElementById('solution-results');
 
+        // Table filter elements
+        const tableFilterCheckboxes = document.querySelectorAll('input[name="table-filter"]');
+        const selectAllTablesBtn = document.getElementById('select-all-tables');
+        const clearAllTablesBtn = document.getElementById('clear-all-tables');
+        const tableInfos = document.querySelectorAll('.table-info');
+
         // Event listeners
         exerciseItems.forEach(item => {
             item.addEventListener('click', () => selectExercise(item.dataset.exerciseId));
@@ -635,6 +732,13 @@
         executeBtn.addEventListener('click', executeQuery);
         validateBtn.addEventListener('click', validateQuery);
         showSolutionBtn.addEventListener('click', showSolution);
+
+        // Table filter event listeners
+        tableFilterCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', filterTables);
+        });
+        selectAllTablesBtn.addEventListener('click', selectAllTables);
+        clearAllTablesBtn.addEventListener('click', clearAllTables);
 
         // Select exercise
         async function selectExercise(exerciseId) {
@@ -849,6 +953,36 @@
                 showSolutionBtn.disabled = false;
                 showSolutionBtn.textContent = 'Show Solution';
             }
+        }
+
+        // Table filter functions
+        function filterTables() {
+            const selectedTables = Array.from(tableFilterCheckboxes)
+                .filter(checkbox => checkbox.checked)
+                .map(checkbox => checkbox.value);
+
+            tableInfos.forEach(tableInfo => {
+                const tableName = tableInfo.dataset.tableName;
+                if (selectedTables.includes(tableName)) {
+                    tableInfo.style.display = 'block';
+                } else {
+                    tableInfo.style.display = 'none';
+                }
+            });
+        }
+
+        function selectAllTables() {
+            tableFilterCheckboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            filterTables();
+        }
+
+        function clearAllTables() {
+            tableFilterCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            filterTables();
         }
 
         // Initialize the application
