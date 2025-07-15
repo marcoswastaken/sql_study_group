@@ -251,6 +251,22 @@ Agent receives detailed curriculum generation prompt and creates educational tab
 - `exercises/week_X/week_X_analysis.md` - Analysis of improvements made (if applicable)
 - Final validated exercise key ready for student use
 
+### Step 12: Generate Student Practice Guide
+
+**Script:** `scripts/exercise_generation/generate_student_practice_guide.py [week_number]`
+
+**Purpose:** Create offline practice guides for students with data dictionaries and problem statements. Students can work on SQL queries without database access, then test solutions later using the web interface.
+
+**Features:**
+- Comprehensive data dictionary with table schemas and relationships
+- Problem statements with spaces for SQL solutions
+- Auto-detects dataset from exercise key metadata
+- Generates markdown files in `practice/` directory
+- Includes instructions for testing solutions with setup script
+
+**Output:**
+- `practice/week_X_offline_practice.md` - Complete practice guide with data dictionary and exercises
+
 ## Project Structure (Current)
 
 ```
@@ -349,6 +365,7 @@ sql_study_group/
 - `scripts/exercise_generation/generate_exercises.py` - Generic exercise generation framework (Step 8)
 - `scripts/exercise_generation/test_solutions.py` - Solution testing and validation (Step 9)
 - `scripts/exercise_generation/generate_exercise_report.py` - Report generation (Step 11)
+- `scripts/exercise_generation/generate_student_practice_guide.py` - Creates offline practice guides
 
 ### Test Infrastructure
 - `scripts/tests/test_core_sql_helper.py` - SQL helper tests
