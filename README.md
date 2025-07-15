@@ -26,15 +26,20 @@ You don't need to install any packages manually - the script handles everything!
 
 ## Quick Start
 
-### One-Command Setup
+### Command-Line Setup
 ```bash
 # Clone the repository
-git clone marcoswastaken/sql_study_group
+git clone https://github.com/marcoswastaken/sql_study_group.git
 cd sql_study_group
+```
 
+```bash
 # Setup and start Week 4 (default)
 python setup.py
+```
 
+Or, you can specify another week to load:
+```bash
 # Or setup and start any specific week
 python setup.py 5
 ```
@@ -52,7 +57,7 @@ SQL_WEEK=5 python app.py     # Week 5 via environment variable
 
 ### What You Get
 - **Complete Automation**: One command handles everything from setup to app startup
-- **Interactive Web Interface**: Practice SQL queries in your browser at `http://localhost:5000`
+- **Interactive Web Interface**: Practice SQL queries in your browser at `http://localhost:5001`
 - **Real Datasets**: 785K+ job postings and other real-world data
 - **Progressive Exercises**: From basic SELECT to complex JOINs and window functions
 - **Instant Feedback**: Execute queries and see results immediately

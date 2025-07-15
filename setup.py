@@ -307,7 +307,7 @@ def setup_environment(week, force_recreate=False):
     print("=" * 60)
     print(f"🎯 Week {week}: {metadata['title']}")
     print(f"📊 Dataset: {metadata['dataset_name']}")
-    print("🚀 Starting app at http://localhost:5000")
+    print("🚀 Starting app at http://localhost:5001")
     print("💡 Press Ctrl+C to stop the server")
     print("=" * 60)
 

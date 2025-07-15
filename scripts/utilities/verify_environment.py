@@ -159,7 +159,7 @@ def main():
         print("🎉 All checks passed! Your environment is ready for SQL practice.")
         print("\nNext steps:")
         print("1. Run: python app.py")
-        print("2. Open your browser to http://localhost:5000")
+        print("2. Open your browser to http://localhost:5001")
         print("3. Start practicing SQL queries!")
     else:
         print(f"⚠️  {failed} check(s) failed. Please fix the issues above.")

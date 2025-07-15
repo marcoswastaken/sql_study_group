@@ -24,7 +24,7 @@ A simple web interface for practicing SQL queries using the Week 4 JOIN operatio
    ```
 
 3. **Access the App**
-   - Open your browser and go to `http://localhost:5000`
+   - Open your browser and go to `http://localhost:5001`
    - The app will automatically load with the data dictionary and available exercises
 
 ## How to Use
@@ -94,7 +94,7 @@ This app is designed for Week 4 of the SQL curriculum, focusing on:
 ## Troubleshooting
 
 - **Database not found**: Ensure `datasets/data_jobs.db` exists in the project directory
-- **Port already in use**: The app runs on port 5000 by default
+- **Port already in use**: The app runs on port 5001 by default
 - **Query timeouts**: Queries are limited to 1000 rows for performance
 - **Syntax errors**: Use the "Validate Query" button to check syntax before execution
 

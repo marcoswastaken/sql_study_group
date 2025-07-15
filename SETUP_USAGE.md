@@ -19,7 +19,7 @@ python setup.py 5
 1. **Auto-detects dataset**: Reads week exercise file → determines dataset (data_jobs, movies, etc.)
 2. **Installs dependencies**: Runs `pip install -r requirements.txt`
 3. **Creates database**: Downloads data from HuggingFace + creates tables
-4. **Starts web app**: Launches Flask interface at `http://localhost:5000`
+4. **Starts web app**: Launches Flask interface at `http://localhost:5001`
 
 ### Manual Control (if needed)
 ```bash
@@ -42,7 +42,7 @@ python app.py --help
 - Week X → Any dataset specified in exercise metadata
 
 ### Troubleshooting
-- **Port 5000 in use**: The app will show an error - stop other services or use different port
+- **Port 5001 in use**: The app will show an error - stop other services or use different port
 - **Dependencies fail**: Try `pip install -r requirements.txt` manually
 - **Database errors**: Check if table creation queries exist for your dataset
 - **No exercises found**: Make sure `exercises/week_X/` directory exists
