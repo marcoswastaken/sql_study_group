@@ -82,6 +82,7 @@ ENV/
 env.bak/
 venv.bak/
 sql-study-group/
+sql-study-group-venv/
 *.virtualenv
 
 # pyenv

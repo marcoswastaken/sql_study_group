@@ -10,7 +10,6 @@ Usage: python create_tables_from_queries.py --dataset jobs
 
 import argparse
 import json
-import os
 import sys
 from pathlib import Path
 
@@ -28,9 +27,11 @@ def load_table_queries(dataset_name):
         return json.load(f)
 
 
-def execute_table_creation(dataset_name, verbose=True):
+def execute_table_creation(dataset_name, verbose=True, force_recreate=False):
     """Execute all table creation queries for the given dataset."""
     print(f"🔧 Creating tables for dataset: {dataset_name}")
+    if force_recreate:
+        print("⚠️  Force recreate mode: existing tables will be dropped")
 
     # Load queries
     try:
@@ -57,12 +58,36 @@ def execute_table_creation(dataset_name, verbose=True):
     if not db_name.startswith("data_"):
         db_name = f"data_{db_name}"
 
-    db_path = f"../../datasets/{db_name}.db"
-    if not os.path.exists(db_path):
+    # Use absolute path to ensure correct database location
+    # This script can be called from various directories
+    from pathlib import Path
+
+    project_root = Path(__file__).parent.parent.parent
+    db_path = project_root / "datasets" / f"{db_name}.db"
+
+    if not db_path.exists():
         print(f"❌ Database not found: {db_path}")
         return False
 
-    helper = SQLHelper(db_path)
+    helper = SQLHelper(str(db_path))
+
+    # Drop existing tables if force_recreate is True
+    if force_recreate:
+        print("🗑️  Dropping existing tables...")
+        for table_name in queries_data["tables"].keys():
+            try:
+                drop_result = helper.execute_query(f"DROP TABLE IF EXISTS {table_name}")
+                if drop_result["status"] == "success":
+                    if verbose:
+                        print(f"   ✅ Dropped table: {table_name}")
+                else:
+                    if verbose:
+                        print(
+                            f"   ⚠️  Could not drop table {table_name}: {drop_result.get('error', 'Unknown error')}"
+                        )
+            except Exception as e:
+                if verbose:
+                    print(f"   ⚠️  Error dropping table {table_name}: {str(e)}")
 
     # Execute queries
     successful_tables = []

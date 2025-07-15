@@ -3,10 +3,12 @@
 SQL Study Group Setup Script
 
 This script sets up the complete environment for practicing SQL with any week/dataset:
-1. Reads the chosen week's exercise file to determine the dataset
-2. Downloads the dataset from HuggingFace
-3. Creates the database tables using the defined table creation queries
-4. Starts the Flask practice app
+1. Creates or activates the virtual environment
+2. Installs dependencies
+3. Reads the chosen week's exercise file to determine the dataset
+4. Downloads the dataset from HuggingFace
+5. Creates the database tables using the defined table creation queries
+6. Starts the Flask practice app
 
 Usage:
     python setup.py [week_number]
@@ -27,36 +29,88 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 
+def is_virtual_environment():
+    """Check if we're running in a virtual environment."""
+    return hasattr(sys, "real_prefix") or (
+        hasattr(sys, "base_prefix") and sys.base_prefix != sys.prefix
+    )
+
+
+def setup_virtual_environment():
+    """Create or activate the virtual environment and restart the script."""
+    venv_dir = Path("sql-study-group-venv")
+
+    if is_virtual_environment():
+        print("✅ Running in virtual environment")
+        return True
+
+    print("🔧 Setting up virtual environment...")
+
+    # Create virtual environment if it doesn't exist
+    if not venv_dir.exists():
+        print("📦 Creating new virtual environment...")
+        try:
+            subprocess.run(
+                [sys.executable, "-m", "venv", str(venv_dir)],
+                check=True,
+                capture_output=True,
+            )
+            print("✅ Virtual environment created successfully")
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Failed to create virtual environment: {e}")
+            return False
+    else:
+        print("✅ Virtual environment already exists")
+
+    # Determine the python executable in the virtual environment
+    if os.name == "nt":  # Windows
+        venv_python = venv_dir / "Scripts" / "python.exe"
+    else:  # Unix/Mac
+        venv_python = venv_dir / "bin" / "python"
+
+    if not venv_python.exists():
+        print(f"❌ Virtual environment Python not found at {venv_python}")
+        return False
+
+    # Re-run the script with the virtual environment Python
+    print("🔄 Restarting script in virtual environment...")
+    try:
+        subprocess.run([str(venv_python)] + sys.argv, check=True)
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Failed to restart script in virtual environment: {e}")
+        return False
+
+
 def get_week_config():
     """Get week configuration from command line args or environment variables."""
-    # Check for help request
-    if len(sys.argv) > 1 and sys.argv[1] in ["-h", "--help", "help"]:
-        print(__doc__)
-        print("Environment Variables:")
-        print("  SQL_WEEK=N    Set week number (default: 4)")
-        print(
-            "\nThis script will automatically detect the dataset from exercise metadata."
-        )
-        return None
+    force_recreate = False
+    week = None
 
-    # Check command line arguments
-    if len(sys.argv) > 1:
+    # Parse command line arguments
+    for arg in sys.argv[1:]:
+        if arg == "--force":
+            force_recreate = True
+        elif arg.startswith("--"):
+            continue  # Skip other options
+        else:
+            try:
+                week = int(arg)
+            except ValueError:
+                print(f"Warning: Invalid week argument '{arg}', using default week 4")
+
+    # If no week specified, check environment variable
+    if week is None:
+        week_env = os.environ.get("SQL_WEEK", "4")
         try:
-            return int(sys.argv[1])
+            week = int(week_env)
         except ValueError:
             print(
-                f"Warning: Invalid week argument '{sys.argv[1]}', using default week 4"
+                f"Warning: Invalid SQL_WEEK environment variable '{week_env}', using default week 4"
             )
+            week = 4
 
-    # Check environment variable
-    week = os.environ.get("SQL_WEEK", "4")
-    try:
-        return int(week)
-    except ValueError:
-        print(
-            f"Warning: Invalid SQL_WEEK environment variable '{week}', using default week 4"
-        )
-        return 4
+    return week, force_recreate
 
 
 def find_exercise_file(week):
@@ -102,9 +156,11 @@ def load_exercise_metadata(exercise_file):
     }
 
 
-def setup_environment(week):
+def setup_environment(week, force_recreate=False):
     """Complete environment setup for the given week."""
     print(f"🚀 Setting up SQL Study Group environment for Week {week}")
+    if force_recreate:
+        print("⚠️  Force recreate mode: existing tables will be dropped")
     print("=" * 60)
 
     # Step 1: Find and load exercise file
@@ -140,6 +196,45 @@ def setup_environment(week):
     # Step 3: Setup dataset and database
     print(f"\n🗄️  Setting up {metadata['dataset_name']} database...")
 
+    # First, ensure the base database exists with the raw dataset
+    db_path = Path("datasets") / f"{metadata['dataset_name']}.db"
+
+    # Create datasets directory if it doesn't exist
+    Path("datasets").mkdir(exist_ok=True)
+
+    if not db_path.exists():
+        print("📥 Database not found, creating from HuggingFace dataset...")
+        try:
+            from scripts.core.explore_dataset import DatasetExplorer
+
+            # Map dataset name to HuggingFace identifier
+            dataset_map = {
+                "data_jobs": "lukebarousse/data_jobs",
+                "data_movies": "lukebarousse/data_movies",  # example
+            }
+
+            hf_dataset = dataset_map.get(
+                metadata["dataset_name"], metadata["dataset_name"]
+            )
+            print(f"📥 Downloading dataset: {hf_dataset}")
+
+            explorer = DatasetExplorer(hf_dataset)
+            if not explorer.load_dataset():
+                print("❌ Failed to load dataset")
+                return False
+
+            if not explorer.create_database(str(db_path)):
+                print("❌ Failed to create database")
+                return False
+
+            print("✅ Base database created successfully")
+
+        except Exception as e:
+            print(f"❌ Error creating base database: {e}")
+            return False
+    else:
+        print(f"✅ Base database exists: {db_path}")
+
     # Check if we have table creation queries for this dataset
     table_queries_file = f"scripts/data_schema_generation/table_creation_queries_{metadata['dataset_name']}.json"
     if os.path.exists(table_queries_file):
@@ -151,7 +246,9 @@ def setup_environment(week):
                 execute_table_creation,
             )
 
-            success = execute_table_creation(metadata["dataset_name"], verbose=True)
+            success = execute_table_creation(
+                metadata["dataset_name"], verbose=True, force_recreate=force_recreate
+            )
             if success:
                 print("✅ Database tables created successfully")
             else:
@@ -247,11 +344,34 @@ def list_available_weeks():
 
 def main():
     """Main setup function."""
-    week = get_week_config()
-    if week is None:  # Help was requested
+    # First, handle help requests without setting up virtual environment
+    if len(sys.argv) > 1 and sys.argv[1] in ["-h", "--help", "help"]:
+        print(__doc__)
+        print("Environment Variables:")
+        print("  SQL_WEEK=N    Set week number (default: 4)")
+        print("\nOptions:")
+        print("  --force       Recreate database tables if they already exist")
+        print(
+            "\nThis script will automatically detect the dataset from exercise metadata."
+        )
         return
 
-    success = setup_environment(week)
+    # Setup virtual environment first (this may restart the script)
+    if not setup_virtual_environment():
+        print("❌ Failed to setup virtual environment")
+        sys.exit(1)
+
+    # If we're not in a virtual environment, the script was restarted
+    # so we don't need to continue
+    if not is_virtual_environment():
+        return
+
+    # Now proceed with the actual setup
+    week, force_recreate = get_week_config()
+    if week is None:  # Help was requested (shouldn't happen here)
+        return
+
+    success = setup_environment(week, force_recreate)
     if not success:
         sys.exit(1)
 
