@@ -84,13 +84,15 @@ def setup_virtual_environment():
 
 def get_week_config():
     """Get week configuration from command line args or environment variables."""
-    force_recreate = False
+    force_recreate = True  # Default to True for setup script (fresh start)
     week = None
 
     # Parse command line arguments
     for arg in sys.argv[1:]:
-        if arg == "--force":
-            force_recreate = True
+        if arg == "--keep-tables":
+            force_recreate = False  # Don't recreate tables if this flag is present
+        elif arg == "--force":
+            force_recreate = True  # Explicitly recreate tables
         elif arg.startswith("--"):
             continue  # Skip other options
         else:
@@ -160,7 +162,14 @@ def setup_environment(week, force_recreate=False):
     """Complete environment setup for the given week."""
     print(f"🚀 Setting up SQL Study Group environment for Week {week}")
     if force_recreate:
-        print("⚠️  Force recreate mode: existing tables will be dropped")
+        print("🔄 Fresh setup mode: existing tables will be recreated for clean start")
+    else:
+        print(
+            "📋 Preserve mode: existing tables will be kept (use --keep-tables to preserve)"
+        )
+    print(
+        "💡 Tip: Use --keep-tables to preserve existing data, or --force to ensure fresh tables"
+    )
     print("=" * 60)
 
     # Step 1: Find and load exercise file
