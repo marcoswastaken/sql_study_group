@@ -29,7 +29,7 @@ You don't need to install any packages manually - the script handles everything!
 ### One-Command Setup
 ```bash
 # Clone the repository
-git clone <repo-url>
+git clone marcoswastaken/sql_study_group
 cd sql_study_group
 
 # Setup and start Week 4 (default)
