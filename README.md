@@ -27,24 +27,31 @@ You don't need to install any packages manually - the script handles everything!
 ## Quick Start
 
 ### Command-Line Setup
+
+First, clone the repository. Navigate to the directory where you want to save the repository and run these commands:
+
 ```bash
 # Clone the repository
 git clone https://github.com/marcoswastaken/sql_study_group.git
 cd sql_study_group
 ```
 
+Then, run the setup script:
+
 ```bash
 # Setup and start Week 4 (default)
 python setup.py
 ```
 
-Or, you can specify another week to load:
+If you want to load the exercises from a different week, you can specify the week number in the setup script:
+
 ```bash
-# Or setup and start any specific week
+# Setup and start any specific week
 python setup.py 5
 ```
 
 ### Manual Setup (if needed)
+
 ```bash
 # Install dependencies
 pip install -r requirements.txt
@@ -56,6 +63,7 @@ SQL_WEEK=5 python app.py     # Week 5 via environment variable
 ```
 
 ### What You Get
+
 - **Complete Automation**: One command handles everything from setup to app startup
 - **Interactive Web Interface**: Practice SQL queries in your browser at `http://localhost:5001`
 - **Real Datasets**: 785K+ job postings and other real-world data
@@ -83,6 +91,7 @@ SQL_WEEK=5 python app.py     # Week 5 via environment variable
 ## How It Works
 
 The setup script automatically:
+
 1. **Detects the dataset** from your chosen week's exercise file
 2. **Downloads data** from HuggingFace (data_jobs, movies, etc.)
 3. **Creates database tables** optimized for learning

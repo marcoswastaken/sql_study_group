@@ -8,11 +8,15 @@
 git clone <repo-url>
 cd sql_study_group
 
-# Setup and start Week 4 (default)
+# Setup and start Week 4 (default) - recreates tables for fresh start
 python setup.py
 
-# Or setup and start any specific week
+# Or setup and start any specific week - recreates tables
 python setup.py 5
+
+# Preserve existing tables (don't recreate)
+python setup.py --keep-tables
+python setup.py 5 --keep-tables
 ```
 
 ### What Happens
@@ -45,6 +49,7 @@ python app.py --help
 - **Port 5001 in use**: The app will show an error - stop other services or use different port
 - **Dependencies fail**: Try `pip install -r requirements.txt` manually
 - **Database errors**: Check if table creation queries exist for your dataset
+- **Tables already exist**: By default, setup recreates tables for fresh start. Use `--keep-tables` to preserve existing data
 - **No exercises found**: Make sure `exercises/week_X/` directory exists
 
 ### For Developers
