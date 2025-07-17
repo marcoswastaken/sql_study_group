@@ -219,7 +219,7 @@ def setup_environment(week, force_recreate=False):
             # Map dataset name to HuggingFace identifier
             dataset_map = {
                 "data_jobs": "lukebarousse/data_jobs",
-                "data_movies": "lukebarousse/data_movies",  # example
+                "data_movies_dataset": "Pablinho/movies-dataset",
             }
 
             hf_dataset = dataset_map.get(
