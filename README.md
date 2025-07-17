@@ -56,11 +56,21 @@ python setup.py 5
 # Install dependencies
 pip install -r requirements.txt
 
+# Create database for specific week (required for first-time setup)
+python scripts/core/explore_dataset.py --dataset lukebarousse/data_jobs --create-database     # Week 4
+python scripts/core/explore_dataset.py --dataset Pablinho/movies-dataset --create-database  # Week 5
+
+# Create database tables
+python scripts/data_schema_generation/create_tables_from_queries.py data_jobs                # Week 4
+python scripts/data_schema_generation/create_tables_from_queries.py data_movies_dataset     # Week 5
+
 # Start the app for specific week
 python app.py 4              # Week 4
 python app.py 5              # Week 5
 SQL_WEEK=5 python app.py     # Week 5 via environment variable
 ```
+
+**Note:** For first-time setup, it's easier to use `python setup.py [week]` which handles everything automatically.
 
 ### What You Get
 

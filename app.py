@@ -64,8 +64,33 @@ try:
     sql_service = SQLService(data_service.get_database_path())
     print(f"📊 Connected to database: {data_service.get_current_dataset()}")
 except Exception as e:
-    print(f"Error initializing SQL service: {e}")
-    sql_service = None
+    print(f"❌ Error initializing SQL service: {e}")
+    print("")
+    print(f"💡 Database not found for Week {week}. To fix this:")
+    print("   Option 1 (Recommended): Run the full setup script:")
+    print(f"     python setup.py {week}")
+    print("")
+    print("   Option 2: Create database manually, then restart the app:")
+    if week == 4:
+        print(
+            "     python scripts/core/explore_dataset.py --dataset lukebarousse/data_jobs --create-database"
+        )
+        print(
+            "     python scripts/data_schema_generation/create_tables_from_queries.py data_jobs"
+        )
+    elif week == 5:
+        print(
+            "     python scripts/core/explore_dataset.py --dataset Pablinho/movies-dataset --create-database"
+        )
+        print(
+            "     python scripts/data_schema_generation/create_tables_from_queries.py data_movies_dataset"
+        )
+    else:
+        print(f"     Check README.md for Week {week} database setup instructions")
+    print("")
+    print("🚫 App cannot start without database. Exiting...")
+
+    sys.exit(1)
 
 
 @app.route("/")

@@ -27,7 +27,15 @@ python setup.py 5 --keep-tables
 
 ### Manual Control (if needed)
 ```bash
-# Just start the app for specific week (if database exists)
+# Create database for specific week (required for first-time setup)
+python scripts/core/explore_dataset.py --dataset lukebarousse/data_jobs --create-database     # Week 4
+python scripts/core/explore_dataset.py --dataset Pablinho/movies-dataset --create-database  # Week 5
+
+# Create database tables
+python scripts/data_schema_generation/create_tables_from_queries.py data_jobs                # Week 4
+python scripts/data_schema_generation/create_tables_from_queries.py data_movies_dataset     # Week 5
+
+# Start the app for specific week (requires database to exist)
 python app.py 4              # Week 4
 python app.py 5              # Week 5
 SQL_WEEK=5 python app.py     # Week 5 via environment variable
@@ -39,6 +47,8 @@ python -c "from setup import list_available_weeks; print(list_available_weeks())
 python setup.py --help
 python app.py --help
 ```
+
+**Note:** Use `python setup.py [week]` for automatic setup instead of manual steps.
 
 ### Dataset Auto-Detection
 - Week 4 → `data_jobs` dataset (785K job postings)
