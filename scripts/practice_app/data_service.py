@@ -185,16 +185,33 @@ class DataService:
     def get_table_info(self) -> List[Dict[str, Any]]:
         """
         Get simplified table information for the data dictionary.
+        Filters tables based on exercise metadata to show only relevant tables for the week.
 
         Returns:
             List of table information dictionaries
         """
         schema = self.load_table_schema()
 
+        # Get list of tables that should be shown for this week from exercise metadata
+        exercises_data = self.load_exercises()
+        allowed_tables = exercises_data.get("metadata", {}).get("schema_tables", [])
+
         tables_info = []
         for table in schema.get("tables", []):
+            table_name = table["name"]
+
+            # Filter tables based on exercise metadata - only show explicitly allowed tables
+            # Require schema_tables field to prevent raw dataset table access
+            if not allowed_tables:
+                raise ValueError(
+                    "Exercise metadata missing 'schema_tables' field. This field is required to prevent students from accessing raw dataset tables (unless no JOIN operations are expected). Please update the exercise file to include this field."
+                )
+
+            if table_name not in allowed_tables:
+                continue
+
             table_info = {
-                "name": table["name"],
+                "name": table_name,
                 "description": table["description"],
                 "row_count": table.get("row_count", 0),
                 "columns": [],

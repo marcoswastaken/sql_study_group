@@ -52,21 +52,6 @@ The data cards for a collection of tables is provided. For each exercise, come u
 | vote_count | INTEGER | Yes |  | Number of votes for the movie, used for JOIN operations and filtering |
 | poster_url | VARCHAR | Yes |  | URL of the movie poster, used for JOIN operations and filtering |
 
-### movies_dataset
-**Row Count:** 9,837
-
-| Column | Type | Nullable | Key | Description |
-|--------|------|----------|-----|-------------|
-| Release_Date | VARCHAR | Yes |  | Movie release date, used for temporal analysis and JOIN operations |
-| Title | VARCHAR | Yes |  | Movie title, used for JOIN operations and filtering |
-| Overview | VARCHAR | Yes |  | Movie overview, used for JOIN operations and filtering |
-| Popularity | DOUBLE | Yes |  | Movie popularity score, used for JOIN operations and filtering |
-| Vote_Count | VARCHAR | Yes |  | Number of votes for the movie, used for JOIN operations and filtering |
-| Vote_Average | VARCHAR | Yes |  | Movie average rating score, used for JOIN operations and filtering |
-| Original_Language | VARCHAR | Yes |  | Movie original language code, used for JOIN operations and filtering |
-| Genre | VARCHAR | Yes |  | Movie genre, used for JOIN operations and filtering |
-| Poster_Url | VARCHAR | Yes |  | URL of the movie poster, used for JOIN operations and filtering |
-
 ### ratings
 **Row Count:** 74
 
@@ -91,6 +76,8 @@ Identify the standout performers among movies with 'Excellent' ratings. Find mov
 
 **Problem Statement:**
 Determine which movie achieved the highest popularity in each decade. Your analysis should span from the 1980s through the 2020s, showing the decade name, the champion movie's title, and its popularity score. Only include decades that have movies in the database. Results should be ordered chronologically by decade.
+
+**Helpful Tip:** The SUBSTR function extracts part of a text string. Syntax: `SUBSTR(text, start_position, length)`. Examples: `SUBSTR('2023-12-25', 6, 2)` returns '12' (month), `SUBSTR('Hello World', 1, 5)` returns 'Hello', `SUBSTR('ABC123DEF', 4, 3)` returns '123'. When extracting from dates, you can get specific parts like years or months.
 
 ---
 

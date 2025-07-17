@@ -203,11 +203,14 @@ Agent receives detailed curriculum generation prompt and creates educational tab
 1. Agent reviews syllabus topics and dataset schema
 2. Generates exercises covering each topic with progressive difficulty
 3. Creates SQL solutions and validates syntax
-4. Outputs `exercises/week_X/week_X_key.json` with complete exercise metadata (organized by week)
+4. **CRITICAL:** Adds `schema_tables` field to metadata, excluding raw dataset tables (unless absolutely needed for exercises)
+5. Outputs `exercises/week_X/week_X_key.json` with complete exercise metadata (organized by week)
 
 **Key Requirements:**
 - Questions must demonstrate educational value of target concepts
 - Solutions must be tested and include sample results
+- **MUST include `schema_tables` field** in metadata listing only the educational tables (excludes raw dataset tables like `data_jobs`, `movies_dataset`, unless no child tables are created)
+- Raw dataset tables should be excluded to force JOIN practice between normalized tables (unless no JOIN operations are expected)
 - Progressive difficulty from Easy → Medium → Hard
 
 ### Step 9: Test and Validate Exercises
@@ -215,16 +218,22 @@ Agent receives detailed curriculum generation prompt and creates educational tab
 **Script:** `scripts/exercise_generation/test_solutions.py --exercise-key [file] --dataset [dataset]`
 
 **Process:**
-1. **Validate exercise metadata structure and required fields**:
-   - Verify required metadata fields (title, description, week, database, generated_date)
-   - Check exercise structure (id, title, statement, difficulty, topics, solution)
-   - Validate database and schema file existence
-   - Ensure exercise IDs are numeric and difficulty values are valid
-   - Confirm topics arrays are properly structured
-2. Execute all SQL solutions against database
-3. Capture execution time, row counts, and sample results
-4. Update exercise key with test results and metadata
-5. Verify 100% success rate before proceeding
+
+  1. **Validate exercise metadata structure and required fields**:
+     - Verify required metadata fields (title, description, week, database, generated_date)
+     - **NEW:** Validate `schema_tables` field exists and excludes raw dataset tables
+     - Check exercise structure (id, title, statement, difficulty, topics, solution)
+     - Validate database and schema file existence
+     - Ensure exercise IDs are numeric and difficulty values are valid
+     - Confirm topics arrays are properly structured
+  2. **NEW: Validate SQL solutions only use allowed tables**:
+     - Check that solutions don't reference raw dataset tables (data_jobs, movies_dataset, etc.)
+     - Ensure solutions only use tables from the `schema_tables` field
+     - Prevent student-solution mismatch where solutions use hidden tables
+  3. Execute all SQL solutions against database
+  4. Capture execution time, row counts, and sample results
+  5. Update exercise key with test results and metadata
+  6. Verify 100% success rate before proceeding
 
 **Validation Requirements:**
 - All required metadata fields must be present and non-empty
@@ -236,11 +245,11 @@ Agent receives detailed curriculum generation prompt and creates educational tab
 ### Step 10: Review and Improve Exercises
 
 **Manual Review Process:**
-1. Instructor/agent reviews exercise educational value
-2. Identifies exercises that could be done without target concepts (e.g., joins that don't add value)
-3. Redesigns exercises to ensure concepts are essential for solving problems
-4. Creates improved version (e.g., `week_X_key_v2.json`) if needed
-5. Re-runs Step 9 to validate improvements
+  1. Instructor/agent reviews exercise educational value
+  2. Identifies exercises that could be done without target concepts (e.g., joins that don't add value)
+  3. Redesigns exercises to ensure concepts are essential for solving problems
+  4. Creates improved version (e.g., `week_X_key_v2.json`) if needed
+  5. Re-runs Step 9 to validate improvements
 
 ### Step 11: Generate Documentation and Reports
 

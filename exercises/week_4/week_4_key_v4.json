@@ -19,6 +19,13 @@
       "Medium",
       "Hard"
     ],
+    "schema_tables": [
+      "companies",
+      "job_platforms",
+      "job_postings",
+      "locations",
+      "salary_ranges"
+    ],
     "improvement_notes": "Final refinements: fixed Exercise 2 threshold (1000+ jobs), simplified Exercise 3 by removing redundant salary columns, enhanced Exercise 4 with other_types column, refined problem statements for SQL students",
     "data_quality_notes": {
       "salary_uniformity": "Salary averages appear similar across countries (~142k-145k) due to normalized ranges in the original lukebarousse/data_jobs dataset. This is a known limitation of the source data, not a query issue.",

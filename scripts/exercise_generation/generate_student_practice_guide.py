@@ -70,22 +70,29 @@ def extract_dataset_name(exercise_key):
     return metadata.get("dataset", "jobs")
 
 
-def generate_data_dictionary_markdown(schema_data):
-    """Generate markdown for data dictionary section."""
+def generate_data_dictionary_markdown(schema_data, allowed_tables=None):
+    """Generate markdown for data dictionary section.
+
+    Args:
+        schema_data: Schema data containing table information
+        allowed_tables: List of table names to include (from exercise metadata schema_tables field)
+    """
     markdown = []
 
     markdown.append("## 📚 Data Dictionary")
     markdown.append("")
 
-    # Add table information (only child tables, skip parent database table)
+    # Add table information (filter based on allowed_tables from exercise metadata)
     tables = schema_data.get("tables", [])
 
     for table in tables:
         table_name = table.get("name", "Unknown")
         row_count = table.get("row_count", 0)
 
-        # Skip the parent database table (data_jobs)
-        if table_name == "data_jobs":
+        # Filter tables based on allowed_tables list from exercise metadata
+        # If allowed_tables is provided, only include tables in that list
+        # This prevents students from seeing raw dataset tables
+        if allowed_tables is not None and table_name not in allowed_tables:
             continue
 
         markdown.append(f"### {table_name}")
@@ -161,6 +168,18 @@ def generate_practice_guide(week):
         # Load data schema
         schema_data = load_data_schema(f"data_{dataset_name}")
 
+        # Extract allowed tables from exercise metadata (schema_tables field)
+        # This ensures offline practice files only show the same tables as the web app
+        allowed_tables = exercise_key.get("metadata", {}).get("schema_tables", None)
+        if allowed_tables:
+            print(
+                f"📋 Filtering to {len(allowed_tables)} allowed tables: {allowed_tables}"
+            )
+        else:
+            print(
+                "⚠️  No schema_tables field found in exercise metadata - showing all tables"
+            )
+
         # Generate markdown content
         markdown_content = []
 
@@ -173,8 +192,8 @@ def generate_practice_guide(week):
         )
         markdown_content.append("")
 
-        # Data Dictionary
-        data_dict_md = generate_data_dictionary_markdown(schema_data)
+        # Data Dictionary (filtered by allowed_tables from exercise metadata)
+        data_dict_md = generate_data_dictionary_markdown(schema_data, allowed_tables)
         markdown_content.append(data_dict_md)
 
         markdown_content.append("---")

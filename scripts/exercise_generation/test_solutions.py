@@ -22,6 +22,63 @@ import pandas as pd
 from scripts.core.sql_helper import SQLHelper
 
 
+def validate_sql_solutions_use_allowed_tables(exercise_key):
+    """Validate that SQL solutions only use tables from schema_tables field"""
+    print("🔍 Validating SQL solutions use only allowed tables...")
+
+    validation_errors = []
+    metadata = exercise_key.get("metadata", {})
+    allowed_tables = metadata.get("schema_tables", [])
+
+    if not allowed_tables:
+        validation_errors.append(
+            "Cannot validate solution tables: schema_tables field missing"
+        )
+        return validation_errors
+
+    # Get database name to identify potential raw dataset tables
+    database_name = metadata.get("database", "").replace(".db", "")
+
+    # Common raw dataset table patterns that should not appear in solutions
+    raw_dataset_patterns = [
+        database_name.replace("data_", ""),  # e.g., "jobs" from "data_jobs"
+        database_name,  # e.g., "data_jobs"
+        f"{database_name.replace('data_', '')}_dataset",  # e.g., "jobs_dataset"
+        f"{database_name}_dataset",  # e.g., "data_jobs_dataset"
+        "movies_dataset",  # specific known raw table
+        "data_jobs",  # specific known raw table
+    ]
+
+    exercises = exercise_key.get("exercises", [])
+    for exercise in exercises:
+        exercise_id = exercise.get("id", "unknown")
+        solution = exercise.get("solution", "").lower()
+        title = exercise.get("title", "unknown")
+
+        # Check for raw dataset table usage
+        found_raw_tables = []
+        for pattern in raw_dataset_patterns:
+            if pattern and pattern.lower() in solution:
+                # More precise check: look for table name in FROM/JOIN clauses
+                import re
+
+                # Match pattern when it appears after FROM, JOIN, or as standalone table reference
+                pattern_regex = rf"\b{re.escape(pattern.lower())}\b"
+                if re.search(pattern_regex, solution):
+                    found_raw_tables.append(pattern)
+
+        if found_raw_tables:
+            validation_errors.append(
+                f"Exercise {exercise_id} ({title}): Solution uses raw dataset tables {found_raw_tables} - students cannot access these tables"
+            )
+
+        # Check that solution only uses allowed tables (basic validation)
+        # Extract table names from FROM/JOIN clauses would be more sophisticated
+        # For now, just warn if solution seems to use unexpected table names
+
+    return validation_errors
+
+
 def validate_exercise_metadata(exercise_key):
     """Validate exercise metadata structure and required fields"""
     print("🔍 Validating exercise metadata...")
@@ -47,6 +104,43 @@ def validate_exercise_metadata(exercise_key):
                 validation_errors.append(f"Missing required metadata field: '{field}'")
             elif not metadata[field] or str(metadata[field]).strip() == "":
                 validation_errors.append(f"Empty required metadata field: '{field}'")
+
+        # NEW: Validate schema_tables field (required for proper table filtering)
+        if "schema_tables" not in metadata:
+            validation_errors.append(
+                "Missing required metadata field: 'schema_tables' - this field is required to prevent students from accessing raw dataset tables (unless no JOIN operations are expected)"
+            )
+        elif not isinstance(metadata["schema_tables"], list):
+            validation_errors.append("'schema_tables' must be a list")
+        elif len(metadata["schema_tables"]) == 0:
+            validation_errors.append(
+                "'schema_tables' list cannot be empty - must specify which tables students should access"
+            )
+        else:
+            # Validate that raw dataset tables are excluded
+            schema_tables = metadata["schema_tables"]
+            database_name = metadata.get("database", "").replace(".db", "")
+
+            # Common raw dataset table patterns to detect and warn about
+            raw_dataset_patterns = [
+                database_name.replace("data_", ""),  # e.g., "jobs" from "data_jobs"
+                database_name,  # e.g., "data_jobs"
+                f"{database_name.replace('data_', '')}_dataset",  # e.g., "jobs_dataset"
+                f"{database_name}_dataset",  # e.g., "data_jobs_dataset"
+                "movies_dataset",  # specific known raw table
+                "data_jobs",  # specific known raw table
+            ]
+
+            found_raw_tables = []
+            for table in schema_tables:
+                for pattern in raw_dataset_patterns:
+                    if pattern and table.lower() == pattern.lower():
+                        found_raw_tables.append(table)
+
+            if found_raw_tables:
+                validation_errors.append(
+                    f"Raw dataset tables found in schema_tables (these should be excluded to force JOIN practice): {found_raw_tables}"
+                )
 
     # Check if exercises exist
     if "exercises" not in exercise_key:
@@ -129,7 +223,7 @@ def validate_exercise_metadata(exercise_key):
         if not schema_path.exists():
             validation_errors.append(f"Schema file not found: {schema_path}")
 
-    # Report validation results
+    # Print validation results
     if validation_errors:
         print("❌ Metadata validation failed:")
         for error in validation_errors:
@@ -327,6 +421,15 @@ def main():
     # Validate exercise metadata structure
     if not validate_exercise_metadata(exercise_key):
         print("❌ Metadata validation failed - cannot proceed with solution testing")
+        return
+
+    # Validate SQL solutions only use allowed tables
+    solution_table_errors = validate_sql_solutions_use_allowed_tables(exercise_key)
+    if solution_table_errors:
+        print("❌ Solution table validation failed:")
+        for error in solution_table_errors:
+            print(f"   • {error}")
+        print("Solutions must only use tables from the schema_tables field")
         return
 
     # Validate database exists
