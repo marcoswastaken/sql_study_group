@@ -5,7 +5,7 @@
 **Total Exercises:** 6
 **Focus Topics:** INNER JOIN, LEFT JOIN, Table aliases, Cross-table analysis, Business insights, Window functions (advanced)
 
-*Report generated on: 2025-07-14 07:28:31*
+*Report generated on: 2025-07-16 20:12:58*
 
 ---
 
@@ -44,26 +44,26 @@ LIMIT 30;
 
 | job_country | platform_name | platform_jobs_in_country |
 | --- | --- | --- |
-| Albania | via LinkedIn Albania | 54 |
-| Argentina | via LinkedIn | 30337 |
-| Argentina | via Indeed | 4413 |
-| Argentina | via BeBee | 2613 |
-| Argentina | via ZipRecruiter | 2115 |
-| Argentina | via Jobgether | 1547 |
-| Argentina | via Recruit.net | 1479 |
-| Argentina | via Trabajo.org - Vacantes De Empleo, Trabajo | 1187 |
-| Argentina | via Upwork | 995 |
-| Argentina | via hh.ru | 646 |
-| Argentina | via Snagajob | 624 |
-| Argentina | via Linkedin | 604 |
-| Argentina | via Startup Jobs | 562 |
-| Argentina | via JobTeaser | 399 |
+| Albania | via LinkedIn Albania | 40 |
+| Argentina | via LinkedIn | 30541 |
+| Argentina | via Indeed | 4408 |
+| Argentina | via BeBee | 2567 |
+| Argentina | via ZipRecruiter | 2094 |
+| Argentina | via Jobgether | 1524 |
+| Argentina | via Recruit.net | 1474 |
+| Argentina | via Trabajo.org - Vacantes De Empleo, Trabajo | 1157 |
+| Argentina | via Upwork | 1022 |
+| Argentina | via hh.ru | 629 |
+| Argentina | via Linkedin | 627 |
+| Argentina | via Snagajob | 620 |
+| Argentina | via Startup Jobs | 575 |
+| Argentina | via JobTeaser | 410 |
 | Argentina | via HelloWork | 398 |
-| Argentina | via Trabajo.org | 348 |
+| Argentina | via Trabajo.org | 363 |
+| Argentina | via Get.It | 345 |
 | Argentina | via Totaljobs | 344 |
-| Argentina | via Get.It | 332 |
-| Argentina | via Sercanto | 317 |
-| Argentina | via Dice | 314 |
+| Argentina | via Sercanto | 322 |
+| Argentina | via Dice | 302 |
 
 ---
 
@@ -96,7 +96,7 @@ LIMIT 15;
 ### Results
 
 ✅ **Query executed successfully**
-- **Execution time:** 0.028s
+- **Execution time:** 0.029s
 - **Rows returned:** 20
 - **Columns:** platform_name, platform_capacity, unique_companies, actual_jobs_posted, avg_jobs_per_company
 
@@ -104,26 +104,26 @@ LIMIT 15;
 
 | platform_name | platform_capacity | unique_companies | actual_jobs_posted | avg_jobs_per_company |
 | --- | --- | --- | --- | --- |
-| via LinkedIn | 186679 | 37996 | 139839 | 3.68 |
-| via BeBee | 103507 | 26626 | 77541 | 2.91 |
-| via Trabajo.org | 61562 | 18543 | 46264 | 2.49 |
-| via Indeed | 42756 | 16396 | 32035 | 1.95 |
-| via Recruit.net | 23646 | 7999 | 17835 | 2.23 |
-| via ZipRecruiter | 15533 | 4733 | 11629 | 2.46 |
-| via Jobs Trabajo.org | 10605 | 4692 | 7920 | 1.69 |
-| via Trabajo.org - Vacantes De Empleo, Trabajo | 8919 | 1787 | 6665 | 3.73 |
-| via BeBee India | 8642 | 2895 | 6483 | 2.24 |
-| via BeBee Singapore | 7985 | 2869 | 5873 | 2.05 |
-| via SimplyHired | 6632 | 3427 | 4941 | 1.44 |
-| via Jobrapido.com | 6202 | 2744 | 4709 | 1.72 |
-| via Sercanto | 5691 | 2538 | 4268 | 1.68 |
-| via The Muse | 5578 | 372 | 4167 | 11.20 |
-| via BeBee Portugal | 5493 | 1128 | 4115 | 3.65 |
-| via Ai-Jobs.net | 5373 | 1344 | 4059 | 3.02 |
-| via Adzuna | 5238 | 2289 | 3856 | 1.68 |
-| via Emplois Trabajo.org | 5099 | 2043 | 3816 | 1.87 |
-| via Dice | 4493 | 1221 | 3400 | 2.78 |
-| via BeBee Belgique | 4421 | 1296 | 3324 | 2.56 |
+| via LinkedIn | 186679 | 38014 | 139951 | 3.68 |
+| via BeBee | 103507 | 26651 | 77504 | 2.91 |
+| via Trabajo.org | 61562 | 18572 | 46277 | 2.49 |
+| via Recruit.net | 23646 | 8019 | 17730 | 2.21 |
+| via ZipRecruiter | 15533 | 4694 | 11600 | 2.47 |
+| via Jobs Trabajo.org | 10605 | 4739 | 7966 | 1.68 |
+| via Snagajob | 9355 | 1418 | 6993 | 4.93 |
+| via Trabajo.org - Vacantes De Empleo, Trabajo | 8919 | 1793 | 6606 | 3.68 |
+| via BeBee India | 8642 | 2895 | 6468 | 2.23 |
+| via BeBee Singapore | 7985 | 2920 | 6009 | 2.06 |
+| via SimplyHired | 6632 | 3457 | 5009 | 1.45 |
+| via Jobrapido.com | 6202 | 2730 | 4637 | 1.70 |
+| via Sercanto | 5691 | 2504 | 4221 | 1.69 |
+| via The Muse | 5578 | 378 | 4203 | 11.12 |
+| via BeBee Portugal | 5493 | 1114 | 4108 | 3.69 |
+| via Ai-Jobs.net | 5373 | 1334 | 4027 | 3.02 |
+| via Adzuna | 5238 | 2284 | 3947 | 1.73 |
+| via Emplois Trabajo.org | 5099 | 2050 | 3830 | 1.87 |
+| via BeBee Canada | 4668 | 1814 | 3477 | 1.92 |
+| via Dice | 4493 | 1248 | 3391 | 2.72 |
 
 ---
 
@@ -156,7 +156,7 @@ LIMIT 15;
 ### Results
 
 ✅ **Query executed successfully**
-- **Execution time:** 0.047s
+- **Execution time:** 0.018s
 - **Rows returned:** 20
 - **Columns:** job_country, data_scientist_positions, positions_with_salary, salary_data_percentage
 
@@ -164,26 +164,26 @@ LIMIT 15;
 
 | job_country | data_scientist_positions | positions_with_salary | salary_data_percentage |
 | --- | --- | --- | --- |
-| United States | 48006 | 3666 | 7.64 |
-| Sudan | 29440 | 2351 | 7.99 |
-| India | 17950 | 879 | 4.90 |
-| United Kingdom | 15883 | 874 | 5.50 |
-| France | 14550 | 851 | 5.85 |
-| Germany | 13953 | 850 | 6.09 |
-| Spain | 13239 | 838 | 6.33 |
-| Singapore | 12572 | 837 | 6.66 |
-| Netherlands | 12267 | 835 | 6.81 |
-| Italy | 12237 | 833 | 6.81 |
-| Portugal | 12011 | 839 | 6.99 |
-| South Africa | 11800 | 835 | 7.08 |
-| Mexico | 11515 | 844 | 7.33 |
-| Switzerland | 11350 | 834 | 7.35 |
-| Poland | 11288 | 847 | 7.50 |
-| Austria | 11185 | 828 | 7.40 |
-| Belgium | 11185 | 831 | 7.43 |
-| Chile | 11181 | 831 | 7.43 |
-| Ireland | 11129 | 832 | 7.48 |
-| Canada | 11028 | 853 | 7.73 |
+| United States | 47966 | 3667 | 7.64 |
+| Sudan | 29381 | 2334 | 7.94 |
+| India | 18026 | 877 | 4.87 |
+| United Kingdom | 15888 | 883 | 5.56 |
+| France | 14559 | 855 | 5.87 |
+| Germany | 14023 | 849 | 6.05 |
+| Spain | 13294 | 841 | 6.33 |
+| Singapore | 12629 | 844 | 6.68 |
+| Italy | 12276 | 831 | 6.77 |
+| Netherlands | 12258 | 838 | 6.84 |
+| Portugal | 12066 | 840 | 6.96 |
+| South Africa | 11817 | 839 | 7.10 |
+| Mexico | 11508 | 847 | 7.36 |
+| Switzerland | 11375 | 833 | 7.32 |
+| Poland | 11334 | 852 | 7.52 |
+| Chile | 11201 | 833 | 7.44 |
+| Austria | 11192 | 829 | 7.41 |
+| Belgium | 11160 | 832 | 7.46 |
+| Ireland | 11147 | 831 | 7.45 |
+| Canada | 11062 | 855 | 7.73 |
 
 ---
 
@@ -217,7 +217,7 @@ LIMIT 20;
 ### Results
 
 ✅ **Query executed successfully**
-- **Execution time:** 0.02s
+- **Execution time:** 0.015s
 - **Rows returned:** 20
 - **Columns:** platform_name, total_jobs, fulltime_jobs, contract_jobs, other_types, contract_percentage
 
@@ -225,26 +225,26 @@ LIMIT 20;
 
 | platform_name | total_jobs | fulltime_jobs | contract_jobs | other_types | contract_percentage |
 | --- | --- | --- | --- | --- | --- |
-| via LinkedIn | 135548 | 116025 | 12863 | 6660 | 9.49 |
-| via BeBee | 76052 | 70066 | 898 | 5088 | 1.18 |
-| via Trabajo.org | 46227 | 45547 | 1 | 679 | 0 |
-| via Indeed | 31597 | 28447 | 1283 | 1867 | 4.06 |
-| via Recruit.net | 17763 | 16274 | 1080 | 409 | 6.08 |
-| via ZipRecruiter | 11540 | 10372 | 628 | 540 | 5.44 |
-| via Jobs Trabajo.org | 7915 | 7542 | 0 | 373 | 0 |
-| via Trabajo.org - Vacantes De Empleo, Trabajo | 6664 | 6619 | 1 | 44 | 0.02 |
-| via BeBee India | 6467 | 6228 | 40 | 199 | 0.62 |
-| via BeBee Singapore | 5862 | 4491 | 983 | 388 | 16.77 |
-| via SimplyHired | 4894 | 4497 | 152 | 245 | 3.11 |
-| via Jobrapido.com | 4646 | 4336 | 85 | 225 | 1.83 |
-| via Sercanto | 4230 | 4117 | 26 | 87 | 0.61 |
-| via The Muse | 4152 | 3977 | 19 | 156 | 0.46 |
-| via BeBee Portugal | 4099 | 3959 | 32 | 108 | 0.78 |
-| via Ai-Jobs.net | 4048 | 3795 | 56 | 197 | 1.38 |
-| via Adzuna | 3855 | 3710 | 0 | 145 | 0 |
-| via Emplois Trabajo.org | 3811 | 3696 | 0 | 115 | 0 |
-| via Dice | 3400 | 1503 | 1759 | 138 | 51.74 |
-| via BeBee Belgique | 3234 | 3007 | 54 | 173 | 1.67 |
+| via LinkedIn | 135706 | 116039 | 12905 | 6762 | 9.51 |
+| via BeBee | 75968 | 70044 | 889 | 5035 | 1.17 |
+| via Trabajo.org | 46239 | 45557 | 1 | 681 | 0 |
+| via Recruit.net | 17657 | 16153 | 1076 | 428 | 6.09 |
+| via ZipRecruiter | 11514 | 10323 | 624 | 567 | 5.42 |
+| via Jobs Trabajo.org | 7962 | 7607 | 0 | 355 | 0 |
+| via Snagajob | 6993 | 5736 | 0 | 1257 | 0 |
+| via Trabajo.org - Vacantes De Empleo, Trabajo | 6606 | 6559 | 1 | 46 | 0.02 |
+| via BeBee India | 6455 | 6225 | 43 | 187 | 0.67 |
+| via BeBee Singapore | 5996 | 4639 | 965 | 392 | 16.09 |
+| via SimplyHired | 4963 | 4572 | 164 | 227 | 3.30 |
+| via Jobrapido.com | 4573 | 4256 | 88 | 229 | 1.92 |
+| via Sercanto | 4188 | 4062 | 29 | 97 | 0.69 |
+| via The Muse | 4186 | 4010 | 23 | 153 | 0.55 |
+| via BeBee Portugal | 4092 | 3943 | 31 | 118 | 0.76 |
+| via Ai-Jobs.net | 4015 | 3760 | 57 | 198 | 1.42 |
+| via Adzuna | 3947 | 3799 | 0 | 148 | 0 |
+| via Emplois Trabajo.org | 3824 | 3713 | 0 | 111 | 0 |
+| via BeBee Canada | 3402 | 3157 | 123 | 122 | 3.62 |
+| via Dice | 3391 | 1499 | 1742 | 150 | 51.37 |
 
 ---
 
@@ -262,14 +262,16 @@ Find companies that operate in many different places around the world. Use the `
 
 ```sql
 SELECT c.company_name,
-       COUNT(DISTINCT l.job_location) AS unique_locations,
+       COUNT(DISTINCT jp.job_location) AS unique_locations,
        COUNT(DISTINCT l.job_country) AS unique_countries,
        COUNT(jp.job_id) AS total_jobs
 FROM companies AS c
 INNER JOIN job_postings AS jp ON c.company_name = jp.company_name
 LEFT JOIN locations AS l ON jp.job_location = l.job_location
+WHERE jp.job_location NOT IN ('Remote', 'Anywhere', 'N/A', 'Various', 'Multiple Locations', 'Worldwide')
+  AND jp.job_location IS NOT NULL
 GROUP BY c.company_name
-HAVING COUNT(DISTINCT l.job_location) >= 10 AND COUNT(jp.job_id) >= 100
+HAVING COUNT(DISTINCT jp.job_location) >= 10 AND COUNT(jp.job_id) >= 100
 ORDER BY unique_locations DESC, unique_countries DESC
 LIMIT 20;
 ```
@@ -277,7 +279,7 @@ LIMIT 20;
 ### Results
 
 ✅ **Query executed successfully**
-- **Execution time:** 0.125s
+- **Execution time:** 0.057s
 - **Rows returned:** 20
 - **Columns:** company_name, unique_locations, unique_countries, total_jobs
 
@@ -285,26 +287,26 @@ LIMIT 20;
 
 | company_name | unique_locations | unique_countries | total_jobs |
 | --- | --- | --- | --- |
-| Dice | 215 | 73 | 81307 |
-| Randstad | 212 | 73 | 2133 |
-| Robert Half | 199 | 73 | 12881 |
-| Deloitte | 197 | 76 | 2325 |
-| Accenture | 191 | 75 | 3194 |
-| Michael Page | 190 | 74 | 4449 |
-| Capgemini | 183 | 74 | 3178 |
-| EY | 159 | 77 | 2244 |
-| SynergisticIT | 153 | 73 | 3532 |
-| Experis | 144 | 73 | 2375 |
-| IBM | 143 | 73 | 2240 |
-| Amazon | 142 | 77 | 2423 |
-| TEKsystems | 142 | 73 | 3523 |
-| PwC | 136 | 76 | 1867 |
-| Harnham | 126 | 73 | 24495 |
-| CGI | 125 | 73 | 3947 |
-| ClickJobs.io | 121 | 73 | 2732 |
-| Cognizant | 118 | 74 | 4137 |
-| Diverse Lynx | 117 | 73 | 1769 |
-| IQVIA | 113 | 76 | 2294 |
+| Robert Half | 336 | 18 | 1514 |
+| Insight Global | 326 | 6 | 1890 |
+| Guidehouse | 304 | 3 | 1607 |
+| SynergisticIT | 290 | 2 | 1541 |
+| Randstad | 289 | 35 | 1074 |
+| Dice | 288 | 6 | 1518 |
+| Michael Page | 278 | 38 | 1297 |
+| Capital One | 273 | 6 | 1948 |
+| Deloitte | 248 | 46 | 1633 |
+| Hays | 222 | 32 | 925 |
+| Citi | 218 | 29 | 2126 |
+| Accenture | 215 | 49 | 1298 |
+| Capgemini | 209 | 36 | 1210 |
+| EY | 201 | 51 | 848 |
+| Leidos | 200 | 14 | 957 |
+| Experis | 191 | 25 | 756 |
+| Flexjobs | 191 | 3 | 200 |
+| PwC | 180 | 41 | 636 |
+| Harnham | 173 | 12 | 1883 |
+| Walmart | 169 | 8 | 1930 |
 
 ---
 
@@ -316,7 +318,7 @@ LIMIT 20;
 
 ### Problem Statement
 
-This is an advanced exercise using window functions. Find which platform is the #1 leader in each country, then count how many countries each platform leads. First, create a ranking of platforms within each country based on job count. Then, select only the #1 platform per country and count how many countries each platform leads. Your result should show platform name (`platform_name`), number of countries led (`countries_led`), and market share percentage (`market_share_percentage`). Only include platforms with at least 10 jobs per country. Order by countries led (highest first) and limit to 15 rows.
+Find which platform is the #1 leader in each country, then count how many countries each platform leads. First, create a ranking of platforms within each country based on job count. Then, select only the #1 platform per country and count how many countries each platform leads. Your result should show platform name (`platform_name`), number of countries led (`countries_led`), and market share percentage (`market_share_percentage`). Only include platforms with at least 10 jobs per country. Order by countries led (highest first) and limit to 15 rows.
 
 ### SQL Solution
 
@@ -346,7 +348,7 @@ LIMIT 15;
 ### Results
 
 ✅ **Query executed successfully**
-- **Execution time:** 0.043s
+- **Execution time:** 0.042s
 - **Rows returned:** 20
 - **Columns:** platform_name, countries_led, market_share_percentage
 
@@ -354,25 +356,25 @@ LIMIT 15;
 
 | platform_name | countries_led | market_share_percentage |
 | --- | --- | --- |
-| via LinkedIn | 75 | 72.12 |
-| via Emplois Trabajo.org | 3 | 2.88 |
-| via Trabajo.org | 3 | 2.88 |
-| via Nexxt | 2 | 1.92 |
-| via Sercanto | 1 | 0.96 |
-| via LinkedIn Guatemala | 1 | 0.96 |
-| via LinkedIn Cambodia | 1 | 0.96 |
-| via LinkedIn Albania | 1 | 0.96 |
-| via BeBee Kenya | 1 | 0.96 |
-| via Great Zambia Jobs | 1 | 0.96 |
-| via LinkedIn Maurice | 1 | 0.96 |
-| via LinkedIn Ethiopia | 1 | 0.96 |
-| via BeBee الكويت | 1 | 0.96 |
-| via LinkedIn Macedonia | 1 | 0.96 |
-| via LinkedIn Nepal | 1 | 0.96 |
-| via LinkedIn Senegal | 1 | 0.96 |
-| via Intellijobs.ai | 1 | 0.96 |
-| via Whatjobs? Jobs In The Uganda | 1 | 0.96 |
-| via 242 Jobs | 1 | 0.96 |
-| via LinkedIn Azerbaijan | 1 | 0.96 |
+| via LinkedIn | 75 | 71.43 |
+| via Trabajo.org | 4 | 3.81 |
+| via Emplois Trabajo.org | 3 | 2.86 |
+| via Nexxt | 2 | 1.90 |
+| via Sercanto | 1 | 0.95 |
+| via LinkedIn Guatemala | 1 | 0.95 |
+| via LinkedIn Cambodia | 1 | 0.95 |
+| via WhatJobs | 1 | 0.95 |
+| via Great Zambia Jobs | 1 | 0.95 |
+| via LinkedIn Maurice | 1 | 0.95 |
+| via LinkedIn Albania | 1 | 0.95 |
+| via BeBee | 1 | 0.95 |
+| via LinkedIn Ethiopia | 1 | 0.95 |
+| via Intellijobs.ai | 1 | 0.95 |
+| via LinkedIn Senegal | 1 | 0.95 |
+| via BeBee Kenya | 1 | 0.95 |
+| via Rabota.md | 1 | 0.95 |
+| via LinkedIn Macedonia | 1 | 0.95 |
+| via LinkedIn Nepal | 1 | 0.95 |
+| via 242 Jobs | 1 | 0.95 |
 
 ---
