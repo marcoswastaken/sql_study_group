@@ -1,0 +1,331 @@
+{
+  "metadata": {
+    "title": "Week 5 Practice - Movies Dataset",
+    "description": "Advanced JOIN operations, subqueries, and Common Table Expressions (CTEs) using real-world movie data with ratings, languages, and temporal information",
+    "week": 5,
+    "total_exercises": 6,
+    "database": "data_movies_dataset.db",
+    "focus_topics": [
+      "RIGHT JOIN",
+      "FULL OUTER JOIN",
+      "SELF JOIN",
+      "Subqueries (scalar, WHERE, SELECT, FROM)",
+      "CTEs (WITH clause)",
+      "Advanced data analysis",
+      "Real-world data quality handling"
+    ],
+    "generated_date": "2025-01-15T14:30:00.000000",
+    "difficulty_levels": [
+      "Easy",
+      "Medium",
+      "Hard"
+    ],
+    "syllabus_topics": [
+      "RIGHT JOIN",
+      "FULL OUTER JOIN",
+      "SELF JOIN",
+      "Subqueries (scalar, in WHERE, SELECT, FROM)",
+      "Introduction to CTEs (WITH clause)"
+    ],
+    "learning_objectives": [
+      "Utilize different JOIN types",
+      "Implement SELF JOINs",
+      "Write subqueries",
+      "Start using CTEs for readability"
+    ],
+    "schema_tables": [
+      "decades",
+      "languages",
+      "movie_languages",
+      "movie_ratings",
+      "movies",
+      "ratings"
+    ],
+    "total_records": 39377,
+    "test_results": {
+      "total_exercises": 6,
+      "working_exercises": 6,
+      "failed_exercises": 0,
+      "success_rate": 100.0,
+      "total_execution_time": 1.586,
+      "average_execution_time": 0.264,
+      "test_date": "2025-07-15 15:47:06"
+    }
+  },
+  "exercises": [
+    {
+      "id": 1,
+      "title": "Languages Without Movies - RIGHT JOIN",
+      "statement": "Find all languages that don't have any movies in our database. This is a classic RIGHT JOIN scenario to find unmatched records. Show the language code and language name for languages that have zero movies. Order by language code.",
+      "solution": "SELECT l.language_code, l.language_name\nFROM movie_languages ml\nRIGHT JOIN languages l ON ml.language_id = l.language_id\nWHERE ml.language_id IS NULL\nORDER BY l.language_code;",
+      "topics": [
+        "RIGHT JOIN",
+        "IS NULL",
+        "Unmatched records",
+        "ORDER BY"
+      ],
+      "difficulty": "Easy",
+      "result": {
+        "working": true,
+        "execution_time": 0.005,
+        "row_count": 1,
+        "columns": [
+          "language_code",
+          "language_name"
+        ],
+        "sample_results": [
+          {
+            "language_code": "et",
+            "language_name": "Other Language"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 2,
+      "title": "Decade Popularity Comparison - SELF JOIN",
+      "statement": "Compare movies within the same decade to find popularity gaps. Use a SELF JOIN to find pairs of movies from the same decade where one movie has significantly higher popularity (at least 200 points higher) than another. Show both movie titles, their popularity scores, and the decade name. Limit to 10 results ordered by popularity difference.",
+      "solution": "SELECT \n    m1.title AS popular_movie,\n    m1.popularity AS popular_score,\n    m2.title AS less_popular_movie,\n    m2.popularity AS less_popular_score,\n    d.decade_name,\n    (m1.popularity - m2.popularity) AS popularity_gap\nFROM movies m1\nJOIN movies m2 ON m1.movie_id != m2.movie_id\nJOIN decades d ON TRY_CAST(SUBSTR(m1.release_date, 1, 4) AS INTEGER) >= d.decade_start \n    AND TRY_CAST(SUBSTR(m1.release_date, 1, 4) AS INTEGER) <= d.decade_end\nJOIN decades d2 ON TRY_CAST(SUBSTR(m2.release_date, 1, 4) AS INTEGER) >= d2.decade_start \n    AND TRY_CAST(SUBSTR(m2.release_date, 1, 4) AS INTEGER) <= d2.decade_end\nWHERE d.decade_name = d2.decade_name\n    AND m1.popularity > m2.popularity + 200\n    AND m1.popularity IS NOT NULL \n    AND m2.popularity IS NOT NULL\n    AND TRY_CAST(SUBSTR(m1.release_date, 1, 4) AS INTEGER) IS NOT NULL\n    AND TRY_CAST(SUBSTR(m2.release_date, 1, 4) AS INTEGER) IS NOT NULL\nORDER BY popularity_gap DESC\nLIMIT 10;",
+      "topics": [
+        "SELF JOIN",
+        "Date extraction",
+        "Multiple conditions",
+        "Calculated fields"
+      ],
+      "difficulty": "Medium",
+      "result": {
+        "working": true,
+        "execution_time": 1.546,
+        "row_count": 10,
+        "columns": [
+          "popular_movie",
+          "popular_score",
+          "less_popular_movie",
+          "less_popular_score",
+          "decade_name",
+          "popularity_gap"
+        ],
+        "sample_results": [
+          {
+            "popular_movie": "Spider-Man: No Way Home",
+            "popular_score": "5083.954",
+            "less_popular_movie": "The United States vs. Billie Holiday",
+            "less_popular_score": "13.354",
+            "decade_name": "2019.0s",
+            "popularity_gap": "5070.6"
+          },
+          {
+            "popular_movie": "Spider-Man: No Way Home",
+            "popular_score": "5083.954",
+            "less_popular_movie": "The United States vs. Billie Holiday",
+            "less_popular_score": "13.354",
+            "decade_name": "2018.0s",
+            "popularity_gap": "5070.6"
+          },
+          {
+            "popular_movie": "Spider-Man: No Way Home",
+            "popular_score": "5083.954",
+            "less_popular_movie": "The United States vs. Billie Holiday",
+            "less_popular_score": "13.354",
+            "decade_name": "2021.0s",
+            "popularity_gap": "5070.6"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 3,
+      "title": "Above Average Movies by Rating Category - Scalar Subquery",
+      "statement": "Find movies that have above-average popularity within their specific rating category (Excellent, Very Good, Good, etc.). Use a scalar subquery to calculate the average popularity for each rating category. Show movie title, popularity, rating category, and how much above the category average they are (as `above_average_by`). Order by the difference descending and limit to 15 results.",
+      "solution": "SELECT \n    m.title,\n    m.popularity,\n    r.rating_category,\n    ROUND(m.popularity - (\n        SELECT AVG(m2.popularity)\n        FROM movies m2\n        JOIN movie_ratings mr2 ON m2.movie_id = mr2.movie_id\n        JOIN ratings r2 ON mr2.rating_id = r2.rating_id\n        WHERE r2.rating_category = r.rating_category\n            AND m2.popularity IS NOT NULL\n    ), 2) AS above_average_by\nFROM movies m\nJOIN movie_ratings mr ON m.movie_id = mr.movie_id\nJOIN ratings r ON mr.rating_id = r.rating_id\nWHERE m.popularity > (\n    SELECT AVG(m2.popularity)\n    FROM movies m2\n    JOIN movie_ratings mr2 ON m2.movie_id = mr2.movie_id\n    JOIN ratings r2 ON mr2.rating_id = r2.rating_id\n    WHERE r2.rating_category = r.rating_category\n        AND m2.popularity IS NOT NULL\n)\nAND m.popularity IS NOT NULL\nORDER BY above_average_by DESC\nLIMIT 15;",
+      "topics": [
+        "Scalar subquery",
+        "Correlated subquery",
+        "AVG function",
+        "Multiple JOINs"
+      ],
+      "difficulty": "Medium",
+      "result": {
+        "working": true,
+        "execution_time": 0.01,
+        "row_count": 15,
+        "columns": [
+          "title",
+          "popularity",
+          "rating_category",
+          "above_average_by"
+        ],
+        "sample_results": [
+          {
+            "title": "Spider-Man: No Way Home",
+            "popularity": "5083.954",
+            "rating_category": "Excellent",
+            "above_average_by": "5007.5"
+          },
+          {
+            "title": "The Batman",
+            "popularity": "3827.658",
+            "rating_category": "Excellent",
+            "above_average_by": "3751.21"
+          },
+          {
+            "title": "No Exit",
+            "popularity": "2618.087",
+            "rating_category": "Good",
+            "above_average_by": "2580.86"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 4,
+      "title": "Most Popular Movie by Decade - Subquery in FROM",
+      "statement": "Create a decade summary showing the most popular movie from each decade. Use a subquery in the FROM clause to first find the maximum popularity per decade, then join back to get the movie details. Show decade name, movie title, and popularity score. Handle cases where multiple movies might tie for highest popularity by showing just one.",
+      "solution": "SELECT \n    decade_max.decade_name,\n    ANY_VALUE(m.title) AS most_popular_movie,\n    decade_max.max_popularity\nFROM (\n    SELECT \n        d.decade_name,\n        MAX(m.popularity) AS max_popularity\n    FROM decades d\n    JOIN movies m ON TRY_CAST(SUBSTR(m.release_date, 1, 4) AS INTEGER) >= d.decade_start \n        AND TRY_CAST(SUBSTR(m.release_date, 1, 4) AS INTEGER) <= d.decade_end\n    WHERE m.popularity IS NOT NULL\n        AND TRY_CAST(SUBSTR(m.release_date, 1, 4) AS INTEGER) IS NOT NULL\n    GROUP BY d.decade_name\n) AS decade_max\nJOIN movies m ON m.popularity = decade_max.max_popularity\nJOIN decades d ON TRY_CAST(SUBSTR(m.release_date, 1, 4) AS INTEGER) >= d.decade_start \n    AND TRY_CAST(SUBSTR(m.release_date, 1, 4) AS INTEGER) <= d.decade_end\n    AND d.decade_name = decade_max.decade_name\nWHERE TRY_CAST(SUBSTR(m.release_date, 1, 4) AS INTEGER) IS NOT NULL\nGROUP BY decade_max.decade_name, decade_max.max_popularity\nORDER BY decade_max.decade_name;",
+      "topics": [
+        "Subquery in FROM",
+        "MAX function",
+        "GROUP BY",
+        "Complex JOINs"
+      ],
+      "difficulty": "Hard",
+      "result": {
+        "working": true,
+        "execution_time": 0.013,
+        "row_count": 102,
+        "columns": [
+          "decade_name",
+          "most_popular_movie",
+          "max_popularity"
+        ],
+        "sample_results": [
+          {
+            "decade_name": "1902.0s",
+            "most_popular_movie": "A Trip to the Moon",
+            "max_popularity": "18.356"
+          },
+          {
+            "decade_name": "1920.0s",
+            "most_popular_movie": "Nosferatu",
+            "max_popularity": "28.638"
+          },
+          {
+            "decade_name": "1921.0s",
+            "most_popular_movie": "Nosferatu",
+            "max_popularity": "28.638"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 5,
+      "title": "Language Popularity Rankings - Multi-step CTE",
+      "statement": "Use Common Table Expressions to perform a multi-step language analysis. First CTE: calculate movie counts and average popularity by language. Second CTE: add rankings based on movie count and popularity. Final query: show languages with their statistics and tier classification (Top 25%, Upper 25%, etc.). Only include languages with at least 20 movies.",
+      "solution": "WITH language_stats AS (\n    SELECT \n        l.language_name,\n        COUNT(m.movie_id) AS movie_count,\n        ROUND(AVG(m.popularity), 2) AS avg_popularity,\n        ROUND(AVG(r.rating_score), 2) AS avg_rating\n    FROM languages l\n    JOIN movie_languages ml ON l.language_id = ml.language_id\n    JOIN movies m ON ml.movie_id = m.movie_id\n    LEFT JOIN movie_ratings mr ON m.movie_id = mr.movie_id\n    LEFT JOIN ratings r ON mr.rating_id = r.rating_id\n    WHERE m.popularity IS NOT NULL\n    GROUP BY l.language_name\n    HAVING COUNT(m.movie_id) >= 20\n),\nlanguage_rankings AS (\n    SELECT \n        language_name,\n        movie_count,\n        avg_popularity,\n        avg_rating,\n        ROW_NUMBER() OVER (ORDER BY movie_count DESC) AS count_rank,\n        ROW_NUMBER() OVER (ORDER BY avg_popularity DESC) AS popularity_rank,\n        NTILE(4) OVER (ORDER BY avg_popularity) AS popularity_quartile\n    FROM language_stats\n)\nSELECT \n    language_name,\n    movie_count,\n    avg_popularity,\n    avg_rating,\n    count_rank,\n    popularity_rank,\n    CASE popularity_quartile\n        WHEN 4 THEN 'Top 25%'\n        WHEN 3 THEN 'Upper 25%'\n        WHEN 2 THEN 'Lower 25%'\n        WHEN 1 THEN 'Bottom 25%'\n    END AS popularity_tier\nFROM language_rankings\nORDER BY count_rank;",
+      "topics": [
+        "CTE (WITH clause)",
+        "Window functions",
+        "ROW_NUMBER",
+        "NTILE",
+        "CASE WHEN",
+        "Multi-step analysis"
+      ],
+      "difficulty": "Hard",
+      "result": {
+        "working": true,
+        "execution_time": 0.007,
+        "row_count": 15,
+        "columns": [
+          "language_name",
+          "movie_count",
+          "avg_popularity",
+          "avg_rating",
+          "count_rank",
+          "popularity_rank",
+          "popularity_tier"
+        ],
+        "sample_results": [
+          {
+            "language_name": "English",
+            "movie_count": "8970",
+            "avg_popularity": "43.15",
+            "avg_rating": "6.37",
+            "count_rank": "1",
+            "popularity_rank": "3",
+            "popularity_tier": "Top 25%"
+          },
+          {
+            "language_name": "Japanese",
+            "movie_count": "679",
+            "avg_popularity": "39.54",
+            "avg_rating": "6.94",
+            "count_rank": "2",
+            "popularity_rank": "4",
+            "popularity_tier": "Upper 25%"
+          },
+          {
+            "language_name": "French",
+            "movie_count": "357",
+            "avg_popularity": "37.11",
+            "avg_rating": "6.39",
+            "count_rank": "3",
+            "popularity_rank": "7",
+            "popularity_tier": "Upper 25%"
+          }
+        ],
+        "error": null
+      }
+    },
+    {
+      "id": 6,
+      "title": "Comprehensive Data Quality Report - Advanced CTE",
+      "statement": "Create a comprehensive data quality analysis using multiple CTEs. Analyze missing data patterns, coverage statistics, and data completeness across different aspects of the movie database. The final result should be a single-row summary showing overall data health metrics and a quality grade.",
+      "solution": "WITH data_quality_metrics AS (\n    SELECT \n        COUNT(*) AS total_movies,\n        COUNT(CASE WHEN vote_count IS NULL THEN 1 END) AS missing_vote_count,\n        COUNT(CASE WHEN popularity IS NULL THEN 1 END) AS missing_popularity,\n        COUNT(CASE WHEN popularity > 1000 THEN 1 END) AS high_popularity_outliers,\n        ROUND(COUNT(CASE WHEN vote_count IS NOT NULL THEN 1 END) * 100.0 / COUNT(*), 2) AS vote_coverage_pct\n    FROM movies\n),\nlanguage_coverage AS (\n    SELECT \n        COUNT(DISTINCT m.movie_id) AS movies_with_language,\n        COUNT(DISTINCT l.language_id) AS unique_languages,\n        ROUND(COUNT(DISTINCT m.movie_id) * 100.0 / (SELECT COUNT(*) FROM movies), 2) AS language_coverage_pct\n    FROM movies m\n    JOIN movie_languages ml ON m.movie_id = ml.movie_id\n    JOIN languages l ON ml.language_id = l.language_id\n),\nrating_coverage AS (\n    SELECT \n        COUNT(DISTINCT m.movie_id) AS movies_with_ratings,\n        ROUND(COUNT(DISTINCT m.movie_id) * 100.0 / (SELECT COUNT(*) FROM movies), 2) AS rating_coverage_pct,\n        MIN(r.rating_score) AS min_rating,\n        MAX(r.rating_score) AS max_rating\n    FROM movies m\n    JOIN movie_ratings mr ON m.movie_id = mr.movie_id\n    JOIN ratings r ON mr.rating_id = r.rating_id\n)\nSELECT \n    'Data Quality Report' AS report_type,\n    dq.total_movies,\n    dq.missing_vote_count,\n    dq.missing_popularity,\n    dq.vote_coverage_pct,\n    lc.language_coverage_pct,\n    rc.rating_coverage_pct,\n    rc.min_rating,\n    rc.max_rating,\n    CASE \n        WHEN lc.language_coverage_pct >= 95 AND rc.rating_coverage_pct >= 95 AND dq.vote_coverage_pct >= 90 THEN 'A - Excellent'\n        WHEN lc.language_coverage_pct >= 85 AND rc.rating_coverage_pct >= 85 AND dq.vote_coverage_pct >= 75 THEN 'B - Good'\n        WHEN lc.language_coverage_pct >= 70 AND rc.rating_coverage_pct >= 70 AND dq.vote_coverage_pct >= 60 THEN 'C - Fair'\n        ELSE 'D - Needs Improvement'\n    END AS overall_data_quality_grade\nFROM data_quality_metrics dq\nCROSS JOIN language_coverage lc\nCROSS JOIN rating_coverage rc;",
+      "topics": [
+        "Advanced CTE",
+        "CROSS JOIN",
+        "Data quality analysis",
+        "Conditional aggregation",
+        "CASE WHEN",
+        "Complex business logic"
+      ],
+      "difficulty": "Hard",
+      "result": {
+        "working": true,
+        "execution_time": 0.005,
+        "row_count": 1,
+        "columns": [
+          "report_type",
+          "total_movies",
+          "missing_vote_count",
+          "missing_popularity",
+          "vote_coverage_pct",
+          "language_coverage_pct",
+          "rating_coverage_pct",
+          "min_rating",
+          "max_rating",
+          "overall_data_quality_grade"
+        ],
+        "sample_results": [
+          {
+            "report_type": "Data Quality Report",
+            "total_movies": "9337",
+            "missing_vote_count": "2",
+            "missing_popularity": "1",
+            "vote_coverage_pct": "99.98",
+            "language_coverage_pct": "99.99",
+            "rating_coverage_pct": "99.98",
+            "min_rating": "0.0",
+            "max_rating": "10.0",
+            "overall_data_quality_grade": "A - Excellent"
+          }
+        ],
+        "error": null
+      }
+    }
+  ]
+}

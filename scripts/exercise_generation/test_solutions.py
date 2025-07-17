@@ -335,15 +335,16 @@ def main():
         print(f"❌ Database not found: {db_path}")
         return
 
-    # Expected tables for data_jobs dataset
-    expected_tables = [
-        "companies",
-        "data_jobs",
-        "job_platforms",
-        "job_postings",
-        "locations",
-        "salary_ranges",
-    ]
+    # Load expected tables from schema file
+    schema_path = Path(f"../../schemas/data_schema_{args.dataset}.json")
+    if not schema_path.exists():
+        print(f"❌ Schema file not found: {schema_path}")
+        return
+
+    with open(schema_path) as f:
+        schema = json.load(f)
+
+    expected_tables = [table["name"] for table in schema["tables"]]
 
     # Validate database tables
     db_manager = SQLHelper(str(db_path))

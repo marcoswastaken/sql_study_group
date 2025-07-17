@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "database_name": "data_data_jobs.db",
+    "database_name": "data_jobs.db",
     "description": "Comprehensive data science job market database designed for SQL education, featuring real-world job postings with normalized tables for practicing JOIN operations, aggregate functions, and relational database concepts.",
     "total_tables": 6,
     "total_records": 1495466,

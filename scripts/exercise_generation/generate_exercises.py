@@ -2,13 +2,11 @@
 """
 Generic Exercise Generation Script
 
-Generates SQL exercises based on:
-- Week topics from syllabus schema
-- Table structure from data schema
-- Educational requirements for progressive difficulty
+Processes existing exercise JSON files to add metadata, validate structure,
+and enhance with syllabus and schema information.
 
 Usage:
-    python generate_exercises.py --week 4 --dataset data_jobs
+    python generate_exercises.py --exercise-file exercises/week_5/week_5_key.json --dataset movies-dataset
 """
 
 import argparse
@@ -19,14 +17,18 @@ from pathlib import Path
 
 def load_syllabus_schema():
     """Load syllabus schema to get week-specific topics"""
-    syllabus_path = Path("../asset_generation/syllabus_schema.json")
+    project_root = Path(__file__).parent.parent.parent
+    syllabus_path = (
+        project_root / "scripts" / "asset_generation" / "syllabus_schema.json"
+    )
     with open(syllabus_path) as f:
         return json.load(f)
 
 
 def load_data_schema(dataset):
     """Load data schema to understand table structure"""
-    schema_path = Path(f"../../schemas/data_schema_{dataset}.json")
+    project_root = Path(__file__).parent.parent.parent
+    schema_path = project_root / "schemas" / f"data_schema_{dataset}.json"
     with open(schema_path) as f:
         return json.load(f)
 
@@ -39,238 +41,208 @@ def get_week_info(syllabus, week_num):
     return None
 
 
-def generate_week_4_exercises(schema_info, week_info):
-    """Generate Week 4 specific exercises focusing on JOIN operations"""
-
-    exercises = []
-
-    # Exercise 1: Basic INNER JOIN - Companies and Job Postings
-    exercises.append(
-        {
-            "id": 1,
-            "title": "Company Job Postings",
-            "statement": "Find all Data Scientist job postings along with company names. Show the job title, company name, and posted date. Use INNER JOIN to only show jobs that have company information.",
-            "solution": """SELECT jp.job_title, c.company_name, jp.job_posted_date
-FROM job_postings AS jp
-INNER JOIN companies AS c ON jp.company_name = c.company_name
-WHERE jp.job_title_short = 'Data Scientist'
-ORDER BY jp.job_posted_date DESC
-LIMIT 10;""",
-            "topics": ["INNER JOIN", "Table aliases", "WHERE clause", "ORDER BY"],
-            "difficulty": "Easy",
-            "educational_focus": "Basic INNER JOIN syntax with table aliases",
-        }
-    )
-
-    # Exercise 2: LEFT JOIN - All companies with job counts
-    exercises.append(
-        {
-            "id": 2,
-            "title": "All Companies with Job Counts",
-            "statement": "List all companies and count how many job postings they have. Include companies even if they don't have any job postings in the job_postings table (show 0 for them). Use LEFT JOIN to ensure all companies are included.",
-            "solution": """SELECT c.company_name, COUNT(jp.job_id) AS job_count
-FROM companies AS c
-LEFT JOIN job_postings AS jp ON c.company_name = jp.company_name
-GROUP BY c.company_name
-ORDER BY job_count DESC
-LIMIT 20;""",
-            "topics": ["LEFT JOIN", "COUNT", "GROUP BY", "Table aliases"],
-            "difficulty": "Medium",
-            "educational_focus": "LEFT JOIN to include all records from left table, handling NULLs",
-        }
-    )
-
-    # Exercise 3: Platform Analysis with INNER JOIN
-    exercises.append(
-        {
-            "id": 3,
-            "title": "Platform Job Distribution",
-            "statement": "Show which job platforms are posting the most Data Engineer jobs. Include platform name and job count. Use INNER JOIN to connect job postings with platforms.",
-            "solution": """SELECT jpl.platform_name, COUNT(jp.job_id) AS job_count
-FROM job_platforms AS jpl
-INNER JOIN job_postings AS jp ON jpl.platform_name = jp.job_via
-WHERE jp.job_title_short = 'Data Engineer'
-GROUP BY jpl.platform_name
-ORDER BY job_count DESC
-LIMIT 10;""",
-            "topics": ["INNER JOIN", "COUNT", "GROUP BY", "WHERE clause"],
-            "difficulty": "Medium",
-            "educational_focus": "INNER JOIN with aggregation and filtering",
-        }
-    )
-
-    # Exercise 4: Geographic Analysis with LEFT JOIN
-    exercises.append(
-        {
-            "id": 4,
-            "title": "Jobs by Location",
-            "statement": "List all job postings with their location details. Show job title, location, and country. Use LEFT JOIN to include jobs even if location information is missing.",
-            "solution": """SELECT jp.job_title_short, jp.job_location, l.job_country
-FROM job_postings AS jp
-LEFT JOIN locations AS l ON jp.job_location = l.job_location
-WHERE jp.job_title_short IN ('Data Scientist', 'Data Engineer', 'Data Analyst')
-ORDER BY l.job_country, jp.job_location
-LIMIT 15;""",
-            "topics": ["LEFT JOIN", "WHERE IN", "ORDER BY", "Table aliases"],
-            "difficulty": "Medium",
-            "educational_focus": "LEFT JOIN with multiple column sorting and filtering",
-        }
-    )
-
-    # Exercise 5: Salary Range Analysis with conditional JOIN
-    exercises.append(
-        {
-            "id": 5,
-            "title": "Salary Range Classification",
-            "statement": "Classify Data Scientist jobs by salary ranges. Show job title, salary, and experience level. Use a conditional JOIN to match salaries with appropriate ranges.",
-            "solution": """SELECT jp.job_title, jp.salary_year_avg, sr.range_name, sr.experience_level
-FROM job_postings AS jp
-INNER JOIN salary_ranges AS sr ON jp.salary_year_avg BETWEEN sr.min_salary AND sr.max_salary
-WHERE jp.job_title_short = 'Data Scientist'
-  AND jp.salary_year_avg IS NOT NULL
-ORDER BY jp.salary_year_avg DESC
-LIMIT 10;""",
-            "topics": ["INNER JOIN", "BETWEEN", "IS NOT NULL", "Table aliases"],
-            "difficulty": "Hard",
-            "educational_focus": "Conditional JOIN using BETWEEN clause",
-        }
-    )
-
-    # Exercise 6: Multiple JOINs
-    exercises.append(
-        {
-            "id": 6,
-            "title": "Comprehensive Job Analysis",
-            "statement": "Create a comprehensive report showing job title, company name, location, country, and platform for Data Analyst positions. Use multiple JOINs to combine information from different tables.",
-            "solution": """SELECT jp.job_title, c.company_name, jp.job_location, l.job_country, jp.job_via
-FROM job_postings AS jp
-INNER JOIN companies AS c ON jp.company_name = c.company_name
-LEFT JOIN locations AS l ON jp.job_location = l.job_location
-WHERE jp.job_title_short = 'Data Analyst'
-  AND jp.job_location IS NOT NULL
-ORDER BY l.job_country, jp.job_location
-LIMIT 12;""",
-            "topics": ["Multiple JOINs", "INNER JOIN", "LEFT JOIN", "WHERE clause"],
-            "difficulty": "Hard",
-            "educational_focus": "Combining multiple JOIN types in a single query",
-        }
-    )
-
-    # Exercise 7: Foreign Key Relationships
-    exercises.append(
-        {
-            "id": 7,
-            "title": "Platform Performance Analysis",
-            "statement": "Compare platform performance by showing platform name, total jobs posted, and average jobs per platform. Use PRIMARY KEY and FOREIGN KEY concepts through JOINs.",
-            "solution": """SELECT jpl.platform_name, jpl.jobs_posted, COUNT(jp.job_id) AS actual_jobs
-FROM job_platforms AS jpl
-LEFT JOIN job_postings AS jp ON jpl.platform_name = jp.job_via
-GROUP BY jpl.platform_name, jpl.jobs_posted
-HAVING COUNT(jp.job_id) > 100
-ORDER BY actual_jobs DESC
-LIMIT 15;""",
-            "topics": ["LEFT JOIN", "GROUP BY", "HAVING", "COUNT"],
-            "difficulty": "Hard",
-            "educational_focus": "Understanding primary/foreign key relationships through JOINs",
-        }
-    )
-
-    # Exercise 8: Remote Work Analysis
-    exercises.append(
-        {
-            "id": 8,
-            "title": "Remote Work by Company",
-            "statement": "Analyze remote work opportunities by company. Show company name, total jobs, and count of remote jobs. Include companies even if they don't offer remote work.",
-            "solution": """SELECT c.company_name,
-       COUNT(jp.job_id) AS total_jobs,
-       COUNT(CASE WHEN jp.job_work_from_home = 'True' THEN 1 END) AS remote_jobs
-FROM companies AS c
-LEFT JOIN job_postings AS jp ON c.company_name = jp.company_name
-GROUP BY c.company_name
-HAVING COUNT(jp.job_id) > 5
-ORDER BY remote_jobs DESC
-LIMIT 10;""",
-            "topics": ["LEFT JOIN", "COUNT", "CASE WHEN", "GROUP BY", "HAVING"],
-            "difficulty": "Hard",
-            "educational_focus": "LEFT JOIN with conditional aggregation",
-        }
-    )
-
-    return exercises
+def load_exercise_file(exercise_file_path):
+    """Load existing exercise JSON file"""
+    with open(exercise_file_path) as f:
+        return json.load(f)
 
 
-def generate_exercise_key(dataset, week_num, exercises):
-    """Generate the complete exercise key structure"""
-    return {
-        "metadata": {
-            "title": f"Week {week_num} Practice - {dataset.replace('_', ' ').title()} Dataset",
-            "description": "JOIN operations on real-world data job postings",
-            "week": week_num,
-            "total_exercises": len(exercises),
-            "database": f"{dataset}.db",
-            "focus_topics": [
-                "INNER JOIN",
-                "LEFT JOIN",
-                "Table aliases",
-                "Primary/Foreign keys",
-            ],
-            "generated_date": datetime.now().isoformat(),
-            "difficulty_levels": ["Easy", "Medium", "Hard"],
-        },
-        "exercises": exercises,
+def enhance_exercise_metadata(exercise_key, week_info, schema_info, dataset):
+    """Enhance exercise metadata with syllabus and schema information"""
+
+    # Extract week number from metadata or week_info
+    week_num = exercise_key.get("metadata", {}).get("week") or week_info.get("number")
+
+    # Update metadata with enhanced information
+    enhanced_metadata = {
+        "title": f"Week {week_num} Practice - {dataset.replace('_', ' ').title()} Dataset",
+        "description": exercise_key.get("metadata", {}).get(
+            "description",
+            f"{week_info.get('title', 'SQL Practice')} using {dataset} dataset",
+        ),
+        "week": week_num,
+        "total_exercises": len(exercise_key.get("exercises", [])),
+        "database": f"{dataset}.db",
+        "focus_topics": week_info.get("core_concepts", []),
+        "generated_date": datetime.now().isoformat(),
+        "difficulty_levels": ["Easy", "Medium", "Hard"],
+        "syllabus_topics": week_info.get("core_concepts", []),
+        "learning_objectives": week_info.get("learning_objectives", []),
+        "schema_tables": [table["name"] for table in schema_info.get("tables", [])],
+        "total_records": schema_info.get("metadata", {}).get("total_records", 0),
     }
+
+    # Preserve any existing metadata fields
+    existing_metadata = exercise_key.get("metadata", {})
+    for key, value in existing_metadata.items():
+        if key not in enhanced_metadata and value:
+            enhanced_metadata[key] = value
+
+    exercise_key["metadata"] = enhanced_metadata
+    return exercise_key
+
+
+def validate_exercise_structure(exercise_key):
+    """Validate that exercise follows expected structure"""
+
+    required_fields = ["metadata", "exercises"]
+    missing_fields = [field for field in required_fields if field not in exercise_key]
+
+    if missing_fields:
+        print(f"❌ Missing required fields: {missing_fields}")
+        return False
+
+    # Validate metadata
+    metadata = exercise_key["metadata"]
+    required_metadata = ["title", "week", "database", "total_exercises"]
+    missing_metadata = [field for field in required_metadata if field not in metadata]
+
+    if missing_metadata:
+        print(f"❌ Missing required metadata fields: {missing_metadata}")
+        return False
+
+    # Validate exercises
+    exercises = exercise_key["exercises"]
+    if not exercises:
+        print("❌ No exercises found")
+        return False
+
+    for i, exercise in enumerate(exercises):
+        required_exercise_fields = [
+            "id",
+            "title",
+            "statement",
+            "solution",
+            "topics",
+            "difficulty",
+        ]
+        missing_exercise_fields = [
+            field for field in required_exercise_fields if field not in exercise
+        ]
+
+        if missing_exercise_fields:
+            print(
+                f"❌ Exercise {i+1} missing required fields: {missing_exercise_fields}"
+            )
+            return False
+
+    print("✅ Exercise structure validation passed")
+    print(f"📊 Found {len(exercises)} exercises")
+    return True
+
+
+def analyze_topic_coverage(exercise_key, week_info):
+    """Analyze how well exercises cover the week's topics"""
+
+    week_topics = set(week_info.get("core_concepts", []))
+    covered_topics = set()
+
+    for exercise in exercise_key.get("exercises", []):
+        for topic in exercise.get("topics", []):
+            covered_topics.add(topic)
+
+    # Find which week topics are covered (fuzzy matching)
+    covered_week_topics = set()
+    for week_topic in week_topics:
+        for covered_topic in covered_topics:
+            if (
+                week_topic.lower() in covered_topic.lower()
+                or covered_topic.lower() in week_topic.lower()
+            ):
+                covered_week_topics.add(week_topic)
+                break
+
+    missing_topics = week_topics - covered_week_topics
+
+    print("\n📚 Topic Coverage Analysis:")
+    print(
+        f"✅ Week {week_info.get('number')} topics covered: {len(covered_week_topics)}/{len(week_topics)}"
+    )
+    if covered_week_topics:
+        print(f"   Covered: {', '.join(sorted(covered_week_topics))}")
+    if missing_topics:
+        print(f"❌ Missing topics: {', '.join(sorted(missing_topics))}")
+
+    return len(covered_week_topics) / len(week_topics) if week_topics else 0
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate SQL exercises for a specific week"
+        description="Process and enhance SQL exercise files"
     )
-    parser.add_argument("--week", type=int, required=True, help="Week number (e.g., 4)")
     parser.add_argument(
-        "--dataset", type=str, required=True, help="Dataset name (e.g., data_jobs)"
+        "--exercise-file", required=True, help="Path to exercise JSON file"
     )
-    parser.add_argument("--output", type=str, help="Output file path (optional)")
+    parser.add_argument(
+        "--dataset", required=True, help="Dataset name (e.g., movies-dataset)"
+    )
+    parser.add_argument("--output", help="Output file path (optional)")
 
     args = parser.parse_args()
 
-    # Load schemas
+    # Load input files
+    print(f"📁 Loading exercise file: {args.exercise_file}")
+    exercise_key = load_exercise_file(args.exercise_file)
+
+    print("📚 Loading syllabus schema...")
     syllabus = load_syllabus_schema()
+
+    print(f"📊 Loading data schema for {args.dataset}...")
     schema_info = load_data_schema(args.dataset)
 
-    # Get week information
-    week_info = get_week_info(syllabus, args.week)
+    # Get week information from exercise metadata
+    week_num = exercise_key.get("metadata", {}).get("week")
+    if not week_num:
+        print("❌ No week number found in exercise metadata")
+        return
+
+    week_info = get_week_info(syllabus, week_num)
     if not week_info:
-        print(f"❌ Week {args.week} not found in syllabus")
+        print(f"❌ Week {week_num} not found in syllabus")
         return
 
-    print(f"📚 Generating exercises for Week {args.week}: {week_info['title']}")
-    print(f"🎯 Core concepts: {', '.join(week_info['core_concepts'])}")
+    print(f"🎯 Processing Week {week_num}: {week_info['title']}")
+    print(f"📋 Core concepts: {', '.join(week_info['core_concepts'])}")
 
-    # Generate exercises based on week
-    if args.week == 4:
-        exercises = generate_week_4_exercises(schema_info, week_info)
-    else:
-        print(f"❌ Exercise generation not implemented for Week {args.week}")
+    # Validate exercise structure
+    if not validate_exercise_structure(exercise_key):
+        print("❌ Exercise structure validation failed")
         return
 
-    # Generate complete exercise key
-    exercise_key = generate_exercise_key(args.dataset, args.week, exercises)
+    # Enhance metadata
+    exercise_key = enhance_exercise_metadata(
+        exercise_key, week_info, schema_info, args.dataset
+    )
+
+    # Analyze topic coverage
+    coverage_pct = analyze_topic_coverage(exercise_key, week_info)
 
     # Output file
     if args.output:
         output_path = Path(args.output)
     else:
-        output_path = Path(f"../../exercises/week_{args.week}_key.json")
+        input_path = Path(args.exercise_file)
+        output_path = input_path.parent / f"{input_path.stem}_enhanced.json"
 
-    # Write to file
+    # Write enhanced file
     with open(output_path, "w") as f:
         json.dump(exercise_key, f, indent=2)
 
-    print(f"✅ Generated {len(exercises)} exercises")
-    print(f"📁 Output: {output_path}")
-    print(
-        f"🎯 Topics covered: {', '.join({topic for ex in exercises for topic in ex['topics']})}"
-    )
+    print("\n✅ Exercise processing completed!")
+    print(f"📁 Enhanced file: {output_path}")
+    print(f"📊 Topic coverage: {coverage_pct:.1%}")
+    print(f"🎯 Total exercises: {len(exercise_key['exercises'])}")
+
+    # Summary
+    difficulties = {}
+    all_topics = set()
+    for exercise in exercise_key["exercises"]:
+        diff = exercise.get("difficulty", "Unknown")
+        difficulties[diff] = difficulties.get(diff, 0) + 1
+        all_topics.update(exercise.get("topics", []))
+
+    print(f"📈 Difficulty distribution: {dict(difficulties)}")
+    print(f"🏷️  Unique topics covered: {len(all_topics)}")
 
 
 if __name__ == "__main__":

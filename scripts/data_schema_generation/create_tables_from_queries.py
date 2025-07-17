@@ -54,6 +54,9 @@ def execute_table_creation(dataset_name, verbose=True, force_recreate=False):
     else:
         db_name = dataset_name
 
+    # Convert dashes to underscores for consistency (e.g., "movies-dataset" -> "movies_dataset")
+    db_name = db_name.replace("-", "_")
+
     # Ensure db_name starts with 'data_' if it doesn't already
     if not db_name.startswith("data_"):
         db_name = f"data_{db_name}"
@@ -161,10 +164,17 @@ def main():
         "--dataset", required=True, help="Dataset name (e.g., jobs, movies)"
     )
     parser.add_argument("--quiet", action="store_true", help="Suppress verbose output")
+    parser.add_argument(
+        "--force-recreate",
+        action="store_true",
+        help="Drop existing tables before creating new ones",
+    )
 
     args = parser.parse_args()
 
-    success = execute_table_creation(args.dataset, verbose=not args.quiet)
+    success = execute_table_creation(
+        args.dataset, verbose=not args.quiet, force_recreate=args.force_recreate
+    )
 
     if success:
         print(f"\n🎉 All tables created successfully for {args.dataset}!")

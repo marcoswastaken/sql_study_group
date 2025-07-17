@@ -686,8 +686,11 @@ def main():
 
     # Create database if requested
     if args.create_database:
-        dataset_name = args.dataset.split("/")[-1]
-        db_path = f"../../datasets/{dataset_name}.db"
+        dataset_name = args.dataset.split("/")[-1].replace("-", "_")
+        # Use absolute path relative to project root, not current working directory
+        # Follow naming convention: data_{dataset_name}.db (with underscores)
+        project_root = Path(__file__).parent.parent.parent
+        db_path = str(project_root / "datasets" / f"data_{dataset_name}.db")
         if not explorer.create_database(db_path):
             sys.exit(1)
 

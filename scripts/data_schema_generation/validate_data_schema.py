@@ -212,8 +212,14 @@ def validate_educational_context(data):
 
     # Check metadata educational fields
     metadata = data.get("metadata", {})
-    if metadata.get("target_week") != 4:
-        print("❌ Target week should be 4 for this dataset")
+    target_week = metadata.get("target_week")
+    if (
+        not target_week
+        or not isinstance(target_week, int)
+        or target_week < 1
+        or target_week > 8
+    ):
+        print(f"❌ Target week should be a valid week number (1-8), got: {target_week}")
         return False
 
     if "JOIN" not in str(metadata.get("core_concepts", [])):
@@ -296,8 +302,11 @@ def validate_data_schema(dataset_name):
     """Main validation function."""
     print(f"🔍 Validating data schema for dataset: {dataset_name}")
 
-    # Construct file path
-    schema_file = f"../../schemas/data_schema_{dataset_name}.json"
+    # Construct file path using absolute path
+    from pathlib import Path
+
+    project_root = Path(__file__).parent.parent.parent
+    schema_file = str(project_root / "schemas" / f"data_schema_{dataset_name}.json")
 
     # Load and validate JSON structure
     data = validate_json_structure(schema_file)

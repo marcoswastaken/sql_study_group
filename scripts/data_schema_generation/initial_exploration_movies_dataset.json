@@ -1,0 +1,298 @@
+{
+  "metadata": {
+    "dataset_name": "movies-dataset",
+    "hf_source": "Pablinho/movies-dataset",
+    "split": "train",
+    "total_records": 9837,
+    "total_columns": 9,
+    "memory_usage_mb": 8.03,
+    "analysis_date": "2025-07-15T12:36:14.184236",
+    "column_names": [
+      "Release_Date",
+      "Title",
+      "Overview",
+      "Popularity",
+      "Vote_Count",
+      "Vote_Average",
+      "Original_Language",
+      "Genre",
+      "Poster_Url"
+    ]
+  },
+  "columns": [
+    {
+      "name": "Release_Date",
+      "data_type": "object",
+      "pandas_type": "text",
+      "null_count": 0,
+      "null_percentage": 0.0,
+      "unique_count": 5903,
+      "unique_percentage": 60.01,
+      "sample_values": [
+        "1978-01-08",
+        "2005-07-22",
+        "2008-07-12",
+        "2019-02-20",
+        "2018-10-13"
+      ],
+      "statistics": {
+        "count": 9837,
+        "memory_usage_mb": 0.554
+      }
+    },
+    {
+      "name": "Title",
+      "data_type": "object",
+      "pandas_type": "text",
+      "null_count": 9,
+      "null_percentage": 0.09,
+      "unique_count": 9514,
+      "unique_percentage": 96.72,
+      "sample_values": [
+        "John Wick: Chapter 2",
+        "Ocean Waves",
+        "Radio Silence",
+        "Captain Underpants: The First Epic Movie",
+        "Junglee"
+      ],
+      "statistics": {
+        "count": 9828,
+        "memory_usage_mb": 0.629
+      }
+    },
+    {
+      "name": "Overview",
+      "data_type": "object",
+      "pandas_type": "text",
+      "null_count": 9,
+      "null_percentage": 0.09,
+      "unique_count": 9823,
+      "unique_percentage": 99.86,
+      "sample_values": [
+        "A journey through the psyche of a young ballerina ...",
+        "Thirty years after the events of the first film, a...",
+        "Separated from his daughter, a father with an inte...",
+        "An Oscar-winning writer in a slump leaves Hollywoo...",
+        "The early Middle Ages. A time of heavy swords and ..."
+      ],
+      "statistics": {
+        "count": 9828,
+        "memory_usage_mb": 4.061
+      }
+    },
+    {
+      "name": "Popularity",
+      "data_type": "float64",
+      "pandas_type": "numeric",
+      "null_count": 10,
+      "null_percentage": 0.1,
+      "unique_count": 8160,
+      "unique_percentage": 82.95,
+      "sample_values": [
+        "15.349",
+        "16.481",
+        "73.522",
+        "42.394",
+        "14.201"
+      ],
+      "statistics": {
+        "count": 9827,
+        "memory_usage_mb": 0.075,
+        "mean": 40.320671720769305,
+        "std": 108.87567312070105,
+        "min": 7.1,
+        "max": 5083.954,
+        "median": 21.191
+      },
+      "is_integer": false,
+      "has_negatives": false,
+      "has_zeros": false,
+      "potential_id_field": false
+    },
+    {
+      "name": "Vote_Count",
+      "data_type": "object",
+      "pandas_type": "text",
+      "null_count": 10,
+      "null_percentage": 0.1,
+      "unique_count": 3267,
+      "unique_percentage": 33.21,
+      "sample_values": [
+        "6085",
+        "1",
+        "2094",
+        "4824",
+        "2687"
+      ],
+      "statistics": {
+        "count": 9827,
+        "memory_usage_mb": 0.489
+      }
+    },
+    {
+      "name": "Vote_Average",
+      "data_type": "object",
+      "pandas_type": "categorical",
+      "null_count": 10,
+      "null_percentage": 0.1,
+      "unique_count": 75,
+      "unique_percentage": 0.76,
+      "sample_values": [
+        "6.4",
+        "6.3",
+        "6.5",
+        "6.8",
+        "6.7"
+      ],
+      "statistics": {
+        "count": 9827,
+        "memory_usage_mb": 0.488
+      },
+      "top_values": {
+        "6.4": 435,
+        "6.3": 429,
+        "6.5": 427,
+        "6.8": 423,
+        "6.7": 420,
+        "6.6": 414,
+        "7.1": 389,
+        "6.2": 388,
+        "7.0": 387,
+        "6.9": 378
+      },
+      "category_count": 75,
+      "potential_foreign_key": true
+    },
+    {
+      "name": "Original_Language",
+      "data_type": "object",
+      "pandas_type": "categorical",
+      "null_count": 10,
+      "null_percentage": 0.1,
+      "unique_count": 44,
+      "unique_percentage": 0.45,
+      "sample_values": [
+        "en",
+        "ja",
+        "es",
+        "fr",
+        "ko"
+      ],
+      "statistics": {
+        "count": 9827,
+        "memory_usage_mb": 0.478
+      },
+      "top_values": {
+        "en": 7569,
+        "ja": 645,
+        "es": 339,
+        "fr": 292,
+        "ko": 170,
+        "zh": 129,
+        "it": 123,
+        "cn": 109,
+        "ru": 83,
+        "de": 82
+      },
+      "category_count": 44,
+      "potential_foreign_key": true
+    },
+    {
+      "name": "Genre",
+      "data_type": "object",
+      "pandas_type": "text",
+      "null_count": 11,
+      "null_percentage": 0.11,
+      "unique_count": 2337,
+      "unique_percentage": 23.76,
+      "sample_values": [
+        "Mystery, Drama, Thriller, Crime",
+        "Action, Science Fiction, Animation, Adventure",
+        "Comedy, Action, Mystery",
+        "Thriller, Drama, Fantasy, Horror",
+        "Horror, Mystery, Crime, Thriller"
+      ],
+      "statistics": {
+        "count": 9826,
+        "memory_usage_mb": 0.662
+      }
+    },
+    {
+      "name": "Poster_Url",
+      "data_type": "object",
+      "pandas_type": "text",
+      "null_count": 11,
+      "null_percentage": 0.11,
+      "unique_count": 9826,
+      "unique_percentage": 99.89,
+      "sample_values": [
+        "https://image.tmdb.org/t/p/original/rXPxSAYf3FdQkt...",
+        "https://image.tmdb.org/t/p/original/xaG10x1C8dCHkN...",
+        "https://image.tmdb.org/t/p/original/fKBeM6vjMD79G3...",
+        "https://image.tmdb.org/t/p/original/mVcKV76XSxxJCs...",
+        "https://image.tmdb.org/t/p/original/69HNOB21IINYXU..."
+      ],
+      "statistics": {
+        "count": 9826,
+        "memory_usage_mb": 1.087
+      }
+    }
+  ],
+  "data_quality": {
+    "total_records": 9837,
+    "duplicate_records": 0,
+    "duplicate_percentage": 0.0,
+    "completeness_score": 99.91,
+    "completeness_by_column": {
+      "Release_Date": 100.0,
+      "Title": 99.91,
+      "Overview": 99.91,
+      "Popularity": 99.9,
+      "Vote_Count": 99.9,
+      "Vote_Average": 99.9,
+      "Original_Language": 99.9,
+      "Genre": 99.89,
+      "Poster_Url": 99.89
+    },
+    "potential_issues": []
+  },
+  "relationships": {
+    "potential_primary_keys": [],
+    "normalization_opportunities": [
+      {
+        "column": "Vote_Average",
+        "suggested_table": "voteaverage_table",
+        "unique_values": 75,
+        "foreign_key_potential": "high"
+      },
+      {
+        "column": "Original_Language",
+        "suggested_table": "originallanguage_table",
+        "unique_values": 44,
+        "foreign_key_potential": "high"
+      }
+    ],
+    "total_categorical_columns": 2,
+    "suggested_fact_table": "main_table"
+  },
+  "educational_assessment": {
+    "sql_suitability_score": 5.0,
+    "complexity_level": "intermediate",
+    "recommended_topics": [
+      "INNER JOIN",
+      "LEFT JOIN",
+      "GROUP BY",
+      "Aggregation functions",
+      "Mathematical operations"
+    ],
+    "column_type_distribution": {
+      "text": 6,
+      "numeric": 1,
+      "categorical": 2
+    },
+    "strengths": [],
+    "limitations": [
+      "High missing data rates may complicate analysis"
+    ]
+  }
+}

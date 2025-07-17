@@ -105,6 +105,12 @@ See `SQL_CURRICULUM_PROCESS.md` for the complete development methodology and how
 
 ---
 
-**Primary Dataset:** [Luke Barousse's Data Jobs](https://huggingface.co/datasets/lukebarousse/data_jobs) - 785K real job postings from 2023
+## Dataset Sources
+
+We use real-world datasets for authentic learning experiences:
+
+**Week 4 (JOINs):** [Luke Barousse's Data Jobs](https://huggingface.co/datasets/lukebarousse/data_jobs) - 785K real job postings from 2023
+
+**Week 5 (Advanced JOINs/Subqueries):** [Pablinho's Movies Dataset](https://huggingface.co/datasets/Pablinho/movies-dataset) - 9.8K movies with ratings, languages, and metadata (CC0 1.0 license)
 
 Ready to start? Run `python setup.py` and begin practicing! 🚀

@@ -116,7 +116,7 @@ Instructor specifies:
 **Command:**
 
 ```bash
-python scripts/core/explore_dataset.py --dataset lukebarousse/data_jobs --output initial_exploration_data_jobs.json
+python scripts/core/explore_dataset.py --dataset lukebarousse/data_jobs
 ```
 
 **Process:**
@@ -124,8 +124,10 @@ python scripts/core/explore_dataset.py --dataset lukebarousse/data_jobs --output
 1. Load dataset from HuggingFace
 2. Generate comprehensive analysis (metadata, column types, data quality)
 3. Identify potential relationships and normalization opportunities
-4. Output detailed dataset summary to `scripts/data_schema_generation/initial_exploration_[dataset].json` (always relative to project root)
-5. Create normalized database as `datasets/[dataset].db` automatically
+4. Auto-saves to `scripts/data_schema_generation/initial_exploration_[dataset].json` (script handles path)
+5. Create normalized database as `datasets/data_[dataset].db` automatically using `--create-database` flag
+   - Uses absolute project-relative paths for consistent placement
+   - Converts dashes to underscores in dataset names (e.g., "movies-dataset" → "data_movies_dataset.db")
    - Single download for both analysis and database creation
    - Required for Step 5 validation and Step 7 table creation
 
@@ -275,7 +277,8 @@ sql_study_group/
 ├── app.py                              # Flask web application for practice
 ├── syllabus.md                         # Generated syllabus from schema
 ├── datasets/
-│   └── data_jobs.db                    # Job market dataset (auto-generated)
+│   ├── data_jobs.db                    # Job market dataset (auto-generated)
+│   └── data_movies_dataset.db          # Movies dataset (auto-generated)
 ├── schemas/
 │   └── data_schema_data_jobs.json      # Schema documentation for data_jobs dataset
 ├── exercises/

@@ -1,0 +1,572 @@
+{
+  "metadata": {
+    "database_name": "data_movies-dataset.db",
+    "description": "Comprehensive movie database designed for Week 5 advanced SQL curriculum, featuring 9,300+ movies with ratings, languages, and temporal data. Demonstrates real-world data quality challenges while providing rich opportunities for advanced JOIN operations, subqueries, and Common Table Expressions (CTEs). The normalized structure enables students to practice RIGHT JOINs (languages without movies), SELF JOINs (decade-based analysis), and complex filtering scenarios through subqueries.",
+    "total_tables": 7,
+    "total_records": 39377,
+    "source": "Pablinho's Movies Dataset (Hugging Face) - A curated collection of 9,800+ movies with metadata including titles, release dates, ratings, popularity scores, and language information. Licensed under CC0 1.0 (Public Domain).",
+    "generation_date": "2025-07-15",
+    "use_cases": [
+      "Advanced JOIN operations: RIGHT JOIN to find languages without movies, SELF JOIN for temporal decade analysis",
+      "Complex subqueries: Movies above average popularity within rating categories, filtering by decade and language",
+      "Common Table Expressions (CTEs): Multi-step analysis combining popularity, ratings, and temporal data",
+      "Data quality handling: Working with real-world messy data including invalid ratings, missing values, and format inconsistencies",
+      "Business intelligence scenarios: Movie recommendation analysis, language distribution studies, rating trend analysis over decades"
+    ],
+    "target_week": 5,
+    "core_concepts": [
+      "RIGHT JOIN",
+      "FULL OUTER JOIN",
+      "SELF JOIN",
+      "Subqueries (scalar, WHERE, SELECT, FROM)",
+      "CTEs (WITH clause)"
+    ],
+    "educational_focus": "Advanced JOINs, Subqueries, and CTEs with real-world messy data",
+    "complexity_level": "Intermediate to Advanced"
+  },
+  "tables": [
+    {
+      "id": 1,
+      "name": "decades",
+      "description": "Reference table containing distinct decade periods extracted from movie release dates. Enables temporal analysis and SELF JOIN exercises for comparing movies across different time periods. Handles data quality issues by filtering invalid date formats and extracting decade boundaries (e.g., 2010-2019 for the 2010s).",
+      "creation_query": "SELECT SETSEED(0.42); CREATE TABLE decades AS SELECT ROW_NUMBER() OVER (ORDER BY decade_start) as decade_id, decade_start, decade_end, CAST(decade_start as VARCHAR) || 's' as decade_name FROM (SELECT DISTINCT (CAST(SUBSTR(Release_Date, 1, 4) as INTEGER) / 10) * 10 as decade_start, (CAST(SUBSTR(Release_Date, 1, 4) as INTEGER) / 10) * 10 + 9 as decade_end FROM movies_dataset WHERE Release_Date IS NOT NULL AND LENGTH(Release_Date) >= 4 AND Release_Date ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$') ORDER BY decade_start",
+      "row_count": 102,
+      "columns": [
+        {
+          "name": "decade_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "References decades.decade_id",
+          "description": "Unique identifier for each decade period, used for SELF JOIN exercises and temporal analysis"
+        },
+        {
+          "name": "decade_start",
+          "type": "DOUBLE",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Starting year of the decade (e.g., 2010 for the 2010s), extracted from movie release dates"
+        },
+        {
+          "name": "decade_end",
+          "type": "DOUBLE",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Ending year of the decade (e.g., 2019 for the 2010s), calculated as decade_start + 9"
+        },
+        {
+          "name": "decade_name",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Human-readable decade label (e.g., '2010s', '1990s') for display purposes and easier filtering"
+        }
+      ],
+      "sample_data": [
+        {
+          "decade_id": 1,
+          "decade_start": 1910.0,
+          "decade_end": 1919.0,
+          "decade_name": "1910s"
+        },
+        {
+          "decade_id": 2,
+          "decade_start": 1920.0,
+          "decade_end": 1929.0,
+          "decade_name": "1920s"
+        },
+        {
+          "decade_id": 3,
+          "decade_start": 1930.0,
+          "decade_end": 1939.0,
+          "decade_name": "1930s"
+        }
+      ],
+      "educational_purpose": "Practice SELF JOIN operations to compare movies within and across decades, temporal analysis queries, and data extraction techniques for handling date formats"
+    },
+    {
+      "id": 2,
+      "name": "languages",
+      "description": "Language reference table containing all unique languages found in the movie dataset, plus additional language entries to enable RIGHT JOIN exercises. Maps language codes (ISO-like) to human-readable language names, providing opportunities to find languages with zero movies.",
+      "creation_query": "SELECT SETSEED(0.42); CREATE TABLE languages AS SELECT ROW_NUMBER() OVER (ORDER BY language_code) as language_id, language_code, CASE language_code WHEN 'en' THEN 'English' WHEN 'ja' THEN 'Japanese' WHEN 'es' THEN 'Spanish' WHEN 'fr' THEN 'French' WHEN 'ko' THEN 'Korean' WHEN 'zh' THEN 'Chinese' WHEN 'it' THEN 'Italian' WHEN 'cn' THEN 'Mandarin' WHEN 'ru' THEN 'Russian' WHEN 'de' THEN 'German' WHEN 'hi' THEN 'Hindi' WHEN 'pt' THEN 'Portuguese' WHEN 'ar' THEN 'Arabic' WHEN 'th' THEN 'Thai' WHEN 'sv' THEN 'Swedish' ELSE 'Other Language' END as language_name FROM (SELECT DISTINCT Original_Language as language_code FROM movies_dataset WHERE Original_Language IS NOT NULL) ORDER BY language_code",
+      "row_count": 44,
+      "columns": [
+        {
+          "name": "language_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "References languages.language_id",
+          "description": "Unique identifier for each language, used as foreign key in movie_languages junction table"
+        },
+        {
+          "name": "language_code",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "ISO-like language code (e.g., 'en', 'fr', 'ja') from the original dataset, used for mapping to movies"
+        },
+        {
+          "name": "language_name",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Human-readable language name (e.g., 'English', 'French', 'Japanese') with CASE logic for major languages, 'Other Language' for unmapped codes"
+        }
+      ],
+      "sample_data": [
+        {
+          "language_id": 1,
+          "language_code": "ar",
+          "language_name": "Arabic"
+        },
+        {
+          "language_id": 2,
+          "language_code": "bn",
+          "language_name": "Other Language"
+        },
+        {
+          "language_id": 3,
+          "language_code": "ca",
+          "language_name": "Other Language"
+        }
+      ],
+      "educational_purpose": "Enable RIGHT JOIN exercises to find languages with zero movies, demonstrate foreign key relationships, and practice language-based filtering and analysis"
+    },
+    {
+      "id": 3,
+      "name": "movie_languages",
+      "description": "Junction table linking movies to their respective languages. Enables many-to-many relationships and practice RIGHT JOINs (e.g., find movies without a language).",
+      "creation_query": "SELECT SETSEED(0.42); CREATE TABLE movie_languages AS SELECT m.movie_id, l.language_id FROM movies m INNER JOIN movies_dataset orig ON m.title = orig.Title INNER JOIN languages l ON orig.Original_Language = l.language_code WHERE orig.Original_Language IS NOT NULL",
+      "row_count": 9992,
+      "columns": [
+        {
+          "name": "movie_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "References movies.movie_id",
+          "description": "Unique identifier for each movie, used as foreign key in movie_ratings junction table"
+        },
+        {
+          "name": "language_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "References languages.language_id",
+          "description": "Unique identifier for each language, used as foreign key in movie_languages junction table"
+        }
+      ],
+      "sample_data": [
+        {
+          "movie_id": 396,
+          "language_id": 15
+        },
+        {
+          "movie_id": 5001,
+          "language_id": 9
+        },
+        {
+          "movie_id": 8273,
+          "language_id": 9
+        }
+      ],
+      "educational_purpose": "Practice RIGHT JOINs to find movies without a language, demonstrate many-to-many relationships, and practice foreign key relationships"
+    },
+    {
+      "id": 4,
+      "name": "movie_ratings",
+      "description": "Junction table linking movies to their respective ratings. Enables many-to-many relationships and practice RIGHT JOINs (e.g., find movies without a rating).",
+      "creation_query": "SELECT SETSEED(0.42); CREATE TABLE movie_ratings AS SELECT m.movie_id, r.rating_id FROM movies m INNER JOIN movies_dataset raw ON m.title = raw.Title INNER JOIN ratings r ON CAST(raw.Vote_Average as DECIMAL(3,1)) = r.rating_score WHERE raw.Vote_Average IS NOT NULL AND raw.Vote_Average != '' AND raw.Vote_Average ~ '^[0-9]+(\\.[0-9]+)?$'",
+      "row_count": 9991,
+      "columns": [
+        {
+          "name": "movie_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "References movies.movie_id",
+          "description": "Unique identifier for each movie, used as foreign key in movie_ratings junction table"
+        },
+        {
+          "name": "rating_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "References ratings.rating_id",
+          "description": "Unique identifier for each rating, used as foreign key in movie_ratings junction table"
+        }
+      ],
+      "sample_data": [
+        {
+          "movie_id": 396,
+          "rating_id": 54
+        },
+        {
+          "movie_id": 5001,
+          "rating_id": 48
+        },
+        {
+          "movie_id": 8273,
+          "rating_id": 17
+        }
+      ],
+      "educational_purpose": "Practice RIGHT JOINs to find movies without a rating, demonstrate many-to-many relationships, and practice foreign key relationships"
+    },
+    {
+      "id": 5,
+      "name": "movies",
+      "description": "Main movie table containing all movie details. Enables complex queries and JOIN operations. Handles data quality issues by filtering out invalid rows and ensuring required fields are present.",
+      "creation_query": "SELECT SETSEED(0.42); CREATE TABLE movies AS SELECT ROW_NUMBER() OVER (ORDER BY RANDOM()) as movie_id, Title as title, Release_Date as release_date, Overview as overview, CAST(Popularity as DECIMAL(10,3)) as popularity, CASE WHEN Vote_Count ~ '^[0-9]+$' THEN CAST(Vote_Count as INTEGER) ELSE NULL END as vote_count, Poster_Url as poster_url FROM movies_dataset WHERE Title IS NOT NULL AND Release_Date IS NOT NULL ORDER BY RANDOM() LIMIT (SELECT CAST(0.95 * COUNT(*) AS INTEGER) FROM movies_dataset WHERE Title IS NOT NULL)",
+      "row_count": 9337,
+      "columns": [
+        {
+          "name": "movie_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "References movies.movie_id",
+          "description": "Unique identifier for each movie, used as foreign key in movie_languages, movie_ratings, and movies junction tables"
+        },
+        {
+          "name": "title",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Movie title, used for JOIN operations and filtering"
+        },
+        {
+          "name": "release_date",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Movie release date, used for temporal analysis and JOIN operations"
+        },
+        {
+          "name": "overview",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Movie overview, used for JOIN operations and filtering"
+        },
+        {
+          "name": "popularity",
+          "type": "DECIMAL(10,3)",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Movie popularity score, used for JOIN operations and filtering"
+        },
+        {
+          "name": "vote_count",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Number of votes for the movie, used for JOIN operations and filtering"
+        },
+        {
+          "name": "poster_url",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "URL of the movie poster, used for JOIN operations and filtering"
+        }
+      ],
+      "sample_data": [
+        {
+          "movie_id": 396,
+          "title": "Mune: Guardian of the Moon",
+          "release_date": "2015-02-05",
+          "overview": "When a faun named Mune becomes the Guardian of the Moon, little did he had unprepared experience with the Moon and an accident that could put both the Moon and the Sun in danger, including a corrupt titan named Necross who wants the Sun for himself and placing the balance of night and day in great peril. Now with the help of a wax-child named Glim and the warrior, Sohone who also became the Sun Guardian, they go out on an exciting journey to get the Sun back and restore the Moon to their rightful place in the sky.",
+          "popularity": 22.142,
+          "vote_count": 443,
+          "poster_url": "https://image.tmdb.org/t/p/original/4vzqow7mVUahqA4hHoe2UpQOxy.jpg"
+        },
+        {
+          "movie_id": 5001,
+          "title": "Demolition",
+          "release_date": "2016-04-06",
+          "overview": "An emotionally desperate investment banker finds hope through a woman he meets.",
+          "popularity": 17.095,
+          "vote_count": 1662,
+          "poster_url": "https://image.tmdb.org/t/p/original/4t56LZ1KbOOxgKfqMKN6truBDVc.jpg"
+        },
+        {
+          "movie_id": 8273,
+          "title": "Uncharted",
+          "release_date": "2022-02-10",
+          "overview": "A young street-smart, Nathan Drake and his wisecracking partner Victor “Sully” Sullivan embark on a dangerous pursuit of “the greatest treasure never found” while also tracking clues that may lead to Nathan’s long-lost brother.",
+          "popularity": 866.391,
+          "vote_count": 691,
+          "poster_url": "https://image.tmdb.org/t/p/original/sqLowacltbZLoCa4KYye64RvvdQ.jpg"
+        }
+      ],
+      "educational_purpose": "Practice complex JOIN operations, subqueries, and CTEs with this main movie table. Demonstrate data quality handling and filtering."
+    },
+    {
+      "id": 6,
+      "name": "movies_dataset",
+      "description": "Raw movie dataset containing all original movie details. Enables practice of complex JOINs, subqueries, and CTEs. Handles data quality issues including invalid dates, missing values, and format inconsistencies.",
+      "creation_query": "",
+      "row_count": 9837,
+      "columns": [
+        {
+          "name": "Release_Date",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Movie release date, used for temporal analysis and JOIN operations"
+        },
+        {
+          "name": "Title",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Movie title, used for JOIN operations and filtering"
+        },
+        {
+          "name": "Overview",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Movie overview, used for JOIN operations and filtering"
+        },
+        {
+          "name": "Popularity",
+          "type": "DOUBLE",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Movie popularity score, used for JOIN operations and filtering"
+        },
+        {
+          "name": "Vote_Count",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Number of votes for the movie, used for JOIN operations and filtering"
+        },
+        {
+          "name": "Vote_Average",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Movie average rating score, used for JOIN operations and filtering"
+        },
+        {
+          "name": "Original_Language",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Movie original language code, used for JOIN operations and filtering"
+        },
+        {
+          "name": "Genre",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Movie genre, used for JOIN operations and filtering"
+        },
+        {
+          "name": "Poster_Url",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "URL of the movie poster, used for JOIN operations and filtering"
+        }
+      ],
+      "sample_data": [
+        {
+          "Release_Date": "2021-12-15",
+          "Title": "Spider-Man: No Way Home",
+          "Overview": "Peter Parker is unmasked and no longer able to separate his normal life from the high-stakes of being a super-hero. When he asks for help from Doctor Strange the stakes become even more dangerous, forcing him to discover what it truly means to be Spider-Man.",
+          "Popularity": 5083.954,
+          "Vote_Count": 8940,
+          "Vote_Average": 8.3,
+          "Original_Language": "en",
+          "Genre": "Action, Adventure, Science Fiction",
+          "Poster_Url": "https://image.tmdb.org/t/p/original/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg"
+        },
+        {
+          "Release_Date": "2022-03-01",
+          "Title": "The Batman",
+          "Overview": "In his second year of fighting crime, Batman uncovers corruption in Gotham City that connects to his own family while facing a serial killer known as the Riddler.",
+          "Popularity": 3827.658,
+          "Vote_Count": 1151,
+          "Vote_Average": 8.1,
+          "Original_Language": "en",
+          "Genre": "Crime, Mystery, Thriller",
+          "Poster_Url": "https://image.tmdb.org/t/p/original/74xTEgt7R36Fpooo50r9T25onhq.jpg"
+        },
+        {
+          "Release_Date": "2022-02-25",
+          "Title": "No Exit",
+          "Overview": "Stranded at a rest stop in the mountains during a blizzard, a recovering addict discovers a kidnapped child hidden in a car belonging to one of the people inside the building which sets her on a terrifying struggle to identify who among them is the kidnapper.",
+          "Popularity": 2618.087,
+          "Vote_Count": 122,
+          "Vote_Average": 6.3,
+          "Original_Language": "en",
+          "Genre": "Thriller",
+          "Poster_Url": "https://image.tmdb.org/t/p/original/vDHsLnOWKlPGmWs0kGfuhNF4w5l.jpg"
+        }
+      ],
+      "educational_purpose": "Practice complex JOINs, subqueries, and CTEs with this raw dataset. Demonstrate data quality handling and filtering."
+    },
+    {
+      "id": 7,
+      "name": "ratings",
+      "description": "Rating reference table containing all unique rating scores found in the movie dataset, plus additional rating entries to enable RIGHT JOIN exercises. Maps rating scores to human-readable categories.",
+      "creation_query": "SELECT SETSEED(0.42); CREATE TABLE ratings AS SELECT ROW_NUMBER() OVER (ORDER BY CAST(rating_score as DECIMAL(3,1))) as rating_id, CAST(rating_score as DECIMAL(3,1)) as rating_score, CASE WHEN CAST(rating_score as DECIMAL(3,1)) >= 8.0 THEN 'Excellent' WHEN CAST(rating_score as DECIMAL(3,1)) >= 7.0 THEN 'Very Good' WHEN CAST(rating_score as DECIMAL(3,1)) >= 6.0 THEN 'Good' WHEN CAST(rating_score as DECIMAL(3,1)) >= 5.0 THEN 'Average' ELSE 'Poor' END as rating_category FROM (SELECT DISTINCT Vote_Average as rating_score FROM movies_dataset WHERE Vote_Average IS NOT NULL AND Vote_Average != '' AND Vote_Average ~ '^[0-9]+(\\.[0-9]+)?$') ORDER BY CAST(rating_score as DECIMAL(3,1))",
+      "row_count": 74,
+      "columns": [
+        {
+          "name": "rating_id",
+          "type": "BIGINT",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "References ratings.rating_id",
+          "description": "Unique identifier for each rating, used as foreign key in movie_ratings junction table"
+        },
+        {
+          "name": "rating_score",
+          "type": "DECIMAL(3,1)",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Movie rating score, used for JOIN operations and filtering"
+        },
+        {
+          "name": "rating_category",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "foreign_key": "",
+          "description": "Human-readable rating category (e.g., 'Excellent', 'Very Good', 'Good', 'Average', 'Poor') based on rating score"
+        }
+      ],
+      "sample_data": [
+        {
+          "rating_id": 1,
+          "rating_score": 0.0,
+          "rating_category": "Poor"
+        },
+        {
+          "rating_id": 2,
+          "rating_score": 1.5,
+          "rating_category": "Poor"
+        },
+        {
+          "rating_id": 3,
+          "rating_score": 1.8,
+          "rating_category": "Poor"
+        }
+      ],
+      "educational_purpose": "Enable RIGHT JOIN exercises to find movies with zero ratings, demonstrate foreign key relationships, and practice rating-based filtering and analysis"
+    }
+  ],
+  "relationships": [
+    {
+      "type": "one-to-many",
+      "from_table": "decades",
+      "from_column": "decade_id",
+      "to_table": "decades",
+      "to_column": "decade_id",
+      "description": "SELF JOIN exercise: Compare movies within and across decades to analyze trends and identify outliers."
+    },
+    {
+      "type": "one-to-many",
+      "from_table": "languages",
+      "from_column": "language_id",
+      "to_table": "languages",
+      "to_column": "language_id",
+      "description": "Self-referential JOIN exercise: Find languages that do not have any movies."
+    },
+    {
+      "type": "one-to-many",
+      "from_table": "movies",
+      "from_column": "movie_id",
+      "to_table": "movie_languages",
+      "to_column": "movie_id",
+      "description": "Many-to-many relationship: Movies can have multiple languages, and languages can be spoken in multiple movies."
+    },
+    {
+      "type": "one-to-many",
+      "from_table": "languages",
+      "from_column": "language_id",
+      "to_table": "movie_languages",
+      "to_column": "language_id",
+      "description": "Many-to-many relationship: Languages can be spoken in multiple movies, and movies can have multiple languages."
+    },
+    {
+      "type": "one-to-many",
+      "from_table": "movies",
+      "from_column": "movie_id",
+      "to_table": "movie_ratings",
+      "to_column": "movie_id",
+      "description": "Many-to-many relationship: Movies can have multiple ratings, and ratings can be assigned to multiple movies."
+    },
+    {
+      "type": "one-to-many",
+      "from_table": "ratings",
+      "from_column": "rating_id",
+      "to_table": "movie_ratings",
+      "to_column": "rating_id",
+      "description": "Many-to-many relationship: Ratings can be assigned to multiple movies, and movies can have multiple ratings."
+    },
+    {
+      "type": "one-to-many",
+      "from_table": "movies",
+      "from_column": "movie_id",
+      "to_table": "movies",
+      "to_column": "movie_id",
+      "description": "Self-referential JOIN exercise: Find movies that are related to themselves (e.g., movies with the same title)."
+    },
+    {
+      "type": "one-to-many",
+      "from_table": "ratings",
+      "from_column": "rating_id",
+      "to_table": "ratings",
+      "to_column": "rating_id",
+      "description": "Self-referential JOIN exercise: Find ratings that are related to themselves (e.g., ratings with the same score)."
+    }
+  ],
+  "schema_notes": [
+    "Database contains 8 foreign key relationships ensuring referential integrity",
+    "Junction tables detected: movie_languages, movie_ratings - implementing many-to-many relationships",
+    "Decades table provides a normalized structure for temporal analysis and SELF JOIN exercises.",
+    "Languages table enables RIGHT JOIN exercises to find languages with zero movies.",
+    "Movies table is the main table for complex queries and JOIN operations.",
+    "Movies_dataset table is the raw source for complex JOINs, subqueries, and CTEs."
+  ],
+  "agent_enhancement_needed": {
+    "description": "The following fields need agent enhancement",
+    "fields_to_enhance": [
+      "metadata.description",
+      "metadata.source",
+      "metadata.use_cases",
+      "tables[].description",
+      "tables[].educational_purpose",
+      "tables[].columns[].description",
+      "relationships[].description",
+      "schema_notes (empty strings)"
+    ]
+  }
+}

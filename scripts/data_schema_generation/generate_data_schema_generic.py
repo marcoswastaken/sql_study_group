@@ -353,11 +353,19 @@ def generate_data_schema(dataset_name):
     else:
         db_name = dataset_name
 
+    # Convert dashes to underscores for consistency (e.g., "movies-dataset" -> "movies_dataset")
+    db_name = db_name.replace("-", "_")
+
     # Ensure db_name starts with 'data_' if it doesn't already
     if not db_name.startswith("data_"):
         db_name = f"data_{db_name}"
 
-    db_path = f"../../datasets/{db_name}.db"
+    # Use absolute path relative to project root, not current working directory
+    from pathlib import Path
+
+    project_root = Path(__file__).parent.parent.parent
+    db_path = str(project_root / "datasets" / f"{db_name}.db")
+
     if not os.path.exists(db_path):
         print(f"❌ Database not found: {db_path}")
         return False
@@ -404,8 +412,11 @@ def generate_data_schema(dataset_name):
         },
     }
 
-    # Save to schemas directory
-    output_path = f"../../schemas/data_schema_{dataset_name}.json"
+    # Save to schemas directory using absolute path
+    from pathlib import Path
+
+    project_root = Path(__file__).parent.parent.parent
+    output_path = str(project_root / "schemas" / f"data_schema_{dataset_name}.json")
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
     with open(output_path, "w", encoding="utf-8") as f:
