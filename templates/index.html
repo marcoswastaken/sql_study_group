@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL Practice - Week 4 JOIN Operations</title>
+    <title>SQL Practice - {{ week_metadata.title }}</title>
     <style>
         * {
             margin: 0;
@@ -234,6 +234,12 @@
             margin-left: 0.5rem;
         }
 
+        .fk-indicator {
+            cursor: help;
+            text-decoration: underline;
+            text-decoration-style: dotted;
+        }
+
         .column-description {
             color: #4a5568;
             font-size: 0.85rem;
@@ -439,6 +445,15 @@
             background: #38a169;
         }
 
+        .btn-info {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #3182ce;
+        }
+
         .results-section {
             border: 1px solid #e2e8f0;
             border-radius: 8px;
@@ -583,7 +598,7 @@
     <div class="container">
         <header>
             <h1>SQL Practice Lab</h1>
-            <p class="subtitle">Week 4: JOIN Operations - Data Jobs Dataset</p>
+            <p class="subtitle">{{ week_metadata.title }}</p>
         </header>
 
         <div class="main-content">
@@ -620,7 +635,7 @@
                                         <div class="column-key">PK</div>
                                         {% endif %}
                                         {% if column.foreign_key %}
-                                        <div class="column-key">FK</div>
+                                        <div class="column-key fk-indicator" title="Foreign Key - References another table's primary key">FK</div>
                                         {% endif %}
                                     </div>
                                     {% if column.description %}
@@ -669,7 +684,8 @@
                     <div class="button-group">
                         <button class="btn btn-primary" id="execute-btn">Execute Query</button>
                         <button class="btn btn-secondary" id="validate-btn">Validate Query</button>
-                        <button class="btn btn-success" id="show-solution-btn">Show Solution</button>
+                        <button class="btn btn-info" id="show-hint-btn">Show Hint</button>
+                        <button class="btn btn-success" id="show-solution-btn">Show Possible Solution</button>
                     </div>
                 </div>
 
@@ -688,7 +704,7 @@
 
                 <div id="solution-section" class="section hidden">
                     <div class="solution-section">
-                        <h4>🔍 Official Solution</h4>
+                        <h4>🔍 Possible Solution</h4>
                         <div id="solution-query" class="solution-query"></div>
                         <div id="solution-results"></div>
                     </div>
@@ -701,6 +717,8 @@
         // Application state
         let currentExercise = null;
         let currentResults = null;
+        let exerciseInputs = {}; // Store user inputs for each exercise
+        let currentHintIndex = 0; // Track current hint progress
 
         // DOM elements
         const exerciseItems = document.querySelectorAll('.exercise-item');
@@ -711,6 +729,7 @@
         const queryInput = document.getElementById('query-input');
         const executeBtn = document.getElementById('execute-btn');
         const validateBtn = document.getElementById('validate-btn');
+        const showHintBtn = document.getElementById('show-hint-btn');
         const showSolutionBtn = document.getElementById('show-solution-btn');
         const resultsTitle = document.getElementById('results-title');
         const resultsMeta = document.getElementById('results-meta');
@@ -731,7 +750,30 @@
 
         executeBtn.addEventListener('click', executeQuery);
         validateBtn.addEventListener('click', validateQuery);
+        showHintBtn.addEventListener('click', showHint);
         showSolutionBtn.addEventListener('click', showSolution);
+
+        // Enable tab key functionality in textarea
+        queryInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+
+                // Insert tab character
+                this.value = this.value.substring(0, start) + '\t' + this.value.substring(end);
+
+                // Put cursor after tab
+                this.selectionStart = this.selectionEnd = start + 1;
+            }
+        });
+
+        // Save user input when they type
+        queryInput.addEventListener('input', function() {
+            if (currentExercise) {
+                exerciseInputs[currentExercise.id] = this.value;
+            }
+        });
 
         // Table filter event listeners
         tableFilterCheckboxes.forEach(checkbox => {
@@ -757,7 +799,20 @@
                     querySection.classList.remove('hidden');
                     resultsSection.classList.add('hidden');
                     solutionSection.classList.add('hidden');
-                    queryInput.value = '';
+
+                    // Hide hint section if it exists
+                    const hintSection = document.getElementById('hint-section');
+                    if (hintSection) {
+                        hintSection.classList.add('hidden');
+                    }
+
+                    // Restore user's previous input for this exercise or clear if none
+                    queryInput.value = exerciseInputs[exercise.id] || '';
+
+                    // Reset hint progress for new exercise
+                    currentHintIndex = 0;
+                    showHintBtn.textContent = 'Show Hint';
+                    showHintBtn.disabled = false;
                 } else {
                     throw new Error(exercise.error || 'Failed to load exercise');
                 }
@@ -914,6 +969,52 @@
             return `<table class="results-table"><thead><tr>${header}</tr></thead><tbody>${rows}</tbody></table>`;
         }
 
+        // Show hint - progressively reveals lines of the solution
+        function showHint() {
+            if (!currentExercise) return;
+
+            const solutionLines = currentExercise.solution.split('\n').filter(line => line.trim() !== '');
+
+            if (currentHintIndex >= solutionLines.length) {
+                showHintBtn.textContent = 'All hints shown';
+                showHintBtn.disabled = true;
+                return;
+            }
+
+            // Get the hint lines up to current index
+            const hintLines = solutionLines.slice(0, currentHintIndex + 1);
+            const hintText = hintLines.join('\n');
+
+            // Create or update hint display
+            let hintSection = document.getElementById('hint-section');
+            if (!hintSection) {
+                hintSection = document.createElement('div');
+                hintSection.id = 'hint-section';
+                hintSection.className = 'section';
+                hintSection.innerHTML = `
+                    <div class="solution-section">
+                        <h4>💡 Hint ${currentHintIndex + 1}/${solutionLines.length}</h4>
+                        <div id="hint-query" class="solution-query"></div>
+                    </div>
+                `;
+                // Insert hint section before solution section
+                solutionSection.parentNode.insertBefore(hintSection, solutionSection);
+            }
+
+            const hintQuery = document.getElementById('hint-query');
+            hintQuery.textContent = hintText;
+            hintSection.classList.remove('hidden');
+
+            currentHintIndex++;
+
+            if (currentHintIndex >= solutionLines.length) {
+                showHintBtn.textContent = 'All hints shown';
+                showHintBtn.disabled = true;
+            } else {
+                showHintBtn.textContent = `Show Hint (${currentHintIndex + 1}/${solutionLines.length})`;
+            }
+        }
+
         // Show solution
         async function showSolution() {
             if (!currentExercise) return;
@@ -923,6 +1024,12 @@
             showSolutionBtn.textContent = 'Loading...';
 
             try {
+                // Hide hint section when showing full solution
+                const hintSection = document.getElementById('hint-section');
+                if (hintSection) {
+                    hintSection.classList.add('hidden');
+                }
+
                 // Display the solution
                 solutionQuery.textContent = currentExercise.solution;
 

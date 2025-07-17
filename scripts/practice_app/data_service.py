@@ -243,3 +243,22 @@ class DataService:
         if self.current_dataset is None:
             self.load_exercises()
         return self.current_dataset
+
+    def get_week_metadata(self) -> Dict[str, Any]:
+        """
+        Get week metadata for display in the header.
+
+        Returns:
+            Dictionary containing week metadata
+        """
+        if self.exercises_data is None:
+            self.load_exercises()
+
+        metadata = self.exercises_data.get("metadata", {})
+        return {
+            "week": metadata.get("week", self.week),
+            "title": metadata.get("title", f"Week {self.week} Practice"),
+            "description": metadata.get("description", "SQL Practice"),
+            "focus_topics": metadata.get("focus_topics", []),
+            "database": metadata.get("database", "database.db"),
+        }

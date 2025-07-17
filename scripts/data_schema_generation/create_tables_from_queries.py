@@ -74,29 +74,78 @@ def execute_table_creation(dataset_name, verbose=True, force_recreate=False):
 
     helper = SQLHelper(str(db_path))
 
-    # Drop existing tables if force_recreate is True
+    # Check which tables already exist
+    existing_tables = set()
+    try:
+        tables_result = helper.execute_query(
+            "SELECT name FROM sqlite_master WHERE type='table'"
+        )
+        if tables_result["status"] == "success" and tables_result["data"] is not None:
+            existing_tables = set(tables_result["data"]["name"].tolist())
+    except Exception as e:
+        if verbose:
+            print(f"   ⚠️  Could not check existing tables: {str(e)}")
+
+    # Handle existing tables based on force_recreate flag
     if force_recreate:
         print("🗑️  Dropping existing tables...")
         for table_name in queries_data["tables"].keys():
-            try:
-                drop_result = helper.execute_query(f"DROP TABLE IF EXISTS {table_name}")
-                if drop_result["status"] == "success":
+            if table_name in existing_tables:
+                try:
+                    drop_result = helper.execute_query(
+                        f"DROP TABLE IF EXISTS {table_name}"
+                    )
+                    if drop_result["status"] == "success":
+                        if verbose:
+                            print(f"   ✅ Dropped table: {table_name}")
+                    else:
+                        if verbose:
+                            print(
+                                f"   ⚠️  Could not drop table {table_name}: {drop_result.get('error', 'Unknown error')}"
+                            )
+                except Exception as e:
                     if verbose:
-                        print(f"   ✅ Dropped table: {table_name}")
-                else:
-                    if verbose:
-                        print(
-                            f"   ⚠️  Could not drop table {table_name}: {drop_result.get('error', 'Unknown error')}"
-                        )
-            except Exception as e:
-                if verbose:
-                    print(f"   ⚠️  Error dropping table {table_name}: {str(e)}")
+                        print(f"   ⚠️  Error dropping table {table_name}: {str(e)}")
+    else:
+        # In preserve mode, skip tables that already exist
+        existing_required_tables = [
+            t for t in queries_data["tables"].keys() if t in existing_tables
+        ]
+        if existing_required_tables:
+            if verbose:
+                print(
+                    f"📋 Skipping existing tables: {', '.join(existing_required_tables)}"
+                )
 
     # Execute queries
     successful_tables = []
     failed_tables = []
 
     for table_name, table_info in queries_data["tables"].items():
+        # Skip table creation if it already exists and we're not force recreating
+        if not force_recreate and table_name in existing_tables:
+            # Get current row count
+            try:
+                count_result = helper.execute_query(
+                    f"SELECT COUNT(*) as count FROM {table_name}"
+                )
+                if count_result["status"] == "success":
+                    actual_count = count_result["data"].iloc[0]["count"]
+                    if verbose:
+                        print(f"\n📝 Table {table_name} already exists")
+                        print(f"   ✅ Preserved: {actual_count} rows exist")
+                    successful_tables.append((table_name, actual_count))
+                else:
+                    if verbose:
+                        print(f"\n📝 Table {table_name} already exists")
+                        print("   ✅ Preserved: Table exists (count unknown)")
+                    successful_tables.append((table_name, "preserved"))
+            except Exception:
+                if verbose:
+                    print(f"\n📝 Table {table_name} already exists")
+                    print("   ✅ Preserved: Table exists")
+                successful_tables.append((table_name, "preserved"))
+            continue
         if verbose:
             print(f"\n📝 Creating table: {table_name}")
             print(f"   Purpose: {table_info.get('educational_purpose', 'N/A')}")

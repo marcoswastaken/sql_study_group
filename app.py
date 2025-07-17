@@ -78,7 +78,15 @@ def index():
         # Get exercise list
         exercises = data_service.get_exercise_list()
 
-        return render_template("index.html", tables=tables, exercises=exercises)
+        # Get week metadata for header display
+        week_metadata = data_service.get_week_metadata()
+
+        return render_template(
+            "index.html",
+            tables=tables,
+            exercises=exercises,
+            week_metadata=week_metadata,
+        )
     except Exception as e:
         return f"Error loading application: {e}", 500
 

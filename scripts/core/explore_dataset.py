@@ -646,14 +646,15 @@ def main():
 
     # Set default output path if not provided
     if not args.output:
-        dataset_name = args.dataset.split("/")[-1]
+        dataset_name = args.dataset.split("/")[-1].replace("-", "_")
         # Always use absolute path relative to project root, not current working directory
+        # Follow naming convention: data_{dataset_name} (consistent with database naming)
         project_root = Path(__file__).parent.parent.parent
         args.output = str(
             project_root
             / "scripts"
             / "data_schema_generation"
-            / f"initial_exploration_{dataset_name}.json"
+            / f"initial_exploration_data_{dataset_name}.json"
         )
 
     # Create explorer and run analysis
