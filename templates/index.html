@@ -630,6 +630,139 @@
             display: none;
         }
 
+        /* Score Section Styles */
+        .score-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .score-display {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d3748;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .score-circle.perfect {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            transform: scale(1.1);
+            animation: pulse 1s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1.1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .score-details {
+            flex: 1;
+            color: white;
+        }
+
+        #score-text {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .score-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .score-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .score-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Confetti Animation */
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #f56565;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        .confetti-piece:nth-child(odd) {
+            background: #48bb78;
+            width: 8px;
+            height: 8px;
+            animation-duration: 3.2s;
+        }
+
+        .confetti-piece:nth-child(3n) {
+            background: #4299e1;
+            width: 6px;
+            height: 12px;
+            animation-duration: 2.8s;
+        }
+
+        .confetti-piece:nth-child(4n) {
+            background: #ed8936;
+            width: 12px;
+            height: 6px;
+            animation-duration: 3.4s;
+        }
+
+        .confetti-piece:nth-child(5n) {
+            background: #9f7aea;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation-duration: 3.1s;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -752,6 +885,17 @@
                             <span id="results-title">Query Results</span>
                             <span id="results-meta" class="results-meta"></span>
                         </div>
+                        <div id="score-section" class="score-section hidden">
+                            <div class="score-display">
+                                <div class="score-circle">
+                                    <span id="score-percentage">0%</span>
+                                </div>
+                                <div class="score-details">
+                                    <div id="score-text">Click 'Execute Query' to see your score</div>
+                                    <button id="score-btn" class="score-btn hidden">Get Score</button>
+                                </div>
+                            </div>
+                        </div>
                         <div id="results-content" class="results-content">
                             <!-- Results will be populated here -->
                         </div>
@@ -793,6 +937,13 @@
         const solutionQuery = document.getElementById('solution-query');
         const solutionResults = document.getElementById('solution-results');
 
+        // Score elements
+        const scoreSection = document.getElementById('score-section');
+        const scorePercentage = document.getElementById('score-percentage');
+        const scoreText = document.getElementById('score-text');
+        const scoreBtn = document.getElementById('score-btn');
+        const scoreCircle = document.querySelector('.score-circle');
+
         // Table filter elements
         const tableFilterCheckboxes = document.querySelectorAll('input[name="table-filter"]');
         const selectAllTablesBtn = document.getElementById('select-all-tables');
@@ -808,6 +959,7 @@
         validateBtn.addEventListener('click', validateQuery);
         showHintBtn.addEventListener('click', showHint);
         showSolutionBtn.addEventListener('click', showSolution);
+        scoreBtn.addEventListener('click', getScore);
 
         // Enable tab key functionality in textarea
         queryInput.addEventListener('keydown', function(e) {
@@ -909,6 +1061,13 @@
             resultsContent.innerHTML = '';
             resultsSection.classList.add('hidden');
             solutionSection.classList.add('hidden');
+            scoreSection.classList.add('hidden');
+            // Reset score display
+            scorePercentage.textContent = '0%';
+            scoreText.textContent = 'Click \'Execute Query\' to see your score';
+            scoreCircle.classList.remove('perfect');
+            scoreCircle.style.background = 'rgba(255, 255, 255, 0.9)';
+            scoreCircle.style.color = '#2d3748';
         }
 
         // Execute query
@@ -934,6 +1093,11 @@
 
                 const result = await response.json();
                 displayResults(result);
+
+                // Automatically get score if exercise is selected and query succeeded
+                if (currentExercise && result.success) {
+                    setTimeout(() => getScore(), 500); // Small delay for better UX
+                }
             } catch (error) {
                 console.error('Error executing query:', error);
                 displayResults({
@@ -1023,6 +1187,124 @@
             }).join('');
 
             return `<table class="results-table"><thead><tr>${header}</tr></thead><tbody>${rows}</tbody></table>`;
+        }
+
+        // Get score for current query
+        async function getScore() {
+            if (!currentExercise) {
+                alert('Please select an exercise first');
+                return;
+            }
+
+            const query = queryInput.value.trim();
+            if (!query) {
+                alert('Please enter a query first');
+                return;
+            }
+
+            scoreBtn.disabled = true;
+            scoreBtn.textContent = 'Scoring...';
+            scoreText.textContent = 'Calculating your score...';
+
+            try {
+                const response = await fetch('/api/score', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_query: query,
+                        solution_query: currentExercise.solution
+                    })
+                });
+
+                const result = await response.json();
+                displayScore(result);
+            } catch (error) {
+                console.error('Error getting score:', error);
+                scoreText.textContent = 'Error calculating score: ' + error.message;
+            } finally {
+                scoreBtn.disabled = false;
+                scoreBtn.textContent = 'Get Score';
+            }
+        }
+
+        // Display score results
+        function displayScore(result) {
+            scoreSection.classList.remove('hidden');
+
+            if (result.success && result.score) {
+                const score = result.score;
+                scorePercentage.textContent = score.percentage + '%';
+                scoreText.textContent = score.details;
+
+                // Remove any previous perfect class
+                scoreCircle.classList.remove('perfect');
+
+                // Handle perfect score (100% AND correct order)
+                if (score.percentage === 100 && score.order_correct !== false) {
+                    scoreCircle.classList.add('perfect');
+                    triggerConfetti();
+                    scoreText.textContent = '🎉 Perfect match! ' + score.details;
+                    scoreCircle.style.background = 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)';
+                    scoreCircle.style.color = 'white';
+                }
+                // Handle wrong order case (99% indicates perfect content but wrong order)
+                else if (score.percentage === 99 && score.has_perfect_content === true) {
+                    scoreText.textContent = '🔄 ' + score.details;
+                    scoreCircle.style.background = 'linear-gradient(135deg, #ecc94b 0%, #d69e2e 100%)';
+                    scoreCircle.style.color = 'white';
+                }
+                // Handle other scores with encouraging feedback
+                else {
+                    let message = score.details;
+                    let bgColor = '';
+
+                    if (score.percentage >= 80) {
+                        message = '🌟 Great job! ' + score.details;
+                        bgColor = 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)';
+                    } else if (score.percentage >= 60) {
+                        message = '📈 Getting closer! ' + score.details;
+                        bgColor = 'linear-gradient(135deg, #ecc94b 0%, #d69e2e 100%)';
+                    } else if (score.percentage >= 30) {
+                        message = '💪 Keep trying! ' + score.details;
+                        bgColor = 'linear-gradient(135deg, #ecc94b 0%, #d69e2e 100%)';
+                    } else {
+                        message = '🎯 Keep going! ' + score.details;
+                        bgColor = 'linear-gradient(135deg, #ecc94b 0%, #d69e2e 100%)';
+                    }
+
+                    scoreText.textContent = message;
+                    scoreCircle.style.background = bgColor;
+                    scoreCircle.style.color = 'white';
+                }
+            } else {
+                scorePercentage.textContent = '0%';
+                scoreText.textContent = result.score ? ('🤔 ' + result.score.details) : 'Unable to calculate score';
+                scoreCircle.style.background = 'rgba(255, 255, 255, 0.9)';
+                scoreCircle.style.color = '#2d3748';
+            }
+        }
+
+        // Trigger confetti animation
+        function triggerConfetti() {
+            const confettiContainer = document.createElement('div');
+            confettiContainer.className = 'confetti';
+            document.body.appendChild(confettiContainer);
+
+            // Create confetti pieces
+            for (let i = 0; i < 100; i++) {
+                const confettiPiece = document.createElement('div');
+                confettiPiece.className = 'confetti-piece';
+                confettiPiece.style.left = Math.random() * 100 + '%';
+                confettiPiece.style.animationDelay = Math.random() * 3 + 's';
+                confettiContainer.appendChild(confettiPiece);
+            }
+
+            // Remove confetti after animation
+            setTimeout(() => {
+                document.body.removeChild(confettiContainer);
+            }, 4000);
         }
 
         // Show hint - progressively reveals lines of the solution

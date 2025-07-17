@@ -204,6 +204,177 @@ def validate_query():
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
 
+@app.route("/api/score", methods=["POST"])
+def score_query():
+    """Score a user query against the expected solution."""
+    if not sql_service:
+        return jsonify({"error": "SQL service not available"}), 500
+
+    try:
+        data = request.get_json()
+        user_query = data.get("user_query", "")
+        solution_query = data.get("solution_query", "")
+
+        if not user_query or not solution_query:
+            return jsonify(
+                {"error": "Both user_query and solution_query required"}
+            ), 400
+
+        # Execute both queries
+        user_result = sql_service.execute_query(user_query)
+        solution_result = sql_service.execute_query(solution_query)
+
+        # Calculate score if both queries succeeded
+        if user_result.get("success") and solution_result.get("success"):
+            score_data = _calculate_query_score(user_result, solution_result)
+            return jsonify(
+                {
+                    "success": True,
+                    "user_result": user_result,
+                    "solution_result": solution_result,
+                    "score": score_data,
+                }
+            )
+        else:
+            # Return execution results even if one failed
+            return jsonify(
+                {
+                    "success": False,
+                    "user_result": user_result,
+                    "solution_result": solution_result,
+                    "score": {"percentage": 0, "details": "Query execution failed"},
+                }
+            )
+
+    except Exception as e:
+        return jsonify({"error": f"Server error: {str(e)}"}), 500
+
+
+def _calculate_query_score(user_result, solution_result):
+    """Calculate the match score between user and solution results."""
+    try:
+        user_data = user_result.get("data", [])
+        solution_data = solution_result.get("data", [])
+        user_columns = user_result.get("columns", [])
+        solution_columns = solution_result.get("columns", [])
+
+        # Check if columns match
+        if set(user_columns) != set(solution_columns):
+            return {
+                "percentage": 0,
+                "details": f"Column mismatch. Expected: {solution_columns}, Got: {user_columns}",
+                "matching_rows": 0,
+                "total_expected_rows": len(solution_data),
+                "user_row_count": len(user_data),
+                "order_correct": False,
+            }
+
+        # If both results are empty, it's a perfect match
+        if len(user_data) == 0 and len(solution_data) == 0:
+            return {
+                "percentage": 100,
+                "details": "Perfect match - both queries returned no rows",
+                "matching_rows": 0,
+                "total_expected_rows": 0,
+                "user_row_count": 0,
+                "order_correct": True,
+            }
+
+        # Convert solution data to tuples for comparison
+        # Sort by column names to ensure consistent ordering
+        sorted_columns = sorted(solution_columns)
+
+        def row_to_tuple(row):
+            """Convert a row dict to a sorted tuple for comparison."""
+            return tuple(str(row.get(col, "")) for col in sorted_columns)
+
+        # Convert to tuples for comparison
+        solution_tuples = [row_to_tuple(row) for row in solution_data]
+        user_tuples = [row_to_tuple(row) for row in user_data]
+
+        # Check if rows match regardless of order
+        solution_set = set(solution_tuples)
+        user_set = set(user_tuples)
+
+        # Calculate matching rows
+        matching_rows = len(solution_set.intersection(user_set))
+        total_expected_rows = len(solution_data)
+        user_row_count = len(user_data)
+
+        # Check if user has the correct number of rows and all match
+        has_exact_rows = user_row_count == total_expected_rows
+        has_all_correct_rows = matching_rows == total_expected_rows
+        has_perfect_content = has_exact_rows and has_all_correct_rows
+
+        # Check if order is correct (only if they have perfect content)
+        order_correct = has_perfect_content and solution_tuples == user_tuples
+
+        # Calculate percentage based on completeness and correctness
+        if total_expected_rows == 0:
+            percentage = 100 if user_row_count == 0 else 0
+        else:
+            # Base percentage on matching rows, but penalize for missing or extra rows
+            if user_row_count == total_expected_rows:
+                # Same number of rows - percentage based on how many are correct
+                percentage = round((matching_rows / total_expected_rows) * 100, 1)
+            elif user_row_count < total_expected_rows:
+                # Too few rows - even if all are correct, can't be 100%
+                max_possible = round((user_row_count / total_expected_rows) * 100, 1)
+                actual_score = round((matching_rows / total_expected_rows) * 100, 1)
+                percentage = min(max_possible, actual_score)
+            else:
+                # Too many rows - penalize for extra rows
+                percentage = round((matching_rows / total_expected_rows) * 100, 1)
+                if percentage > 0:
+                    # Apply penalty for extra rows (reduce by 10% for each extra row beyond 20% over)
+                    extra_rows = user_row_count - total_expected_rows
+                    if extra_rows > 0:
+                        penalty = min(extra_rows * 5, 30)  # Max 30% penalty
+                        percentage = max(0, percentage - penalty)
+
+        # Special case: perfect content but wrong order
+        if has_perfect_content and not order_correct:
+            return {
+                "percentage": 99,  # Almost perfect, but not quite
+                "details": "Almost! But you need to get your results in the correct order!",
+                "matching_rows": matching_rows,
+                "total_expected_rows": total_expected_rows,
+                "user_row_count": user_row_count,
+                "order_correct": False,
+                "has_perfect_content": True,
+            }
+
+        # Generate appropriate details message
+        if percentage == 100:
+            details = "Perfect match!"
+        elif user_row_count < total_expected_rows:
+            details = f"Found {matching_rows} correct rows, but you're missing {total_expected_rows - user_row_count} rows"
+        elif user_row_count > total_expected_rows:
+            details = f"Found {matching_rows} correct rows, but you have {user_row_count - total_expected_rows} extra rows"
+        else:
+            details = f"Found {matching_rows} of {total_expected_rows} expected rows"
+
+        return {
+            "percentage": percentage,
+            "details": details,
+            "matching_rows": matching_rows,
+            "total_expected_rows": total_expected_rows,
+            "user_row_count": user_row_count,
+            "order_correct": order_correct if percentage == 100 else False,
+            "has_perfect_content": has_perfect_content,
+        }
+
+    except Exception as e:
+        return {
+            "percentage": 0,
+            "details": f"Error calculating score: {str(e)}",
+            "matching_rows": 0,
+            "total_expected_rows": len(solution_result.get("data", [])),
+            "user_row_count": len(user_result.get("data", [])),
+            "order_correct": False,
+        }
+
+
 @app.route("/api/database/info")
 def get_database_info():
     """Get general database information."""
