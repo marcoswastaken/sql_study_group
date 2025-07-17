@@ -238,6 +238,57 @@
             cursor: help;
             text-decoration: underline;
             text-decoration-style: dotted;
+            position: relative;
+        }
+
+        .fk-indicator:hover {
+            background-color: #fee;
+            border-radius: 2px;
+            padding: 1px 2px;
+        }
+
+        /* Custom tooltip for FK indicator */
+        .fk-indicator::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.1s;
+            max-width: 300px;
+            white-space: normal;
+        }
+
+        .fk-indicator:hover::after {
+            opacity: 1;
+        }
+
+        /* Tooltip arrow */
+        .fk-indicator::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(100%);
+            border: 5px solid transparent;
+            border-top-color: #333;
+            z-index: 1001;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.1s;
+        }
+
+        .fk-indicator:hover::before {
+            opacity: 1;
         }
 
         .column-description {
@@ -635,7 +686,7 @@
                                         <div class="column-key">PK</div>
                                         {% endif %}
                                         {% if column.foreign_key %}
-                                        <div class="column-key fk-indicator" title="Foreign Key - References another table's primary key">FK</div>
+                                        <div class="column-key fk-indicator" title="Foreign Key: This column references the primary key of another table, creating a relationship between tables">FK</div>
                                         {% endif %}
                                     </div>
                                     {% if column.description %}
@@ -685,7 +736,7 @@
                         <button class="btn btn-primary" id="execute-btn">Execute Query</button>
                         <button class="btn btn-secondary" id="validate-btn">Validate Query</button>
                         <button class="btn btn-info" id="show-hint-btn">Show Hint</button>
-                        <button class="btn btn-success" id="show-solution-btn">Show Possible Solution</button>
+                        <button class="btn btn-success" id="show-solution-btn">Show Solution</button>
                     </div>
                 </div>
 
@@ -993,8 +1044,9 @@
                 hintSection.className = 'section';
                 hintSection.innerHTML = `
                     <div class="solution-section">
-                        <h4>💡 Hint ${currentHintIndex + 1}/${solutionLines.length}</h4>
+                        <h4>💡 Hint</h4>
                         <div id="hint-query" class="solution-query"></div>
+                        <p style="color: #666; font-style: italic; margin-top: 0.5rem;">Click 'Show Hint' again to see another line</p>
                     </div>
                 `;
                 // Insert hint section before solution section
@@ -1010,8 +1062,13 @@
             if (currentHintIndex >= solutionLines.length) {
                 showHintBtn.textContent = 'All hints shown';
                 showHintBtn.disabled = true;
+                // Update the hint message when all hints are shown
+                const hintMessage = document.querySelector('#hint-section p');
+                if (hintMessage) {
+                    hintMessage.textContent = 'All hint lines have been revealed!';
+                }
             } else {
-                showHintBtn.textContent = `Show Hint (${currentHintIndex + 1}/${solutionLines.length})`;
+                showHintBtn.textContent = 'Show Hint';
             }
         }
 
