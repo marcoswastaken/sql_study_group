@@ -1,0 +1,113 @@
+{
+  "metadata": {
+    "description": "Educational table creation queries for Week 5 advanced JOIN operations, subqueries, and CTEs practice",
+    "target_week": 5,
+    "core_concepts": [
+      "RIGHT JOIN",
+      "FULL OUTER JOIN",
+      "SELF JOIN",
+      "Subqueries (scalar, WHERE, SELECT, FROM)",
+      "CTEs (WITH clause)"
+    ],
+    "dataset_source": "Pablinho/movies-dataset",
+    "database_file": "data_movies_dataset.db",
+    "educational_focus": "Advanced JOINs, Subqueries, and CTEs with real-world messy data",
+    "complexity_progression": "Simple RIGHT JOINs -> SELF JOINs -> Complex subqueries -> Multi-step CTEs -> Data quality handling",
+    "created_date": "2025-07-15",
+    "sampling_method": "seeded_random_sampling",
+    "sampling_seed": 42,
+    "minimum_percentage": 95,
+    "deterministic_fix": "Uses SETSEED for consistent random sampling across runs",
+    "data_quality_note": "Preserves real-world data messiness for educational value"
+  },
+  "tables": {
+    "movies": {
+      "description": "Core movie information table - main fact table with real-world data quality issues",
+      "educational_purpose": "Main table for JOIN operations and demonstrates handling messy data with CASE statements",
+      "row_count_estimate": 9300,
+      "percentage_of_available": 95.0,
+      "available_count": 9837,
+      "query": "SELECT SETSEED(0.42); CREATE TABLE movies AS SELECT ROW_NUMBER() OVER (ORDER BY RANDOM()) as movie_id, Title as title, Release_Date as release_date, Overview as overview, CAST(Popularity as DECIMAL(10,3)) as popularity, CASE WHEN Vote_Count ~ '^[0-9]+$' THEN CAST(Vote_Count as INTEGER) ELSE NULL END as vote_count, Poster_Url as poster_url FROM movies_dataset WHERE Title IS NOT NULL AND Release_Date IS NOT NULL ORDER BY RANDOM() LIMIT (SELECT CAST(0.95 * COUNT(*) AS INTEGER) FROM movies_dataset WHERE Title IS NOT NULL)"
+    },
+    "languages": {
+      "description": "Language reference table for RIGHT JOIN exercises",
+      "educational_purpose": "Enable RIGHT JOIN exercises (find languages with no movies) and foreign key relationships",
+      "row_count_estimate": 44,
+      "percentage_of_available": 100.0,
+      "available_count": 44,
+      "query": "SELECT SETSEED(0.42); CREATE TABLE languages AS SELECT ROW_NUMBER() OVER (ORDER BY language_code) as language_id, language_code, CASE language_code WHEN 'en' THEN 'English' WHEN 'ja' THEN 'Japanese' WHEN 'es' THEN 'Spanish' WHEN 'fr' THEN 'French' WHEN 'ko' THEN 'Korean' WHEN 'zh' THEN 'Chinese' WHEN 'it' THEN 'Italian' WHEN 'cn' THEN 'Mandarin' WHEN 'ru' THEN 'Russian' WHEN 'de' THEN 'German' WHEN 'hi' THEN 'Hindi' WHEN 'pt' THEN 'Portuguese' WHEN 'ar' THEN 'Arabic' WHEN 'th' THEN 'Thai' WHEN 'sv' THEN 'Swedish' ELSE 'Other Language' END as language_name FROM (SELECT DISTINCT Original_Language as language_code FROM movies_dataset WHERE Original_Language IS NOT NULL) ORDER BY language_code"
+    },
+    "ratings": {
+      "description": "Rating categories for vote averages - filters out invalid ratings gracefully",
+      "educational_purpose": "Enable rating-based filtering and demonstrates data cleaning with WHERE clauses",
+      "row_count_estimate": 65,
+      "percentage_of_available": 100.0,
+      "available_count": 75,
+      "query": "SELECT SETSEED(0.42); CREATE TABLE ratings AS SELECT ROW_NUMBER() OVER (ORDER BY CAST(rating_score as DECIMAL(3,1))) as rating_id, CAST(rating_score as DECIMAL(3,1)) as rating_score, CASE WHEN CAST(rating_score as DECIMAL(3,1)) >= 8.0 THEN 'Excellent' WHEN CAST(rating_score as DECIMAL(3,1)) >= 7.0 THEN 'Very Good' WHEN CAST(rating_score as DECIMAL(3,1)) >= 6.0 THEN 'Good' WHEN CAST(rating_score as DECIMAL(3,1)) >= 5.0 THEN 'Average' ELSE 'Poor' END as rating_category FROM (SELECT DISTINCT Vote_Average as rating_score FROM movies_dataset WHERE Vote_Average IS NOT NULL AND Vote_Average != '' AND Vote_Average ~ '^[0-9]+(\\.[0-9]+)?$') ORDER BY CAST(rating_score as DECIMAL(3,1))"
+    },
+    "decades": {
+      "description": "Proper decade reference table (1980s, 1990s, 2000s, etc.) for temporal analysis",
+      "educational_purpose": "Enable decade-based exercises with clean, intuitive decade names",
+      "row_count_estimate": 5,
+      "percentage_of_available": 100.0,
+      "available_count": 5,
+      "query": "SELECT SETSEED(0.42); CREATE TABLE decades AS SELECT ROW_NUMBER() OVER (ORDER BY decade_start) as decade_id, decade_start, decade_end, decade_name FROM (VALUES (1980, 1989, '1980s'), (1990, 1999, '1990s'), (2000, 2009, '2000s'), (2010, 2019, '2010s'), (2020, 2029, '2020s')) AS t(decade_start, decade_end, decade_name)"
+    },
+    "movie_languages": {
+      "description": "Junction table linking movies to their original language - depends on movies and languages tables",
+      "educational_purpose": "Practice INNER JOINs and enable multi-table relationships with referential integrity",
+      "row_count_estimate": 9200,
+      "percentage_of_available": 95.0,
+      "available_count": 9700,
+      "query": "SELECT SETSEED(0.42); CREATE TABLE movie_languages AS SELECT m.movie_id, l.language_id FROM movies m INNER JOIN movies_dataset orig ON m.title = orig.Title INNER JOIN languages l ON orig.Original_Language = l.language_code WHERE orig.Original_Language IS NOT NULL"
+    },
+    "movie_ratings": {
+      "description": "Links movies to their rating categories - depends on movies and ratings tables",
+      "educational_purpose": "Practice JOIN operations with data quality filtering and categorical data",
+      "row_count_estimate": 8500,
+      "percentage_of_available": 90.0,
+      "available_count": 9400,
+      "query": "SELECT SETSEED(0.42); CREATE TABLE movie_ratings AS SELECT m.movie_id, r.rating_id FROM movies m INNER JOIN movies_dataset raw ON m.title = raw.Title INNER JOIN ratings r ON CAST(raw.Vote_Average as DECIMAL(3,1)) = r.rating_score WHERE raw.Vote_Average IS NOT NULL AND raw.Vote_Average != '' AND raw.Vote_Average ~ '^[0-9]+(\\.[0-9]+)?$'"
+    }
+  },
+  "educational_queries": [
+    {
+      "concept": "RIGHT JOIN with data quality",
+      "description": "Find all languages and their movie counts, including languages with zero movies - handles missing data",
+      "difficulty": "Medium",
+      "query_template": "SELECT l.language_name, COALESCE(COUNT(ml.movie_id), 0) as movie_count FROM languages l LEFT JOIN movie_languages ml ON l.language_id = ml.language_id GROUP BY l.language_id, l.language_name ORDER BY movie_count DESC"
+    },
+    {
+      "concept": "SELF JOIN with messy data",
+      "description": "Find movies released in the same decade with similar popularity - filters out NULL values",
+      "difficulty": "Hard",
+      "query_template": "SELECT m1.title, m2.title, m1.popularity, m2.popularity FROM movies m1 JOIN movies m2 ON SUBSTR(m1.release_date,1,4) = SUBSTR(m2.release_date,1,4) WHERE ABS(m1.popularity - m2.popularity) < 50 AND m1.movie_id < m2.movie_id AND m1.popularity IS NOT NULL AND m2.popularity IS NOT NULL"
+    },
+    {
+      "concept": "Subquery with data cleaning",
+      "description": "Movies with above-average popularity in their rating category - excludes movies with missing ratings",
+      "difficulty": "Medium",
+      "query_template": "SELECT m.title, m.popularity, r.rating_category FROM movies m JOIN movie_ratings mr ON m.movie_id = mr.movie_id JOIN ratings r ON mr.rating_id = r.rating_id WHERE m.popularity > (SELECT AVG(m2.popularity) FROM movies m2 JOIN movie_ratings mr2 ON m2.movie_id = mr2.movie_id WHERE mr2.rating_id = mr.rating_id AND m2.popularity IS NOT NULL)"
+    },
+    {
+      "concept": "CTE with data quality handling",
+      "description": "Top 3 most productive decades with data quality metrics using multi-step analysis",
+      "difficulty": "Hard",
+      "query_template": "WITH decade_stats AS (SELECT d.decade_name, COUNT(m.movie_id) as movie_count, COUNT(m.vote_count) as movies_with_votes, AVG(m.popularity) as avg_popularity FROM decades d LEFT JOIN movies m ON (CAST(SUBSTR(m.release_date,1,4) as INTEGER) / 10) * 10 = d.decade_start GROUP BY d.decade_id, d.decade_name), top_decades AS (SELECT * FROM decade_stats WHERE movie_count > 0 ORDER BY movie_count DESC LIMIT 3) SELECT * FROM top_decades"
+    }
+  ],
+  "learning_progression": [
+    "Start with basic RIGHT JOINs demonstrating how to handle missing relationships",
+    "Progress to SELF JOINs while filtering out data quality issues",
+    "Practice subqueries for data cleaning and conditional aggregation",
+    "Combine concepts with CTEs for complex multi-step analysis including data quality metrics",
+    "Learn to work with real-world messy data using COALESCE, IS NULL, and regex filtering"
+  ],
+  "data_quality_lessons": [
+    "Use COALESCE to handle NULL values in aggregations",
+    "Filter invalid data with regex patterns and IS NOT NULL",
+    "Handle data type conversion errors gracefully",
+    "Include data quality metrics in analytical queries",
+    "Understand the impact of data quality on JOIN results"
+  ]
+}
