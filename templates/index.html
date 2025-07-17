@@ -486,7 +486,6 @@
         .results-section {
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            overflow: hidden;
         }
 
         .results-header {
@@ -507,6 +506,8 @@
             padding: 1rem;
             overflow-x: auto;
             max-width: 100%;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .results-content::-webkit-scrollbar {
@@ -527,6 +528,32 @@
             background: #a1a1a1;
         }
 
+        /* Solution results container - same overflow behavior as results-content */
+        #solution-results {
+            overflow-x: auto;
+            max-width: 100%;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #solution-results::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        #solution-results::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        #solution-results::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+
+        #solution-results::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+
         .error-message {
             background: #fed7d7;
             color: #c53030;
@@ -544,10 +571,10 @@
         }
 
         .results-table {
-            width: 100%;
             border-collapse: collapse;
             margin-top: 1rem;
             min-width: max-content;
+            width: max-content;
         }
 
         .results-table th,
@@ -789,11 +816,11 @@
                 const start = this.selectionStart;
                 const end = this.selectionEnd;
 
-                // Insert tab character
-                this.value = this.value.substring(0, start) + '\t' + this.value.substring(end);
+                // Insert 4 spaces instead of tab character
+                this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
 
-                // Put cursor after tab
-                this.selectionStart = this.selectionEnd = start + 1;
+                // Put cursor after the 4 spaces
+                this.selectionStart = this.selectionEnd = start + 4;
             }
         });
 
