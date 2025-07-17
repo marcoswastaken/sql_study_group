@@ -30,9 +30,9 @@
       "working_exercises": 6,
       "failed_exercises": 0,
       "success_rate": 100.0,
-      "total_execution_time": 0.043,
-      "average_execution_time": 0.007,
-      "test_date": "2025-07-14 12:16:49"
+      "total_execution_time": 0.2,
+      "average_execution_time": 0.033,
+      "test_date": "2025-07-16 20:12:50"
     }
   },
   "exercises": [
@@ -51,7 +51,7 @@
       "educational_focus": "Shows how joining location data with job postings reveals platform competition patterns across different geographic markets. Removed unnecessary WHERE constraint to simplify query while maintaining educational value.",
       "result": {
         "working": true,
-        "execution_time": 0.011,
+        "execution_time": 0.04,
         "row_count": 30,
         "columns": [
           "job_country",
@@ -60,19 +60,19 @@
         ],
         "sample_results": [
           {
-            "job_country": "Argentina",
-            "platform_name": "via LinkedIn",
-            "platform_jobs_in_country": "282"
+            "job_country": "Albania",
+            "platform_name": "via LinkedIn Albania",
+            "platform_jobs_in_country": "40"
           },
           {
             "job_country": "Argentina",
-            "platform_name": "via Recruit.net",
-            "platform_jobs_in_country": "103"
+            "platform_name": "via LinkedIn",
+            "platform_jobs_in_country": "30541"
           },
           {
             "job_country": "Argentina",
             "platform_name": "via Indeed",
-            "platform_jobs_in_country": "56"
+            "platform_jobs_in_country": "4408"
           }
         ],
         "error": null
@@ -94,8 +94,8 @@
       "educational_focus": "Demonstrates combining platform capacity data with actual usage patterns to understand business models. Shows realistic utilization rates (~75%) and employer diversity across 60+ platforms.",
       "result": {
         "working": true,
-        "execution_time": 0.008,
-        "row_count": 2,
+        "execution_time": 0.031,
+        "row_count": 15,
         "columns": [
           "platform_name",
           "platform_capacity",
@@ -107,16 +107,23 @@
           {
             "platform_name": "via LinkedIn",
             "platform_capacity": "186679",
-            "unique_companies": "1079",
-            "actual_jobs_posted": "1952",
-            "avg_jobs_per_company": "1.81"
+            "unique_companies": "38014",
+            "actual_jobs_posted": "139951",
+            "avg_jobs_per_company": "3.68"
+          },
+          {
+            "platform_name": "via BeBee",
+            "platform_capacity": "103507",
+            "unique_companies": "26651",
+            "actual_jobs_posted": "77504",
+            "avg_jobs_per_company": "2.91"
           },
           {
             "platform_name": "via Trabajo.org",
             "platform_capacity": "61562",
-            "unique_companies": "911",
-            "actual_jobs_posted": "1308",
-            "avg_jobs_per_company": "1.44"
+            "unique_companies": "18572",
+            "actual_jobs_posted": "46277",
+            "avg_jobs_per_company": "2.49"
           }
         ],
         "error": null
@@ -140,7 +147,7 @@
       "educational_focus": "Shows how joins enable cross-table analysis by combining job classification data with geographic information. Simplified by removing redundant salary columns and focusing on data availability patterns.",
       "result": {
         "working": true,
-        "execution_time": 0.004,
+        "execution_time": 0.019,
         "row_count": 15,
         "columns": [
           "job_country",
@@ -151,21 +158,21 @@
         "sample_results": [
           {
             "job_country": "United States",
-            "data_scientist_positions": "814",
-            "positions_with_salary": "40",
-            "salary_data_percentage": "4.91"
+            "data_scientist_positions": "47966",
+            "positions_with_salary": "3667",
+            "salary_data_percentage": "7.64"
           },
           {
             "job_country": "Sudan",
-            "data_scientist_positions": "355",
-            "positions_with_salary": "10",
-            "salary_data_percentage": "2.82"
+            "data_scientist_positions": "29381",
+            "positions_with_salary": "2334",
+            "salary_data_percentage": "7.94"
           },
           {
             "job_country": "India",
-            "data_scientist_positions": "264",
-            "positions_with_salary": "6",
-            "salary_data_percentage": "2.27"
+            "data_scientist_positions": "18026",
+            "positions_with_salary": "877",
+            "salary_data_percentage": "4.87"
           }
         ],
         "error": null
@@ -188,7 +195,7 @@
       "educational_focus": "Reveals platform specialization patterns by combining platform data with employment type information. Enhanced with other_types column to capture all employment data comprehensively.",
       "result": {
         "working": true,
-        "execution_time": 0.003,
+        "execution_time": 0.014,
         "row_count": 20,
         "columns": [
           "platform_name",
@@ -201,27 +208,27 @@
         "sample_results": [
           {
             "platform_name": "via LinkedIn",
-            "total_jobs": "1902",
-            "fulltime_jobs": "1377",
-            "contract_jobs": "501",
-            "other_types": "24",
-            "contract_percentage": "26.34"
+            "total_jobs": "135706",
+            "fulltime_jobs": "116039",
+            "contract_jobs": "12905",
+            "other_types": "6762",
+            "contract_percentage": "9.51"
+          },
+          {
+            "platform_name": "via BeBee",
+            "total_jobs": "75968",
+            "fulltime_jobs": "70044",
+            "contract_jobs": "889",
+            "other_types": "5035",
+            "contract_percentage": "1.17"
           },
           {
             "platform_name": "via Trabajo.org",
-            "total_jobs": "1307",
-            "fulltime_jobs": "1306",
-            "contract_jobs": "0",
-            "other_types": "1",
+            "total_jobs": "46239",
+            "fulltime_jobs": "45557",
+            "contract_jobs": "1",
+            "other_types": "681",
             "contract_percentage": "0.0"
-          },
-          {
-            "platform_name": "via Recruit.net",
-            "total_jobs": "773",
-            "fulltime_jobs": "730",
-            "contract_jobs": "29",
-            "other_types": "14",
-            "contract_percentage": "3.75"
           }
         ],
         "error": null
@@ -231,7 +238,7 @@
       "id": 5,
       "title": "Global Company Expansion Analysis",
       "statement": "Find companies that operate in many different places around the world. Use the `companies`, `job_postings`, and `locations` tables. Your result should show the company name (`company_name`), number of different locations (`unique_locations`), number of different countries (`unique_countries`), and total jobs posted (`total_jobs`). Only include companies with at least 10 different locations AND at least 100 total jobs. Order by unique locations first (highest first), then by unique countries (highest first), and limit to 20 rows.",
-      "solution": "SELECT c.company_name,\n       COUNT(DISTINCT l.job_location) AS unique_locations,\n       COUNT(DISTINCT l.job_country) AS unique_countries,\n       COUNT(jp.job_id) AS total_jobs\nFROM companies AS c\nINNER JOIN job_postings AS jp ON c.company_name = jp.company_name\nLEFT JOIN locations AS l ON jp.job_location = l.job_location\nGROUP BY c.company_name\nHAVING COUNT(DISTINCT l.job_location) >= 10 AND COUNT(jp.job_id) >= 100\nORDER BY unique_locations DESC, unique_countries DESC\nLIMIT 20;",
+      "solution": "SELECT c.company_name,\n       COUNT(DISTINCT jp.job_location) AS unique_locations,\n       COUNT(DISTINCT l.job_country) AS unique_countries,\n       COUNT(jp.job_id) AS total_jobs\nFROM companies AS c\nINNER JOIN job_postings AS jp ON c.company_name = jp.company_name\nLEFT JOIN locations AS l ON jp.job_location = l.job_location\nWHERE jp.job_location NOT IN ('Remote', 'Anywhere', 'N/A', 'Various', 'Multiple Locations', 'Worldwide')\n  AND jp.job_location IS NOT NULL\nGROUP BY c.company_name\nHAVING COUNT(DISTINCT jp.job_location) >= 10 AND COUNT(jp.job_id) >= 100\nORDER BY unique_locations DESC, unique_countries DESC\nLIMIT 20;",
       "topics": [
         "INNER JOIN",
         "LEFT JOIN",
@@ -244,8 +251,8 @@
       "educational_focus": "Demonstrates complex multi-table joins to analyze company expansion patterns across geographic markets",
       "result": {
         "working": true,
-        "execution_time": 0.007,
-        "row_count": 10,
+        "execution_time": 0.056,
+        "row_count": 20,
         "columns": [
           "company_name",
           "unique_locations",
@@ -254,22 +261,22 @@
         ],
         "sample_results": [
           {
-            "company_name": "Diverse Lynx",
-            "unique_locations": "51",
-            "unique_countries": "38",
-            "total_jobs": "362"
+            "company_name": "Robert Half",
+            "unique_locations": "336",
+            "unique_countries": "18",
+            "total_jobs": "1514"
           },
           {
-            "company_name": "Michael Page",
-            "unique_locations": "30",
-            "unique_countries": "39",
-            "total_jobs": "194"
+            "company_name": "Insight Global",
+            "unique_locations": "326",
+            "unique_countries": "6",
+            "total_jobs": "1890"
           },
           {
-            "company_name": "SynergisticIT",
-            "unique_locations": "29",
-            "unique_countries": "38",
-            "total_jobs": "205"
+            "company_name": "Guidehouse",
+            "unique_locations": "304",
+            "unique_countries": "3",
+            "total_jobs": "1607"
           }
         ],
         "error": null
@@ -294,8 +301,8 @@
       "educational_focus": "Advanced exercise demonstrating window functions and CTEs to analyze market leadership patterns. Shows which platforms dominate in the most countries, revealing global platform strategies.",
       "result": {
         "working": true,
-        "execution_time": 0.01,
-        "row_count": 5,
+        "execution_time": 0.04,
+        "row_count": 15,
         "columns": [
           "platform_name",
           "countries_led",
@@ -304,18 +311,18 @@
         "sample_results": [
           {
             "platform_name": "via LinkedIn",
-            "countries_led": "39",
-            "market_share_percentage": "78.0"
+            "countries_led": "75",
+            "market_share_percentage": "71.43"
           },
           {
             "platform_name": "via Trabajo.org",
-            "countries_led": "7",
-            "market_share_percentage": "14.0"
+            "countries_led": "4",
+            "market_share_percentage": "3.81"
           },
           {
-            "platform_name": "via BeBee",
-            "countries_led": "2",
-            "market_share_percentage": "4.0"
+            "platform_name": "via Emplois Trabajo.org",
+            "countries_led": "3",
+            "market_share_percentage": "2.86"
           }
         ],
         "error": null
