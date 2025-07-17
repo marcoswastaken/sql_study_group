@@ -23,7 +23,8 @@ python setup.py 5 --keep-tables
 1. **Auto-detects dataset**: Reads week exercise file → determines dataset (data_jobs, movies, etc.)
 2. **Installs dependencies**: Runs `pip install -r requirements.txt`
 3. **Creates database**: Downloads data from HuggingFace + creates tables
-4. **Starts web app**: Launches Flask interface at `http://localhost:5001`
+4. **Finds available port**: Checks port 5001, uses next available if busy
+5. **Starts web app**: Launches Flask interface at `http://localhost:[port]`
 
 ### Manual Control (if needed)
 ```bash

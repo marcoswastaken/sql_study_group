@@ -441,6 +441,7 @@ SQL_WEEK=5 python app.py     # Week 5 via environment variable
 1. **Detects dataset**: Reads the week's exercise file to determine which dataset to use
 2. **Downloads data**: Automatically downloads the dataset from HuggingFace
 3. **Creates tables**: Uses the table creation queries to build the database
-4. **Starts app**: Launches the Flask web interface at `http://localhost:5001`
+4. **Finds available port**: Checks port 5001, uses next available if busy
+5. **Starts app**: Launches the Flask web interface at the detected port
 
 The app automatically adapts to different weeks and datasets based on the exercise metadata.

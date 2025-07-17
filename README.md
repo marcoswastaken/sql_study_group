@@ -28,6 +28,8 @@ You don't need to install any packages manually - the script handles everything!
 
 ### Command-Line Setup
 
+#### Clone and Update this Project
+
 First, clone the repository. Navigate to the directory where you want to save the repository and run these commands:
 
 ```bash
@@ -36,21 +38,34 @@ git clone https://github.com/marcoswastaken/sql_study_group.git
 cd sql_study_group
 ```
 
-Then, run the setup script:
+If you have already cloned the repository, but you want the latest version, navigate the the `sql_study_group` directory and run this command:
+```bash
+# Pull the latest changes to your local copy
+git pull
+```
+
+#### Automated Setup
+
+This script will set up a virtual environment, download the dataset, prepare the database, and launch the app. The default command loads the exercises for Week 4.
 
 ```bash
 # Setup and start Week 4 (default)
 python setup.py
 ```
 
-If you want to load the exercises from a different week, you can specify the week number in the setup script:
+If you want to load the exercises from a specific week, you must include the week number in the setup script:
 
 ```bash
 # Setup and start any specific week
 python setup.py 5
 ```
 
+Once setup is complete, you should see message with a link you can use to access the app in your browser. The default is `http://127.0.0.1:5001` or `http://localhost:5001` but if the port `5001` was in use, the script will try to use a different port.
+
+
 ### Manual Setup (if needed)
+
+If you don't want the setup script to create a virtual environment for you, run these commands to get started:
 
 ```bash
 # Install dependencies
@@ -75,7 +90,8 @@ SQL_WEEK=5 python app.py     # Week 5 via environment variable
 ### What You Get
 
 - **Complete Automation**: One command handles everything from setup to app startup
-- **Interactive Web Interface**: Practice SQL queries in your browser at `http://localhost:5001`
+- **Interactive Web Interface**: Practice SQL queries in your browser (auto-detects available port)
+- **Smart Port Detection**: Automatically finds available port if 5001 is busy
 - **Real Datasets**: 785K+ job postings and other real-world data
 - **Progressive Exercises**: From basic SELECT to complex JOINs and window functions
 - **Instant Feedback**: Execute queries and see results immediately

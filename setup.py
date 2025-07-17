@@ -21,6 +21,7 @@ Examples:
 
 import json
 import os
+import socket
 import subprocess
 import sys
 from pathlib import Path
@@ -34,6 +35,42 @@ def is_virtual_environment():
     return hasattr(sys, "real_prefix") or (
         hasattr(sys, "base_prefix") and sys.base_prefix != sys.prefix
     )
+
+
+def find_available_port(start_port=5001, max_attempts=10):
+    """Find an available port starting from start_port with clear messaging."""
+    for port in range(start_port, start_port + max_attempts):
+        try:
+            # Create a socket and try to bind to the port
+            # Don't use SO_REUSEADDR for port detection - we want accurate availability
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                sock.bind(("localhost", port))
+                return port
+        except OSError:
+            # Port is already in use, show message and try the next one
+            if port == start_port:
+                print(
+                    f"🔄 Another process running on port {port}, trying another port..."
+                )
+            else:
+                print(f"🔄 Port {port} also busy, trying port {port + 1}...")
+            continue
+
+    # If we couldn't find an available port, raise an exception
+    raise RuntimeError(
+        f"Could not find an available port in range {start_port}-{start_port + max_attempts - 1}"
+    )
+
+
+def is_port_available(port):
+    """Check if a specific port is available."""
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            sock.bind(("localhost", port))
+            return True
+    except OSError:
+        return False
 
 
 def setup_virtual_environment():
@@ -311,24 +348,36 @@ def setup_environment(week, force_recreate=False):
         print(f"⚠️  Environment verification failed: {e}")
         print("💡 You can still try to run the app")
 
-    # Step 5: Start the app
+    # Step 5: Find available port and start the app
     print("\n🎉 Setup complete! Starting the SQL Practice App...")
     print("=" * 60)
     print(f"🎯 Week {week}: {metadata['title']}")
     print(f"📊 Dataset: {metadata['dataset_name']}")
-    print("🚀 Starting app at http://localhost:5001")
-    print("💡 Press Ctrl+C to stop the server")
+
+    # Find an available port
+    try:
+        port = find_available_port(start_port=5001, max_attempts=10)
+        if port != 5001:
+            print(f"✅ Found available port {port}")
+        print(f"🚀 Starting app at http://localhost:{port}")
+        print("💡 Press Ctrl+C to stop the server")
+    except RuntimeError as e:
+        print(f"❌ {e}")
+        print("💡 Please check for running services and try again")
+        return False
+
     print("=" * 60)
 
-    # Start the Flask app with the correct week
+    # Start the Flask app with the correct week and port
     try:
         os.environ["SQL_WEEK"] = str(week)
+        os.environ["SQL_PORT"] = str(port)
         subprocess.run([sys.executable, "app.py"], check=True)
     except KeyboardInterrupt:
         print("\n👋 App stopped by user")
     except subprocess.CalledProcessError as e:
         print(f"\n❌ App failed to start: {e}")
-        print("💡 Try running: python app.py")
+        print(f"💡 Try running: SQL_PORT={port} python app.py")
         return False
 
     return True

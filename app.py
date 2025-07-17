@@ -11,6 +11,7 @@ Examples:
 """
 
 import os
+import socket
 import sys
 
 from flask import Flask, jsonify, render_template, request
@@ -21,6 +22,31 @@ from scripts.practice_app.sql_service import SQLService
 
 app = Flask(__name__)
 CORS(app)
+
+
+def find_available_port(start_port=5001, max_attempts=10):
+    """Find an available port starting from start_port with clear messaging."""
+    for port in range(start_port, start_port + max_attempts):
+        try:
+            # Create a socket and try to bind to the port
+            # Don't use SO_REUSEADDR for port detection - we want accurate availability
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                sock.bind(("localhost", port))
+                return port
+        except OSError:
+            # Port is already in use, show message and try the next one
+            if port == start_port:
+                print(
+                    f"🔄 Another process running on port {port}, trying another port..."
+                )
+            else:
+                print(f"🔄 Port {port} also busy, trying port {port + 1}...")
+            continue
+
+    # If we couldn't find an available port, raise an exception
+    raise RuntimeError(
+        f"Could not find an available port in range {start_port}-{start_port + max_attempts - 1}"
+    )
 
 
 # Configuration: Week selection
@@ -408,5 +434,24 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"Warning: Database not found: {e}")
 
-    # Run the app
-    app.run(debug=True, host="0.0.0.0", port=5001)
+    # Smart port detection with clear messaging
+    try:
+        # First try environment variable if set
+        env_port = os.environ.get("SQL_PORT")
+        if env_port:
+            port = int(env_port)
+        else:
+            # Auto-detect available port with live messaging
+            port = find_available_port(start_port=5001, max_attempts=10)
+            if port != 5001:
+                print(f"✅ Found available port {port}")
+
+        print(f"🚀 Starting SQL Practice App on http://localhost:{port}")
+
+        # Run the app - disable reloader to avoid confusing restart messages
+        app.run(debug=True, host="0.0.0.0", port=port, use_reloader=False)
+
+    except RuntimeError as e:
+        print(f"❌ {e}")
+        print("💡 Please check for running services and try again")
+        sys.exit(1)
